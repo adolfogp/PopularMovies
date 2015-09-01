@@ -47,7 +47,10 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.0.0'
+    compile 'com.android.support:appcompat-v7:23.0.0',
+            'com.squareup.retrofit:retrofit:2.0.0-beta1',
+            'com.squareup.retrofit:converter-gson:2.0.0-beta1',
+            'org.apache.commons:commons-lang3:3.4'
 }
 
 // Required by Retrolambda - https://github.com/evant/gradle-retrolambda
