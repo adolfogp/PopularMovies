@@ -26,7 +26,11 @@ import android.view.ViewGroup;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+
+import mx.com.adolfogarcia.popularmovies.Configuration;
 import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
+import mx.com.adolfogarcia.popularmovies.PopularMoviesApplicationModule;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
 import mx.com.adolfogarcia.popularmovies.rest.TheMovieDbApi;
@@ -44,10 +48,18 @@ public class MainActivityFragment extends Fragment {
 
     private static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
+    @Inject Configuration mConfiguration;
+
     /**
      * Creates a new instance of {@link MainActivityFragment}.
      */
     public MainActivityFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ((PopularMoviesApplication) getActivity().getApplication()).getComponent().inject(this);
     }
 
     @Override
@@ -77,7 +89,7 @@ public class MainActivityFragment extends Fragment {
         TheMovieDbApi service = retrofit.create(TheMovieDbApi.class);
         // FIXME - Remove!
         Call<GeneralConfigurationJsonModel> configCall =
-                service.getConfiguration(PopularMoviesApplication.getTheMovieDbKey());
+                service.getConfiguration(mConfiguration.getMovieApiKey());
         try {
             Response<GeneralConfigurationJsonModel> response = configCall.execute();
             if (response.isSuccess()) {
