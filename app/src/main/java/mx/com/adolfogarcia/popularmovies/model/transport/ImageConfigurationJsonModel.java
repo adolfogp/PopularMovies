@@ -105,13 +105,13 @@ public class ImageConfigurationJsonModel {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 59)
-                .append(this.getBackdropSizes())
-                .append(this.getBaseUrl())
-                .append(this.getLogoSizes())
-                .append(this.getPosterSizes())
-                .append(this.getProfileSizes())
-                .append(this.getSecureBaseUrl())
-                .append(this.getStillSizes())
+                .append(this.backdropSizes)
+                .append(this.baseUrl)
+                .append(this.logoSizes)
+                .append(this.posterSizes)
+                .append(this.profileSizes)
+                .append(this.secureBaseUrl)
+                .append(this.stillSizes)
                 .hashCode();
     }
 
@@ -120,31 +120,31 @@ public class ImageConfigurationJsonModel {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof ImageConfigurationJsonModel)) {
+        if ((obj instanceof ImageConfigurationJsonModel) == false) {
             return false;
         }
         ImageConfigurationJsonModel that = (ImageConfigurationJsonModel) obj;
         return new EqualsBuilder()
-                .append(this.getBackdropSizes(), that.getBackdropSizes())
-                .append(this.getBaseUrl(), that.getBaseUrl())
-                .append(this.getLogoSizes(), that.getLogoSizes())
-                .append(this.getPosterSizes(), that.getPosterSizes())
-                .append(this.getProfileSizes(), that.getProfileSizes())
-                .append(this.getSecureBaseUrl(), that.getSecureBaseUrl())
-                .append(this.getStillSizes(), that.getStillSizes())
+                .append(this.backdropSizes, that.backdropSizes)
+                .append(this.baseUrl, that.baseUrl)
+                .append(this.logoSizes, that.logoSizes)
+                .append(this.posterSizes, that.posterSizes)
+                .append(this.profileSizes, that.profileSizes)
+                .append(this.secureBaseUrl, that.secureBaseUrl)
+                .append(this.stillSizes, that.stillSizes)
                 .isEquals();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("backdropSizes", this.getBackdropSizes())
-                .append("baseUrl", this.getBaseUrl())
-                .append("logoSizes", this.getLogoSizes())
-                .append("posterSizes", this.getPosterSizes())
-                .append("profileSizes", this.getProfileSizes())
-                .append("secureBaseUrl", this.getSecureBaseUrl())
-                .append("stillSizes", this.getStillSizes())
+                .append("backdropSizes", this.backdropSizes)
+                .append("baseUrl", this.baseUrl)
+                .append("logoSizes", this.logoSizes)
+                .append("posterSizes", this.posterSizes)
+                .append("profileSizes", this.profileSizes)
+                .append("secureBaseUrl", this.secureBaseUrl)
+                .append("stillSizes", this.stillSizes)
                 .toString();
     }
 

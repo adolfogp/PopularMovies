@@ -1,5 +1,6 @@
 package mx.com.adolfogarcia.popularmovies.rest;
 
+import mx.com.adolfogarcia.popularmovies.model.transport.DiscoverMoviePage;
 import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
 import retrofit.Call;
 import retrofit.Callback;
@@ -17,7 +18,11 @@ public interface TheMovieDbApi {
     /**
      * The API's base URL.
      */
-    String BASE_URL = "https://api.themoviedb.org/3";
+    String BASE_URL = "https://api.themoviedb.org/";
+
+    String SORT_BY_POPULARITY = "popularity.desc";
+
+    String SORT_BY_USER_RATING = "vote_average.desc";
 
     /**
      * Get the system wide configuration information.
@@ -27,5 +32,13 @@ public interface TheMovieDbApi {
      */
     @GET("/3/configuration")
     Call<GeneralConfigurationJsonModel> getConfiguration(@Query("api_key") String apiKey);
+
+    @GET("/3/discover/movie")
+    Call<DiscoverMoviePage> getMoviePage(
+            @Query("page") int page
+            , @Query("sort_by") String orderCriteria
+            , @Query("api_key") String apiKey);
+
+
 
 }

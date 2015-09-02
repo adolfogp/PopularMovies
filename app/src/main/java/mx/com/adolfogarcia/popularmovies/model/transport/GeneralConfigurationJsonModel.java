@@ -3,6 +3,7 @@ package mx.com.adolfogarcia.popularmovies.model.transport;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -44,8 +45,8 @@ public class GeneralConfigurationJsonModel {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(11, 109)
-                .append(this.getChangeKeys())
-                .append(this.getImages())
+                .append(this.changeKeys)
+                .append(this.images)
                 .hashCode();
     }
 
@@ -54,21 +55,22 @@ public class GeneralConfigurationJsonModel {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof GeneralConfigurationJsonModel)) {
+        if ((obj instanceof GeneralConfigurationJsonModel) == false) {
             return false;
         }
         GeneralConfigurationJsonModel that = (GeneralConfigurationJsonModel) obj;
         return new EqualsBuilder()
-                .append(this.getChangeKeys(), that.getChangeKeys())
-                .append(this.getImages(), that.getImages())
+                .append(this.changeKeys, that.changeKeys)
+                .append(this.images, that.images)
                 .isEquals();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("changeKeys", this.getChangeKeys())
-                .append("images", this.getImages())
+                .append("changeKeys", this.changeKeys)
+                .append("images", this.images)
                 .toString();
     }
+
 }

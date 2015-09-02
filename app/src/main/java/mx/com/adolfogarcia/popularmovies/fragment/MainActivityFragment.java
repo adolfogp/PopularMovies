@@ -30,7 +30,6 @@ import javax.inject.Inject;
 
 import mx.com.adolfogarcia.popularmovies.Configuration;
 import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
-import mx.com.adolfogarcia.popularmovies.PopularMoviesApplicationModule;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
 import mx.com.adolfogarcia.popularmovies.rest.TheMovieDbApi;
@@ -74,20 +73,19 @@ public class MainActivityFragment extends Fragment {
         AsyncTask<Void, Void, Void> myTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
-                retrofitTest();
+                retrofitPopularMoviesTest();
                 return null;
             }
         };
         myTask.execute();
     }
 
-    private void retrofitTest() {
+    private void retrofitMovieConfigTest() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(TheMovieDbApi.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         TheMovieDbApi service = retrofit.create(TheMovieDbApi.class);
-        // FIXME - Remove!
         Call<GeneralConfigurationJsonModel> configCall =
                 service.getConfiguration(mConfiguration.getMovieApiKey());
         try {
@@ -102,4 +100,36 @@ public class MainActivityFragment extends Fragment {
             return;
         }
     }
+
+    private void retrofitPopularMoviesTest() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TheMovieDbApi.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TheMovieDbApi service = retrofit.create(TheMovieDbApi.class);
+        executeCall(service.getConfiguration(mConfiguration.getMovieApiKey()));
+        executeCall(service.getMoviePage(1, TheMovieDbApi.SORT_BY_POPULARITY
+                , mConfiguration.getMovieApiKey()));
+        executeCall(service.getMoviePage(2, TheMovieDbApi.SORT_BY_POPULARITY
+                , mConfiguration.getMovieApiKey()));
+        executeCall(service.getMoviePage(1, TheMovieDbApi.SORT_BY_USER_RATING
+                , mConfiguration.getMovieApiKey()));
+        executeCall(service.getMoviePage(2, TheMovieDbApi.SORT_BY_USER_RATING
+                , mConfiguration.getMovieApiKey()));
+    }
+
+    private void executeCall(Call call) {
+        try {
+            Response response = call.execute();
+            if (response.isSuccess()) {
+                Log.d(LOG_TAG, "SUCCESS! " + response.body().toString());
+            } else {
+                Log.d(LOG_TAG, "FAILURE! " + response.errorBody().string());
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error getting config", e);
+            return;
+        }
+    }
+
 }
