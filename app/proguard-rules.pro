@@ -21,3 +21,6 @@
 -keep class retrofit.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
+
+# Required by Picasso
+-dontwarn com.squareup.okhttp.**
