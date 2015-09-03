@@ -16,13 +16,19 @@
 
 package mx.com.adolfogarcia.popularmovies.fragment;
 
+import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 
@@ -31,6 +37,8 @@ import javax.inject.Inject;
 import mx.com.adolfogarcia.popularmovies.Configuration;
 import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
+import mx.com.adolfogarcia.popularmovies.databinding.MainFragmentBinding;
+import mx.com.adolfogarcia.popularmovies.model.transport.DiscoverMoviePage;
 import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
 import mx.com.adolfogarcia.popularmovies.rest.TheMovieDbApi;
 import retrofit.Call;
@@ -47,13 +55,9 @@ public class MainActivityFragment extends Fragment {
 
     private static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
-    @Inject Configuration mConfiguration;
+    MainFragmentBinding mBinding = null;
 
-    /**
-     * Creates a new instance of {@link MainActivityFragment}.
-     */
-    public MainActivityFragment() {
-    }
+    @Inject Configuration mConfiguration;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,7 +68,8 @@ public class MainActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false);
+        return mBinding.getRoot();
     }
 
     @Override
@@ -107,9 +112,23 @@ public class MainActivityFragment extends Fragment {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         TheMovieDbApi service = retrofit.create(TheMovieDbApi.class);
-        executeCall(service.getConfiguration(mConfiguration.getMovieApiKey()));
-        executeCall(service.getMoviePage(1, TheMovieDbApi.SORT_BY_POPULARITY
-                , mConfiguration.getMovieApiKey()));
+        Response<GeneralConfigurationJsonModel> configurationResponse =
+                executeCall(service.getConfiguration(mConfiguration.getMovieApiKey()));
+        Response<DiscoverMoviePage> moviesResponse =
+                executeCall(service.getMoviePage(1, TheMovieDbApi.SORT_BY_POPULARITY
+                        , mConfiguration.getMovieApiKey()));
+        GeneralConfigurationJsonModel restApiConfig = configurationResponse.body();
+        DiscoverMoviePage moviePage = moviesResponse.body();
+        Uri.Builder uriBuilder = Uri.parse(restApiConfig.getImages().getSecureBaseUrl()).buildUpon();
+        uriBuilder.appendEncodedPath(restApiConfig.getImages().getPosterSizes().get(0));
+        uriBuilder.appendEncodedPath(moviePage.getResults().get(0).getPosterPath());
+        Uri posterUri = uriBuilder.build();
+        Log.d(LOG_TAG, "Poster URI: " + posterUri.toString());
+
+        Handler mainLoopHandler = new Handler(Looper.getMainLooper());
+        mainLoopHandler.post(
+                () -> Picasso.with(getActivity()).load(posterUri).into(mBinding.testImageView));
+
         executeCall(service.getMoviePage(2, TheMovieDbApi.SORT_BY_POPULARITY
                 , mConfiguration.getMovieApiKey()));
         executeCall(service.getMoviePage(1, TheMovieDbApi.SORT_BY_USER_RATING
@@ -118,17 +137,19 @@ public class MainActivityFragment extends Fragment {
                 , mConfiguration.getMovieApiKey()));
     }
 
-    private void executeCall(Call call) {
+    private Response executeCall(Call call) {
         try {
             Response response = call.execute();
             if (response.isSuccess()) {
                 Log.d(LOG_TAG, "SUCCESS! " + response.body().toString());
+                return response;
             } else {
                 Log.d(LOG_TAG, "FAILURE! " + response.errorBody().string());
+                return null;
             }
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error getting config", e);
-            return;
+            return null;
         }
     }
 
