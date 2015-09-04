@@ -1,11 +1,13 @@
 # Popular Movies
 
-An application that displays a list of movies and details about them, developed
-as part of Udacity's Android Developer Nanodegree. The information is
-retrieved from [themoviedatabase.org](https://www.themoviedb.org/), using their
-RESTful API. So, in order to build and use this project, you'll need to
-[get a key](https://www.themoviedb.org/documentation/api) and place it in the
+An Android application that displays a list of movies and details about them. The
+information is retrieved from [themoviedatabase.org](https://www.themoviedb.org/),
+using their RESTful API. So, in order to build and use this project, you'll need
+to [get a key](https://www.themoviedb.org/documentation/api) and place it in the
 configuration properties file `app/src/main/res/raw/configuration.xml`.
+
+This application was developed as an assignment for [Udacity's Android Developer
+Nanodegree](https://www.udacity.com).
 
 ## Configuration
 
