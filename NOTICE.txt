@@ -9,3 +9,4 @@ The XSLT file used to generate the HTML Checkstyle report,
 (checkstyle-noframes-sorted.xsl) was taken from:
 https://svn.apache.org/repos/asf/hive/trunk/checkstyle/
 
+"This product uses the TMDb API but is not endorsed or certified by TMDb."
