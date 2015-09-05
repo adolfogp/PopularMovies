@@ -42,6 +42,8 @@ or
 
     $ ./gradlew build
 
+The resulting APK may be found at `app/build/outputs`.
+
 ## Frameworks and libraries used
 
 This application uses the following frameworks and libraries:
