@@ -41,42 +41,41 @@ public final class MovieContract {
             Uri.parse("content://" + CONTENT_AUTHORITY);
 
     /**
-     * Path for movie data.
+     * Path for cached movie data.
      */
-    public static final String PATH_MOVIE = "movie";
-
+    public static final String PATH_CACHED_MOVIE = "cached_movie";
 
 
     /**
-     * Defines the contents of the table holding movie data.
+     * Defines the contents of the table holding cached movie data.
      *
      * @author Jesús Adolfo García Pasquel
      * @see <a href="http://docs.themoviedb.apiary.io/">The Movie Database API</a>.
      */
-    public static final class MovieEntry implements BaseColumns {
+    public static final class CachedMovieEntry implements BaseColumns {
 
         /**
-         * Base URI for movie data.
+         * Base URI for cached movie data.
          */
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_CACHED_MOVIE).build();
 
         /**
-         * Type for {@code content:} URIs with a directories of movies.
+         * Type for {@code content:} URIs with a directories of chached movies.
          */
-        public static final String CONTENT_TYPE =
-                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_CACHED_MOVIE;
 
         /**
-         * Type for {@code content:} URIs with a single movie.
+         * Type for {@code content:} URIs with a single cached movie.
          */
-        public static final String CONTENT_ITEM_TYPE =
-                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_CACHED_MOVIE;
 
         /**
-         * Name of the table containing movie data.
+         * Name of the table containing cached movie data.
          */
-        public static final String TABLE_NAME = "movie";
+        public static final String TABLE_NAME = "cached_movie";
 
         // TODO: Keep the day the results were downloaded and last page retrieved and saved in shared preferences, along with the kind of list (popularity or rating)
 

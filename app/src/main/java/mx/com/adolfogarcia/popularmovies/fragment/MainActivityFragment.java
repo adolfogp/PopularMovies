@@ -18,8 +18,6 @@ package mx.com.adolfogarcia.popularmovies.fragment;
 
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -29,11 +27,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 
-import static mx.com.adolfogarcia.popularmovies.data.MovieContract.MovieEntry;
-
-import java.io.IOException;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 import javax.inject.Inject;
 
@@ -42,14 +37,7 @@ import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.adapter.MovieAdapter;
 import mx.com.adolfogarcia.popularmovies.databinding.MainFragmentBinding;
-import mx.com.adolfogarcia.popularmovies.model.transport.DiscoverMoviePage;
-import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
-import mx.com.adolfogarcia.popularmovies.rest.FetchMoviesTask;
-import mx.com.adolfogarcia.popularmovies.rest.TheMovieDbApi;
-import retrofit.Call;
-import retrofit.GsonConverterFactory;
-import retrofit.Response;
-import retrofit.Retrofit;
+import mx.com.adolfogarcia.popularmovies.net.FetchMoviesTask;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -88,7 +76,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         // TODO: Set View Models for mBinding, move events to the View Models
 
         Cursor cursor = getActivity().getContentResolver().query(
-                MovieEntry.CONTENT_URI, null, null, null, null); // FIXME: Wrong query
+                CachedMovieEntry.CONTENT_URI, null, null, null, null); // FIXME: Wrong query
         mMovieAdapter = new MovieAdapter(getActivity(), cursor, 0);
         mBinding.gridview.setAdapter(mMovieAdapter); // TODO: Verify if this can be done with DataBinding
         mBinding.gridview.setOnItemClickListener(
@@ -112,7 +100,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         // TODO: Specify projection (place projection in Adapter class)
         // TODO: Specify order
-        return new CursorLoader(this.getActivity(), MovieEntry.CONTENT_URI
+        return new CursorLoader(this.getActivity(), CachedMovieEntry.CONTENT_URI
                 , null, null, null, null);
     }
 

@@ -11,107 +11,129 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * TODO: Document.
- * Created using <a href="http://www.jsonschema2pojo.org/">jsonschema2pojo</a>.
+ * Transfer object for the configuration related to images, of
+ * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
  *
+ * @see <a href="http://docs.themoviedb.apiary.io/">docs.themoviedb.apiary.io</a>
  * @author Jesús Adolfo García Pasquel
  */
 public class ImageConfigurationJsonModel {
 
+    /**
+     * Base URL used to access image files.
+     */
     @SerializedName("base_url")
     @Expose
-    private String baseUrl;
+    private String mBaseUrl;
 
+    /**
+     * Base URL used to access image files over SSL.
+     */
     @SerializedName("secure_base_url")
     @Expose
-    private String secureBaseUrl;
+    private String mSecureBaseUrl;
 
+    /**
+     * Widths (in pixels) at which the backdrop images are available.
+     */
     @SerializedName("backdrop_sizes")
     @Expose
-    private List<String> backdropSizes = new ArrayList<>();
+    private List<String> mBackdropSizes = new ArrayList<>();
 
+    /**
+     * Widths (in pixels) at which the logo is available.
+     */
     @SerializedName("logo_sizes")
     @Expose
-    private List<String> logoSizes = new ArrayList<>();
+    private List<String> mLogoSizes = new ArrayList<>();
 
+    /**
+     * Widths (in pixels) at which the image files of the posters are available.
+     */
     @SerializedName("poster_sizes")
     @Expose
-    private List<String> posterSizes = new ArrayList<>();
+    private List<String> mPosterSizes = new ArrayList<>();
 
+    /**
+     * Widths and heights (in pixels) at which the profile pictures are available.
+     */
     @SerializedName("profile_sizes")
     @Expose
-    private List<String> profileSizes = new ArrayList<>();
+    private List<String> mProfileSizes = new ArrayList<>();
 
+    /**
+     * Widths (in pixels) at which the still images are available.
+     */
     @SerializedName("still_sizes")
     @Expose
-    private List<String> stillSizes = new ArrayList<>();
+    private List<String> mStillSizes = new ArrayList<>();
 
     public String getBaseUrl() {
-        return baseUrl;
+        return mBaseUrl;
     }
 
     public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
+        this.mBaseUrl = baseUrl;
     }
 
     public String getSecureBaseUrl() {
-        return secureBaseUrl;
+        return mSecureBaseUrl;
     }
 
     public void setSecureBaseUrl(String secureBaseUrl) {
-        this.secureBaseUrl = secureBaseUrl;
+        this.mSecureBaseUrl = secureBaseUrl;
     }
 
     public List<String> getBackdropSizes() {
-        return backdropSizes;
+        return mBackdropSizes;
     }
 
     public void setBackdropSizes(List<String> backdropSizes) {
-        this.backdropSizes = backdropSizes;
+        this.mBackdropSizes = backdropSizes;
     }
 
     public List<String> getLogoSizes() {
-        return logoSizes;
+        return mLogoSizes;
     }
 
     public void setLogoSizes(List<String> logoSizes) {
-        this.logoSizes = logoSizes;
+        this.mLogoSizes = logoSizes;
     }
 
     public List<String> getPosterSizes() {
-        return posterSizes;
+        return mPosterSizes;
     }
 
     public void setPosterSizes(List<String> posterSizes) {
-        this.posterSizes = posterSizes;
+        this.mPosterSizes = posterSizes;
     }
 
     public List<String> getProfileSizes() {
-        return profileSizes;
+        return mProfileSizes;
     }
 
     public void setProfileSizes(List<String> profileSizes) {
-        this.profileSizes = profileSizes;
+        this.mProfileSizes = profileSizes;
     }
 
     public List<String> getStillSizes() {
-        return stillSizes;
+        return mStillSizes;
     }
 
     public void setStillSizes(List<String> stillSizes) {
-        this.stillSizes = stillSizes;
+        this.mStillSizes = stillSizes;
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 59)
-                .append(this.backdropSizes)
-                .append(this.baseUrl)
-                .append(this.logoSizes)
-                .append(this.posterSizes)
-                .append(this.profileSizes)
-                .append(this.secureBaseUrl)
-                .append(this.stillSizes)
+                .append(this.mBackdropSizes)
+                .append(this.mBaseUrl)
+                .append(this.mLogoSizes)
+                .append(this.mPosterSizes)
+                .append(this.mProfileSizes)
+                .append(this.mSecureBaseUrl)
+                .append(this.mStillSizes)
                 .hashCode();
     }
 
@@ -125,26 +147,26 @@ public class ImageConfigurationJsonModel {
         }
         ImageConfigurationJsonModel that = (ImageConfigurationJsonModel) obj;
         return new EqualsBuilder()
-                .append(this.backdropSizes, that.backdropSizes)
-                .append(this.baseUrl, that.baseUrl)
-                .append(this.logoSizes, that.logoSizes)
-                .append(this.posterSizes, that.posterSizes)
-                .append(this.profileSizes, that.profileSizes)
-                .append(this.secureBaseUrl, that.secureBaseUrl)
-                .append(this.stillSizes, that.stillSizes)
+                .append(this.mBackdropSizes, that.mBackdropSizes)
+                .append(this.mBaseUrl, that.mBaseUrl)
+                .append(this.mLogoSizes, that.mLogoSizes)
+                .append(this.mPosterSizes, that.mPosterSizes)
+                .append(this.mProfileSizes, that.mProfileSizes)
+                .append(this.mSecureBaseUrl, that.mSecureBaseUrl)
+                .append(this.mStillSizes, that.mStillSizes)
                 .isEquals();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("backdropSizes", this.backdropSizes)
-                .append("baseUrl", this.baseUrl)
-                .append("logoSizes", this.logoSizes)
-                .append("posterSizes", this.posterSizes)
-                .append("profileSizes", this.profileSizes)
-                .append("secureBaseUrl", this.secureBaseUrl)
-                .append("stillSizes", this.stillSizes)
+                .append("mBackdropSizes", this.mBackdropSizes)
+                .append("mBaseUrl", this.mBaseUrl)
+                .append("mLogoSizes", this.mLogoSizes)
+                .append("mPosterSizes", this.mPosterSizes)
+                .append("mProfileSizes", this.mProfileSizes)
+                .append("mSecureBaseUrl", this.mSecureBaseUrl)
+                .append("mStillSizes", this.mStillSizes)
                 .toString();
     }
 

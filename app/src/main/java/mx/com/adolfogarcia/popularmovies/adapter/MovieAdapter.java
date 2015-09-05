@@ -24,8 +24,6 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import mx.com.adolfogarcia.popularmovies.data.MovieContract;
 
 // TODO: Define layout
@@ -46,7 +44,7 @@ public class MovieAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        int idx = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE);
+        int idx = cursor.getColumnIndex(MovieContract.CachedMovieEntry.COLUMN_ORIGINAL_TITLE);
         ((TextView) view).setText(cursor.getString(idx));
     }
 

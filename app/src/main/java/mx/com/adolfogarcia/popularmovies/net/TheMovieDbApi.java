@@ -1,9 +1,8 @@
-package mx.com.adolfogarcia.popularmovies.rest;
+package mx.com.adolfogarcia.popularmovies.net;
 
-import mx.com.adolfogarcia.popularmovies.model.transport.DiscoverMoviePage;
+import mx.com.adolfogarcia.popularmovies.model.transport.MoviePageJsonModel;
 import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
 import retrofit.Call;
-import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.Query;
 
@@ -34,7 +33,7 @@ public interface TheMovieDbApi {
     Call<GeneralConfigurationJsonModel> getConfiguration(@Query("api_key") String apiKey);
 
     @GET("/3/discover/movie")
-    Call<DiscoverMoviePage> getMoviePage(
+    Call<MoviePageJsonModel> getMoviePage(
             @Query("page") int page
             , @Query("sort_by") String orderCriteria
             , @Query("api_key") String apiKey);

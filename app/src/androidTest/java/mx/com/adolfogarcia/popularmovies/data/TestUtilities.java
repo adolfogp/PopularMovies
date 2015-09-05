@@ -26,7 +26,7 @@ import junit.framework.Assert;
 import java.util.Map;
 import java.util.Set;
 
-import static mx.com.adolfogarcia.popularmovies.data.MovieContract.MovieEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 /**
  * Utility methods to help test the movie database. The code is based on
@@ -43,13 +43,13 @@ public final class TestUtilities {
      */
     static ContentValues createMadMaxMovieValues() {
         ContentValues testValues = new ContentValues();
-        testValues.put(MovieEntry._ID, 76341);
-        testValues.put(MovieEntry.COLUMN_BACKDROP_PATH, "/tbhdm8UJAb4ViCTsulYFL3lxMCd.jpg");
-        testValues.put(MovieEntry.COLUMN_ORIGINAL_TITLE, "Mad Max: Fury Road");
-        testValues.put(MovieEntry.COLUMN_OVERVIEW, "An apocalyptic story...");
-        testValues.put(MovieEntry.COLUMN_POPULARITY, 55.32);
-        testValues.put(MovieEntry.COLUMN_POSTER_PATH, "/kqjL17yufvn9OVLyXYpvtyrFfak.jpg");
-        testValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, 7.7);
+        testValues.put(CachedMovieEntry._ID, 76341);
+        testValues.put(CachedMovieEntry.COLUMN_BACKDROP_PATH, "/tbhdm8UJAb4ViCTsulYFL3lxMCd.jpg");
+        testValues.put(CachedMovieEntry.COLUMN_ORIGINAL_TITLE, "Mad Max: Fury Road");
+        testValues.put(CachedMovieEntry.COLUMN_OVERVIEW, "An apocalyptic story...");
+        testValues.put(CachedMovieEntry.COLUMN_POPULARITY, 55.32);
+        testValues.put(CachedMovieEntry.COLUMN_POSTER_PATH, "/kqjL17yufvn9OVLyXYpvtyrFfak.jpg");
+        testValues.put(CachedMovieEntry.COLUMN_VOTE_AVERAGE, 7.7);
         return testValues;
     }
 
@@ -66,7 +66,7 @@ public final class TestUtilities {
         ContentValues testValues = TestUtilities.createMadMaxMovieValues();
 
         long rowId;
-        rowId = db.insert(MovieEntry.TABLE_NAME, null, testValues);
+        rowId = db.insert(CachedMovieEntry.TABLE_NAME, null, testValues);
         Assert.assertTrue("Row was successfully inserted", rowId != -1);
         return rowId;
     }

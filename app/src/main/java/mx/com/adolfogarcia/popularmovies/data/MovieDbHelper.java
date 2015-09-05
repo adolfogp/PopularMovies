@@ -19,7 +19,7 @@ package mx.com.adolfogarcia.popularmovies.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import static mx.com.adolfogarcia.popularmovies.data.MovieContract.MovieEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 /**
  * Manages the creation and maintenance of the local movie database.
@@ -42,15 +42,15 @@ public class MovieDbHelper extends SQLiteOpenHelper {
      * Statement used to create the table that holds the movie data.
      */
     private static final String SQL_CREATE_MOVIE_TABLE =
-            "CREATE TABLE " + MovieEntry.TABLE_NAME + " ("
-            + MovieEntry._ID + " INTEGER, "
-            + MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL, "
-            + MovieEntry.COLUMN_OVERVIEW + " TEXT, "
-            + MovieEntry.COLUMN_BACKDROP_PATH + " TEXT, "
-            + MovieEntry.COLUMN_POSTER_PATH + " TEXT, "
-            + MovieEntry.COLUMN_POPULARITY + " REAL NOT NULL, "
-            + MovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, "
-            + "PRIMARY KEY (" + MovieEntry._ID + ") ON CONFLICT REPLACE"
+            "CREATE TABLE " + CachedMovieEntry.TABLE_NAME + " ("
+            + CachedMovieEntry._ID + " INTEGER, "
+            + CachedMovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL, "
+            + CachedMovieEntry.COLUMN_OVERVIEW + " TEXT, "
+            + CachedMovieEntry.COLUMN_BACKDROP_PATH + " TEXT, "
+            + CachedMovieEntry.COLUMN_POSTER_PATH + " TEXT, "
+            + CachedMovieEntry.COLUMN_POPULARITY + " REAL NOT NULL, "
+            + CachedMovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, "
+            + "PRIMARY KEY (" + CachedMovieEntry._ID + ") ON CONFLICT REPLACE"
             + ");";
 
     /**
@@ -69,7 +69,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CachedMovieEntry.TABLE_NAME);
         onCreate(db);
     }
 

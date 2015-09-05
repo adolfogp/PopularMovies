@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mx.com.adolfogarcia.popularmovies.rest;
+package mx.com.adolfogarcia.popularmovies.net;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -28,17 +28,15 @@ import java.util.List;
 import javax.inject.Inject;
 
 import mx.com.adolfogarcia.popularmovies.Configuration;
-import mx.com.adolfogarcia.popularmovies.data.MovieContract;
-import mx.com.adolfogarcia.popularmovies.model.transport.DiscoverMoviePage;
-import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
-import static mx.com.adolfogarcia.popularmovies.data.MovieContract.MovieEntry;
-import mx.com.adolfogarcia.popularmovies.model.transport.Result;
+import mx.com.adolfogarcia.popularmovies.model.transport.MoviePageJsonModel;
+
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
+import mx.com.adolfogarcia.popularmovies.model.transport.MovieJsonModel;
 import retrofit.Call;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-// TODO: Rename package net
 public class FetchMoviesTask extends AsyncTask<Void, Void, Void> {
 
     private static final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
@@ -59,11 +57,11 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, Void> {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         TheMovieDbApi service = retrofit.create(TheMovieDbApi.class);
-        Call<DiscoverMoviePage> configCall = service.getMoviePage(1
+        Call<MoviePageJsonModel> configCall = service.getMoviePage(1
                 , TheMovieDbApi.SORT_BY_POPULARITY
                 , mConfiguration.getMovieApiKey());
         try {
-            Response<DiscoverMoviePage> response = configCall.execute();
+            Response<MoviePageJsonModel> response = configCall.execute();
             if (response.isSuccess()) {
                 Log.d(LOG_TAG, "SUCCESS! " + response.body().toString());
                 insertMoviesInProvider(response.body());
@@ -76,22 +74,22 @@ public class FetchMoviesTask extends AsyncTask<Void, Void, Void> {
         return null;
     }
 
-    private void insertMoviesInProvider(DiscoverMoviePage response) {
+    private void insertMoviesInProvider(MoviePageJsonModel response) {
         // TODO: Use an array to begin with
-        List<ContentValues> cvList = new ArrayList<>(response.getResults().size());
-        for (Result result : response.getResults()) {
+        List<ContentValues> cvList = new ArrayList<>(response.getMovies().size());
+        for (MovieJsonModel result : response.getMovies()) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(MovieContract.MovieEntry._ID, result.getId());
-            contentValues.put(MovieEntry.COLUMN_ORIGINAL_TITLE, result.getOriginalTitle());
-            contentValues.put(MovieEntry.COLUMN_OVERVIEW, result.getOverview());
-            contentValues.put(MovieEntry.COLUMN_BACKDROP_PATH, result.getBackdropPath());
-            contentValues.put(MovieEntry.COLUMN_POPULARITY, result.getPopularity());
-            contentValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, result.getVoteAverage());
-            contentValues.put(MovieEntry.COLUMN_POSTER_PATH, result.getPosterPath());
+            contentValues.put(CachedMovieEntry._ID, result.getId());
+            contentValues.put(CachedMovieEntry.COLUMN_ORIGINAL_TITLE, result.getOriginalTitle());
+            contentValues.put(CachedMovieEntry.COLUMN_OVERVIEW, result.getOverview());
+            contentValues.put(CachedMovieEntry.COLUMN_BACKDROP_PATH, result.getBackdropPath());
+            contentValues.put(CachedMovieEntry.COLUMN_POPULARITY, result.getPopularity());
+            contentValues.put(CachedMovieEntry.COLUMN_VOTE_AVERAGE, result.getVoteAverage());
+            contentValues.put(CachedMovieEntry.COLUMN_POSTER_PATH, result.getPosterPath());
             cvList.add(contentValues);
         }
         if (cvList.size() > 0 ) {
-            mContext.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI
+            mContext.getContentResolver().bulkInsert(CachedMovieEntry.CONTENT_URI
                     , cvList.toArray(new ContentValues[cvList.size()]));
         }
     }

@@ -24,7 +24,7 @@ import junit.framework.Assert;
 
 import java.util.HashSet;
 import java.util.Set;
-import static mx.com.adolfogarcia.popularmovies.data.MovieContract.MovieEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 /**
  * Test cases that verify the movie database is properly created with a
@@ -47,7 +47,7 @@ public class MovieDbTest extends AndroidTestCase {
     public void testCreateDb() {
         // Set of tables in the schema
         final Set<String> tableNameSet = new HashSet<>();
-        tableNameSet.add(MovieEntry.TABLE_NAME);
+        tableNameSet.add(CachedMovieEntry.TABLE_NAME);
 
         SQLiteDatabase db = new MovieDbHelper(this.mContext).getWritableDatabase();
         Assert.assertTrue("Database should be open.", db.isOpen());
@@ -65,18 +65,18 @@ public class MovieDbTest extends AndroidTestCase {
         c.close();
 
         // Verify the tables contain the required columns
-        c = db.rawQuery("PRAGMA table_info(" + MovieEntry.TABLE_NAME + ")", null);
+        c = db.rawQuery("PRAGMA table_info(" + CachedMovieEntry.TABLE_NAME + ")", null);
         assertTrue("The table must contain columns.", c.moveToFirst());
 
         // Build a HashSet of all of the column names we want to look for
         Set<String> columnNameSet = new HashSet<>();
-        columnNameSet.add(MovieEntry._ID);
-        columnNameSet.add(MovieEntry.COLUMN_BACKDROP_PATH);
-        columnNameSet.add(MovieEntry.COLUMN_ORIGINAL_TITLE);
-        columnNameSet.add(MovieEntry.COLUMN_OVERVIEW);
-        columnNameSet.add(MovieEntry.COLUMN_POPULARITY);
-        columnNameSet.add(MovieEntry.COLUMN_POSTER_PATH);
-        columnNameSet.add(MovieEntry.COLUMN_VOTE_AVERAGE);
+        columnNameSet.add(CachedMovieEntry._ID);
+        columnNameSet.add(CachedMovieEntry.COLUMN_BACKDROP_PATH);
+        columnNameSet.add(CachedMovieEntry.COLUMN_ORIGINAL_TITLE);
+        columnNameSet.add(CachedMovieEntry.COLUMN_OVERVIEW);
+        columnNameSet.add(CachedMovieEntry.COLUMN_POPULARITY);
+        columnNameSet.add(CachedMovieEntry.COLUMN_POSTER_PATH);
+        columnNameSet.add(CachedMovieEntry.COLUMN_VOTE_AVERAGE);
 
         int columnNameIndex = c.getColumnIndex("name");
         do {
@@ -84,7 +84,7 @@ public class MovieDbTest extends AndroidTestCase {
             columnNameSet.remove(columnName);
         } while(c.moveToNext());
 
-        Assert.assertTrue("The table " + MovieEntry.TABLE_NAME
+        Assert.assertTrue("The table " + CachedMovieEntry.TABLE_NAME
                         + " must contain the required columns"
                 , columnNameSet.isEmpty());
         c.close();
@@ -100,7 +100,7 @@ public class MovieDbTest extends AndroidTestCase {
         TestUtilities.insertMadMaxMovieValues(mContext);
         // Verify the data was inserted
         Cursor cursor = db.query(
-                MovieEntry.TABLE_NAME
+                CachedMovieEntry.TABLE_NAME
                 , null // all columns
                 , null // all rows
                 , null // no values for conditions

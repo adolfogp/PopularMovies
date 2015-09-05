@@ -52,7 +52,7 @@ This application uses the following frameworks and libraries:
   (https://developer.android.com/tools/data-binding/guide.html) to follow the
   Model-View-ViewModel pattern. More information can be found in the following
   articles:
-    - [Android databinding: Goodgye presenter, hello ViewModel!]
+    - [Android databinding: Goodbye presenter, hello ViewModel!]
       (http://tech.vg.no/2015/07/17/android-databinding-goodbye-presenter-hello-viewmodel/)
     - [Don't forget the View Model!]
       (http://tech.vg.no/2015/04/06/dont-forget-the-view-model/)

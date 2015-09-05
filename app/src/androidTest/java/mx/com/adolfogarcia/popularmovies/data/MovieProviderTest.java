@@ -26,9 +26,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.test.AndroidTestCase;
-import android.util.Log;
 
-import static mx.com.adolfogarcia.popularmovies.data.MovieContract.MovieEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 import junit.framework.Assert;
 
@@ -58,12 +57,12 @@ public class MovieProviderTest extends AndroidTestCase {
      */
     public void deleteAllMovies() {
         mContext.getContentResolver().delete(
-                MovieEntry.CONTENT_URI
+                CachedMovieEntry.CONTENT_URI
                 , null
                 , null);
 
         Cursor cursor = mContext.getContentResolver().query(
-                MovieEntry.CONTENT_URI
+                CachedMovieEntry.CONTENT_URI
                 , null
                 , null
                 , null
@@ -80,8 +79,8 @@ public class MovieProviderTest extends AndroidTestCase {
     public void testBuildUriMatcher_allMovies() {
         UriMatcher testMatcher = MovieProvider.buildUriMatcher();
         Assert.assertEquals("All movies URI must match expected constant."
-                , testMatcher.match(MovieEntry.CONTENT_URI)
-                , MovieProvider.MOVIE);
+                , testMatcher.match(CachedMovieEntry.CONTENT_URI)
+                , MovieProvider.CACHED_MOVIE);
     }
 
     /**
@@ -92,8 +91,8 @@ public class MovieProviderTest extends AndroidTestCase {
     public void testBuildUriMatcher_singleMovie() {
         UriMatcher testMatcher = MovieProvider.buildUriMatcher();
         Assert.assertEquals("Single movie URI must match expected constant."
-                , testMatcher.match(MovieEntry.buildMovieUri(1))
-                , MovieProvider.MOVIE_ID);
+                , testMatcher.match(CachedMovieEntry.buildMovieUri(1))
+                , MovieProvider.CACHED_MOVIE_ID);
     }
 
     /**
@@ -119,10 +118,10 @@ public class MovieProviderTest extends AndroidTestCase {
      * Case for the URI that identifies all movies.
      */
     public void testGetType_allMovies() {
-        String type = mContext.getContentResolver().getType(MovieEntry.CONTENT_URI);
+        String type = mContext.getContentResolver().getType(CachedMovieEntry.CONTENT_URI);
         Assert.assertEquals(
                 "The content type for the 'all movies' URI must be of type directory"
-                , MovieEntry.CONTENT_TYPE, type);
+                , CachedMovieEntry.CONTENT_TYPE, type);
     }
 
     /**
@@ -130,17 +129,11 @@ public class MovieProviderTest extends AndroidTestCase {
      * Case for the URI that identifies a single movie.
      */
     public void testGetType_singleMovies() {
-        String type = mContext.getContentResolver().getType(MovieEntry.buildMovieUri(1));
+        String type = mContext.getContentResolver().getType(CachedMovieEntry.buildMovieUri(1));
         Assert.assertEquals(
                 "The content type for the URI of a single movie must be of type entry"
-                , MovieEntry.CONTENT_ITEM_TYPE, type);
+                , CachedMovieEntry.CONTENT_ITEM_TYPE, type);
     }
-
-    /*
-        This test uses the database directly to insert and then uses the ContentProvider to
-        read out the data.  Uncomment this test to see if the basic weather query functionality
-        given in the ContentProvider is working correctly.
-     */
 
     /**
      * Verifies that
@@ -156,7 +149,7 @@ public class MovieProviderTest extends AndroidTestCase {
         db.close();
 
         Cursor cursor = mContext.getContentResolver().query(
-                MovieEntry.CONTENT_URI
+                CachedMovieEntry.CONTENT_URI
                 , null
                 , null
                 , null
@@ -180,7 +173,7 @@ public class MovieProviderTest extends AndroidTestCase {
         db.close();
 
         Cursor cursor = mContext.getContentResolver().query(
-                MovieEntry.buildMovieUri(rowId)
+                CachedMovieEntry.buildMovieUri(rowId)
                 , null
                 , null
                 , null
@@ -197,15 +190,15 @@ public class MovieProviderTest extends AndroidTestCase {
     public void testInsert() {
         ContentValues values = TestUtilities.createMadMaxMovieValues();
         Uri locationUri = mContext.getContentResolver().insert(
-                MovieEntry.CONTENT_URI, values);
+                CachedMovieEntry.CONTENT_URI, values);
         long rowId = ContentUris.parseId(locationUri);
         Assert.assertTrue("Provider inserted the movie", rowId != -1);
 
         // Verify the entry was stored properly
         Cursor cursor = mContext.getContentResolver().query(
-                MovieEntry.CONTENT_URI
+                CachedMovieEntry.CONTENT_URI
                 , null
-                , MovieEntry._ID + " = " + rowId
+                , CachedMovieEntry._ID + " = " + rowId
                 , null
                 , null);
         cursor.moveToFirst();
@@ -223,26 +216,26 @@ public class MovieProviderTest extends AndroidTestCase {
     public void testUpdate() {
         ContentValues values = TestUtilities.createMadMaxMovieValues();
         Uri locationUri = mContext.getContentResolver().insert(
-                MovieEntry.CONTENT_URI, values);
+                CachedMovieEntry.CONTENT_URI, values);
         long rowId = ContentUris.parseId(locationUri);
         Assert.assertTrue("Provider inserted the movie", rowId != -1);
 
         ContentValues updatedValues = new ContentValues(values);
-        updatedValues.put(MovieEntry._ID, rowId);
-        updatedValues.put(MovieEntry.COLUMN_OVERVIEW, "A happy story!");
+        updatedValues.put(CachedMovieEntry._ID, rowId);
+        updatedValues.put(CachedMovieEntry.COLUMN_OVERVIEW, "A happy story!");
 
         int count = mContext.getContentResolver().update(
-                MovieEntry.CONTENT_URI
+                CachedMovieEntry.CONTENT_URI
                 , updatedValues
-                , MovieEntry._ID + "= ?"
+                , CachedMovieEntry._ID + "= ?"
                 , new String[]{Long.toString(rowId)});
         Assert.assertEquals("One entry must be updated", 1, count);
 
         // Verify the changes were applied
         Cursor cursor = mContext.getContentResolver().query(
-                MovieEntry.CONTENT_URI
+                CachedMovieEntry.CONTENT_URI
                 , null
-                , MovieEntry._ID + " = " + rowId
+                , CachedMovieEntry._ID + " = " + rowId
                 , null
                 , null);
         cursor.moveToFirst();
@@ -268,15 +261,15 @@ public class MovieProviderTest extends AndroidTestCase {
         ContentValues[] returnContentValues =
                 new ContentValues[BULK_INSERT_NUMBER_OF_RECORDS];
         for (int i = 1; i <= BULK_INSERT_NUMBER_OF_RECORDS; i++) {
-            ContentValues weatherValues = new ContentValues();
-            weatherValues.put(MovieEntry._ID, i);
-            weatherValues.put(MovieEntry.COLUMN_OVERVIEW, "A great story of " + i);
-            weatherValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, i);
-            weatherValues.put(MovieEntry.COLUMN_POSTER_PATH, "/poster" + i + ".jpg");
-            weatherValues.put(MovieEntry.COLUMN_POPULARITY, i);
-            weatherValues.put(MovieEntry.COLUMN_BACKDROP_PATH, "/backdrop" + i + ".jpg");
-            weatherValues.put(MovieEntry.COLUMN_ORIGINAL_TITLE, "The Amazing " + i);
-            returnContentValues[i - 1] = weatherValues;
+            ContentValues movieValues = new ContentValues();
+            movieValues.put(CachedMovieEntry._ID, i);
+            movieValues.put(CachedMovieEntry.COLUMN_OVERVIEW, "A great story of " + i);
+            movieValues.put(CachedMovieEntry.COLUMN_VOTE_AVERAGE, i);
+            movieValues.put(CachedMovieEntry.COLUMN_POSTER_PATH, "/poster" + i + ".jpg");
+            movieValues.put(CachedMovieEntry.COLUMN_POPULARITY, i);
+            movieValues.put(CachedMovieEntry.COLUMN_BACKDROP_PATH, "/backdrop" + i + ".jpg");
+            movieValues.put(CachedMovieEntry.COLUMN_ORIGINAL_TITLE, "The Amazing " + i);
+            returnContentValues[i - 1] = movieValues;
         }
         return returnContentValues;
     }
@@ -293,17 +286,17 @@ public class MovieProviderTest extends AndroidTestCase {
     public void testBulkInsert() {
         ContentValues[] bulkInsertContentValues = createBulkInsertMovieValues();
         int insertCount =
-                mContext.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI
+                mContext.getContentResolver().bulkInsert(CachedMovieEntry.CONTENT_URI
                         , bulkInsertContentValues);
         Assert.assertEquals("The expected number of entries must be inserted"
                 , BULK_INSERT_NUMBER_OF_RECORDS
                 , insertCount);
         Cursor cursor = mContext.getContentResolver().query(
-                MovieEntry.CONTENT_URI
+                CachedMovieEntry.CONTENT_URI
                 , null
                 , null
                 , null
-                , MovieEntry._ID + " ASC");
+                , CachedMovieEntry._ID + " ASC");
         Assert.assertEquals("The expected number of entries must be retrieved"
                 , BULK_INSERT_NUMBER_OF_RECORDS
                 , cursor.getCount());

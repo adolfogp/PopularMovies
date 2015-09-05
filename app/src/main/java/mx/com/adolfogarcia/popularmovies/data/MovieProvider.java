@@ -26,10 +26,11 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
-import static mx.com.adolfogarcia.popularmovies.data.MovieContract.MovieEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 /**
- * Provides cached movie data, originally retrieved from
+ * Provides access to the data used by the application. This includes cached
+ * movie data, originally retrieved from
  * <a href="https://www.themoviedb.org">themoviedb.org</a>
  *
  * @author Jesús Adolfo García Pasquel
@@ -37,14 +38,14 @@ import static mx.com.adolfogarcia.popularmovies.data.MovieContract.MovieEntry;
 public class MovieProvider extends ContentProvider {
 
     /**
-     * Identifies a query for all movies.
+     * Identifies a query for all cached movies.
      */
-    static final int MOVIE = 100;
+    static final int CACHED_MOVIE = 100;
 
     /**
-     * Identifies a query for a specific movie, by id.
+     * Identifies a query for a specific cached movie, by id.
      */
-    static final int MOVIE_ID = 200;
+    static final int CACHED_MOVIE_ID = 200;
 
     /**
      * Used to match URIs to queries and their result type.
@@ -54,48 +55,50 @@ public class MovieProvider extends ContentProvider {
     // Initialize the UriMatcher
     static {
         sUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
-                , MovieContract.PATH_MOVIE
-                , MovieProvider.MOVIE);
+                , MovieContract.PATH_CACHED_MOVIE
+                , MovieProvider.CACHED_MOVIE);
         sUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
-                , MovieContract.PATH_MOVIE + "/#"
-                , MovieProvider.MOVIE_ID);
+                , MovieContract.PATH_CACHED_MOVIE + "/#"
+                , MovieProvider.CACHED_MOVIE_ID);
     }
 
     /**
-     * Used to get access an initialize the database.
+     * Used to get access and initialize the database.
      */
     private MovieDbHelper mOpenHelper;
 
-    private static final SQLiteQueryBuilder sMovieQueryBuilder;
+    /**
+     * Used to query cached movie data.
+     */
+    private static final SQLiteQueryBuilder sCachedMovieQueryBuilder;
 
     static{
-        sMovieQueryBuilder = new SQLiteQueryBuilder();
-        sMovieQueryBuilder.setTables(MovieEntry.TABLE_NAME);
+        sCachedMovieQueryBuilder = new SQLiteQueryBuilder();
+        sCachedMovieQueryBuilder.setTables(CachedMovieEntry.TABLE_NAME);
     }
 
     /**
-     * Selection for a movie queried by id.
+     * Selection for a cached movie queried by id.
      */
-    private static final String SELECTION_MOVIE_ID =
-            MovieEntry.TABLE_NAME + "." + MovieEntry._ID + " = ? ";
+    private static final String SELECTION_CACHED_MOVIE_ID =
+            CachedMovieEntry.TABLE_NAME + "." + CachedMovieEntry._ID + " = ? ";
 
     /**
-     * Returns a new instance of {@link UriMatcher} that maps URIs for the movie
-     * privider's to constants.
+     * Returns a new instance of {@link UriMatcher} that maps URIs to the
+     * equivalent constants used by the provider.
      *
-     * @return a new instance of {@link UriMatcher} for use with the movie
-     *     privider's URIs.
-     * @see #MOVIE
-     * @see #MOVIE_ID
+     * @return a new instance of {@link UriMatcher}.
+     * @see #CACHED_MOVIE
+     * @see #CACHED_MOVIE_ID
      */
     static UriMatcher buildUriMatcher() {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
-                , MovieContract.PATH_MOVIE
-                , MovieProvider.MOVIE);
+                , MovieContract.PATH_CACHED_MOVIE
+                , MovieProvider.CACHED_MOVIE);
         uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
-                , MovieContract.PATH_MOVIE + "/#"
-                , MovieProvider.MOVIE_ID);
+                , MovieContract.PATH_CACHED_MOVIE + "/#"
+                , MovieProvider.CACHED_MOVIE_ID);
         return uriMatcher;
     }
 
@@ -108,10 +111,10 @@ public class MovieProvider extends ContentProvider {
     @Override
     public String getType(Uri uri) {
         switch (sUriMatcher.match(uri)) {
-            case MOVIE:
-                return MovieEntry.CONTENT_TYPE;
-            case MOVIE_ID:
-                return MovieEntry.CONTENT_ITEM_TYPE;
+            case CACHED_MOVIE:
+                return CachedMovieEntry.CONTENT_TYPE;
+            case CACHED_MOVIE_ID:
+                return CachedMovieEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown: " + uri);
         }
@@ -125,10 +128,10 @@ public class MovieProvider extends ContentProvider {
             , String sortOrder) {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
-            case MOVIE:
+            case CACHED_MOVIE:
                 retCursor = getAllMovies(projection, sortOrder);
                 break;
-            case MOVIE_ID:
+            case CACHED_MOVIE_ID:
                 retCursor = getMovieById(uri, projection);
                 break;
             default:
@@ -146,7 +149,7 @@ public class MovieProvider extends ContentProvider {
      * @return a {@link Cursor} for the result.
      */
     private Cursor getAllMovies(String[] projection, String sortOrder) {
-        return sMovieQueryBuilder.query(
+        return sCachedMovieQueryBuilder.query(
                 mOpenHelper.getReadableDatabase()
                 , projection
                 , null // selection
@@ -165,10 +168,10 @@ public class MovieProvider extends ContentProvider {
      */
     private Cursor getMovieById(Uri uri, String[] projection) {
         String id = Long.toString(ContentUris.parseId(uri));
-        return sMovieQueryBuilder.query(
+        return sCachedMovieQueryBuilder.query(
                 mOpenHelper.getReadableDatabase()
                 , projection
-                , SELECTION_MOVIE_ID // selection
+                , SELECTION_CACHED_MOVIE_ID // selection
                 , new String[] {id}  // selectionArgs
                 , null // groupBy
                 , null // having
@@ -181,10 +184,10 @@ public class MovieProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         Uri resultUri;
         switch (sUriMatcher.match(uri)) {
-            case MOVIE:
-                long rowId = db.insert(MovieEntry.TABLE_NAME, null, values);
+            case CACHED_MOVIE:
+                long rowId = db.insert(CachedMovieEntry.TABLE_NAME, null, values);
                 if ( rowId != -1) {
-                    resultUri = MovieEntry.buildMovieUri(rowId);
+                    resultUri = CachedMovieEntry.buildMovieUri(rowId);
                 } else {
                     throw new android.database.SQLException("Insertion failed. " + uri);
                 }
@@ -200,12 +203,12 @@ public class MovieProvider extends ContentProvider {
     public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         switch (sUriMatcher.match(uri)) {
-            case MOVIE:
+            case CACHED_MOVIE:
                 db.beginTransaction();
                 int insertionCount = 0;
                 try {
                     for (ContentValues value : values) {
-                        long _id = db.insert(MovieEntry.TABLE_NAME, null, value);
+                        long _id = db.insert(CachedMovieEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             insertionCount++;
                         }
@@ -229,9 +232,9 @@ public class MovieProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int rowsAffected;
         switch (sUriMatcher.match(uri)) {
-            case MOVIE:
+            case CACHED_MOVIE:
                 rowsAffected =
-                        db.update(MovieEntry.TABLE_NAME, values, selection, selectionArgs);
+                        db.update(CachedMovieEntry.TABLE_NAME, values, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown: " + uri);
@@ -250,9 +253,9 @@ public class MovieProvider extends ContentProvider {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int rowsAffected;
         switch (sUriMatcher.match(uri)) {
-            case MOVIE:
+            case CACHED_MOVIE:
                 rowsAffected =
-                        db.delete(MovieEntry.TABLE_NAME
+                        db.delete(CachedMovieEntry.TABLE_NAME
                                 , selection
                                 , selectionArgs);
                 break;

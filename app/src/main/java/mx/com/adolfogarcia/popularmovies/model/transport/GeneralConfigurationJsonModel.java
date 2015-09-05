@@ -12,41 +12,49 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * TODO: Document.
- * Created using <a href="http://www.jsonschema2pojo.org/">jsonschema2pojo</a>.
+ * Transfer object for the general configuration of
+ * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
  *
+ * @see <a href="http://docs.themoviedb.apiary.io/">docs.themoviedb.apiary.io</a>
  * @author Jesús Adolfo García Pasquel
  */
 public class GeneralConfigurationJsonModel {
 
+    /**
+     * Configuration data related to imageConfiguration.
+     */
+    @SerializedName("images")
     @Expose
-    private ImageConfigurationJsonModel images;
+    private ImageConfigurationJsonModel mImageConfiguration;
 
+    /**
+     * Ignored.
+     */
     @SerializedName("change_keys")
     @Expose
-    private List<String> changeKeys = new ArrayList<>();
+    private List<String> mChangeKeys = new ArrayList<>();
 
-    public ImageConfigurationJsonModel getImages() {
-        return images;
+    public ImageConfigurationJsonModel getImageConfiguration() {
+        return mImageConfiguration;
     }
 
-    public void setImages(ImageConfigurationJsonModel images) {
-        this.images = images;
+    public void setImageConfiguration(ImageConfigurationJsonModel imageConfiguration) {
+        this.mImageConfiguration = imageConfiguration;
     }
 
     public List<String> getChangeKeys() {
-        return changeKeys;
+        return mChangeKeys;
     }
 
     public void setChangeKeys(List<String> changeKeys) {
-        this.changeKeys = changeKeys;
+        this.mChangeKeys = changeKeys;
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(11, 109)
-                .append(this.changeKeys)
-                .append(this.images)
+                .append(this.mChangeKeys)
+                .append(this.mImageConfiguration)
                 .hashCode();
     }
 
@@ -60,16 +68,16 @@ public class GeneralConfigurationJsonModel {
         }
         GeneralConfigurationJsonModel that = (GeneralConfigurationJsonModel) obj;
         return new EqualsBuilder()
-                .append(this.changeKeys, that.changeKeys)
-                .append(this.images, that.images)
+                .append(this.mChangeKeys, that.mChangeKeys)
+                .append(this.mImageConfiguration, that.mImageConfiguration)
                 .isEquals();
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .append("changeKeys", this.changeKeys)
-                .append("images", this.images)
+                .append("mChangeKeys", this.mChangeKeys)
+                .append("mImageConfiguration", this.mImageConfiguration)
                 .toString();
     }
 
