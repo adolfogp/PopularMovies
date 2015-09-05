@@ -43,14 +43,14 @@ public class MovieDbHelper extends SQLiteOpenHelper {
      */
     private static final String SQL_CREATE_MOVIE_TABLE =
             "CREATE TABLE " + MovieEntry.TABLE_NAME + " ("
-            + MovieEntry._ID + " INTEGER PRIMARY KEY, "
+            + MovieEntry._ID + " INTEGER, "
             + MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL, "
             + MovieEntry.COLUMN_OVERVIEW + " TEXT, "
             + MovieEntry.COLUMN_BACKDROP_PATH + " TEXT, "
             + MovieEntry.COLUMN_POSTER_PATH + " TEXT, "
             + MovieEntry.COLUMN_POPULARITY + " REAL NOT NULL, "
             + MovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, "
-            + "UNIQUE (" + MovieEntry._ID + ") ON CONFLICT REPLACE"
+            + "PRIMARY KEY (" + MovieEntry._ID + ") ON CONFLICT REPLACE"
             + ");";
 
     /**

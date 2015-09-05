@@ -16,19 +16,22 @@
 
 package mx.com.adolfogarcia.popularmovies.fragment;
 
+import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 
-import com.squareup.picasso.Picasso;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.MovieEntry;
 
 import java.io.IOException;
 
@@ -37,9 +40,11 @@ import javax.inject.Inject;
 import mx.com.adolfogarcia.popularmovies.Configuration;
 import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
+import mx.com.adolfogarcia.popularmovies.adapter.MovieAdapter;
 import mx.com.adolfogarcia.popularmovies.databinding.MainFragmentBinding;
 import mx.com.adolfogarcia.popularmovies.model.transport.DiscoverMoviePage;
 import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
+import mx.com.adolfogarcia.popularmovies.rest.FetchMoviesTask;
 import mx.com.adolfogarcia.popularmovies.rest.TheMovieDbApi;
 import retrofit.Call;
 import retrofit.GsonConverterFactory;
@@ -51,11 +56,15 @@ import retrofit.Retrofit;
  *
  * @author Jesús Adolfo García Pasquel
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
-    MainFragmentBinding mBinding = null;
+    private static final int MY_LOADER_ID = 2576;
+
+    private MainFragmentBinding mBinding = null;
+
+    private MovieAdapter mMovieAdapter;
 
     @Inject Configuration mConfiguration;
 
@@ -66,91 +75,54 @@ public class MainActivityFragment extends Fragment {
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(MY_LOADER_ID, null, this);
+    }
+
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false);
+        // TODO: Set View Models for mBinding, move events to the View Models
+
+        Cursor cursor = getActivity().getContentResolver().query(
+                MovieEntry.CONTENT_URI, null, null, null, null); // FIXME: Wrong query
+        mMovieAdapter = new MovieAdapter(getActivity(), cursor, 0);
+        mBinding.gridview.setAdapter(mMovieAdapter); // TODO: Verify if this can be done with DataBinding
+        mBinding.gridview.setOnItemClickListener(
+                (adapterView, view, position, l) -> Log.d(LOG_TAG, "Clicked.")); // TODO: Move to DataBinding
         return mBinding.getRoot();
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        AsyncTask<Void, Void, Void> myTask = new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                retrofitPopularMoviesTest();
-                return null;
-            }
-        };
-        myTask.execute();
+        updateMovies(); // FIXME: Remove from here
     }
 
-    private void retrofitMovieConfigTest() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(TheMovieDbApi.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        TheMovieDbApi service = retrofit.create(TheMovieDbApi.class);
-        Call<GeneralConfigurationJsonModel> configCall =
-                service.getConfiguration(mConfiguration.getMovieApiKey());
-        try {
-            Response<GeneralConfigurationJsonModel> response = configCall.execute();
-            if (response.isSuccess()) {
-                Log.d(LOG_TAG, "SUCCESS! " + response.body().toString());
-            } else {
-                Log.d(LOG_TAG, "FAILURE! " + response.errorBody().string());
-            }
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error getting config", e);
-            return;
-        }
+    private void updateMovies() {
+        // TODO: Get new taks using Dart (especially since this may move elsewhere to get the pages)
+        FetchMoviesTask weatherTask = new FetchMoviesTask(getActivity(), mConfiguration);
+        weatherTask.execute();
     }
 
-    private void retrofitPopularMoviesTest() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(TheMovieDbApi.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        TheMovieDbApi service = retrofit.create(TheMovieDbApi.class);
-        Response<GeneralConfigurationJsonModel> configurationResponse =
-                executeCall(service.getConfiguration(mConfiguration.getMovieApiKey()));
-        Response<DiscoverMoviePage> moviesResponse =
-                executeCall(service.getMoviePage(1, TheMovieDbApi.SORT_BY_POPULARITY
-                        , mConfiguration.getMovieApiKey()));
-        GeneralConfigurationJsonModel restApiConfig = configurationResponse.body();
-        DiscoverMoviePage moviePage = moviesResponse.body();
-        Uri.Builder uriBuilder = Uri.parse(restApiConfig.getImages().getSecureBaseUrl()).buildUpon();
-        uriBuilder.appendEncodedPath(restApiConfig.getImages().getPosterSizes().get(0));
-        uriBuilder.appendEncodedPath(moviePage.getResults().get(0).getPosterPath());
-        Uri posterUri = uriBuilder.build();
-        Log.d(LOG_TAG, "Poster URI: " + posterUri.toString());
-
-        Handler mainLoopHandler = new Handler(Looper.getMainLooper());
-        mainLoopHandler.post(
-                () -> Picasso.with(getActivity()).load(posterUri).into(mBinding.testImageView));
-
-        executeCall(service.getMoviePage(2, TheMovieDbApi.SORT_BY_POPULARITY
-                , mConfiguration.getMovieApiKey()));
-        executeCall(service.getMoviePage(1, TheMovieDbApi.SORT_BY_USER_RATING
-                , mConfiguration.getMovieApiKey()));
-        executeCall(service.getMoviePage(2, TheMovieDbApi.SORT_BY_USER_RATING
-                , mConfiguration.getMovieApiKey()));
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // TODO: Specify projection (place projection in Adapter class)
+        // TODO: Specify order
+        return new CursorLoader(this.getActivity(), MovieEntry.CONTENT_URI
+                , null, null, null, null);
     }
 
-    private Response executeCall(Call call) {
-        try {
-            Response response = call.execute();
-            if (response.isSuccess()) {
-                Log.d(LOG_TAG, "SUCCESS! " + response.body().toString());
-                return response;
-            } else {
-                Log.d(LOG_TAG, "FAILURE! " + response.errorBody().string());
-                return null;
-            }
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error getting config", e);
-            return null;
-        }
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mMovieAdapter.swapCursor(data);
     }
 
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mMovieAdapter.swapCursor(null);
+    }
 }

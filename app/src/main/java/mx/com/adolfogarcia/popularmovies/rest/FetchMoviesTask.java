@@ -1,0 +1,100 @@
+/*
+ * Copyright 2015 Jesús Adolfo García Pasquel
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package mx.com.adolfogarcia.popularmovies.rest;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import mx.com.adolfogarcia.popularmovies.Configuration;
+import mx.com.adolfogarcia.popularmovies.data.MovieContract;
+import mx.com.adolfogarcia.popularmovies.model.transport.DiscoverMoviePage;
+import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.MovieEntry;
+import mx.com.adolfogarcia.popularmovies.model.transport.Result;
+import retrofit.Call;
+import retrofit.GsonConverterFactory;
+import retrofit.Response;
+import retrofit.Retrofit;
+
+// TODO: Rename package net
+public class FetchMoviesTask extends AsyncTask<Void, Void, Void> {
+
+    private static final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
+
+    // TODO: Inject with Dagger 2 and get instances of FetchMoviesTask with Dagger 2.
+    @Inject Configuration mConfiguration;
+    @Inject Context mContext;
+
+    public FetchMoviesTask(Context context, Configuration configuration) {
+        mContext = context;
+        mConfiguration = configuration;
+    }
+
+    @Override
+    protected Void doInBackground(Void... params) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TheMovieDbApi.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TheMovieDbApi service = retrofit.create(TheMovieDbApi.class);
+        Call<DiscoverMoviePage> configCall = service.getMoviePage(1
+                , TheMovieDbApi.SORT_BY_POPULARITY
+                , mConfiguration.getMovieApiKey());
+        try {
+            Response<DiscoverMoviePage> response = configCall.execute();
+            if (response.isSuccess()) {
+                Log.d(LOG_TAG, "SUCCESS! " + response.body().toString());
+                insertMoviesInProvider(response.body());
+            } else {
+                Log.d(LOG_TAG, "FAILURE! " + response.errorBody().string());
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error getting config", e);
+        }
+        return null;
+    }
+
+    private void insertMoviesInProvider(DiscoverMoviePage response) {
+        // TODO: Use an array to begin with
+        List<ContentValues> cvList = new ArrayList<>(response.getResults().size());
+        for (Result result : response.getResults()) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(MovieContract.MovieEntry._ID, result.getId());
+            contentValues.put(MovieEntry.COLUMN_ORIGINAL_TITLE, result.getOriginalTitle());
+            contentValues.put(MovieEntry.COLUMN_OVERVIEW, result.getOverview());
+            contentValues.put(MovieEntry.COLUMN_BACKDROP_PATH, result.getBackdropPath());
+            contentValues.put(MovieEntry.COLUMN_POPULARITY, result.getPopularity());
+            contentValues.put(MovieEntry.COLUMN_VOTE_AVERAGE, result.getVoteAverage());
+            contentValues.put(MovieEntry.COLUMN_POSTER_PATH, result.getPosterPath());
+            cvList.add(contentValues);
+        }
+        if (cvList.size() > 0 ) {
+            mContext.getContentResolver().bulkInsert(MovieEntry.CONTENT_URI
+                    , cvList.toArray(new ContentValues[cvList.size()]));
+        }
+    }
+
+
+}
