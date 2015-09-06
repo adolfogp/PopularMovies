@@ -37,7 +37,7 @@ import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.adapter.MovieAdapter;
 import mx.com.adolfogarcia.popularmovies.databinding.MainFragmentBinding;
-import mx.com.adolfogarcia.popularmovies.net.FetchMoviesTask;
+import mx.com.adolfogarcia.popularmovies.net.FetchMovieTask;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -92,8 +92,9 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     private void updateMovies() {
         // TODO: Get new taks using Dart (especially since this may move elsewhere to get the pages)
-        FetchMoviesTask weatherTask = new FetchMoviesTask(getActivity(), mConfiguration);
-        weatherTask.execute();
+        FetchMovieTask fetchMovieTask =
+                new FetchMovieTask(getActivity(), mConfiguration);
+        fetchMovieTask.execute();
     }
 
     @Override

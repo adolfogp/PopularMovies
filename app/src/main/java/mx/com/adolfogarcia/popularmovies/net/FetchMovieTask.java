@@ -37,15 +37,15 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-public class FetchMoviesTask extends AsyncTask<Void, Void, Void> {
+public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
 
-    private static final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
+    private static final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
-    // TODO: Inject with Dagger 2 and get instances of FetchMoviesTask with Dagger 2.
+    // TODO: Inject with Dagger 2 and get instances of FetchMovieTask with Dagger 2.
     @Inject Configuration mConfiguration;
     @Inject Context mContext;
 
-    public FetchMoviesTask(Context context, Configuration configuration) {
+    public FetchMovieTask(Context context, Configuration configuration) {
         mContext = context;
         mConfiguration = configuration;
     }
