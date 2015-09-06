@@ -16,8 +16,10 @@
 
 package mx.com.adolfogarcia.popularmovies.fragment;
 
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
@@ -28,6 +30,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Collections;
+import java.util.Set;
+
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 import javax.inject.Inject;
@@ -37,6 +44,7 @@ import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.adapter.MovieAdapter;
 import mx.com.adolfogarcia.popularmovies.databinding.MainFragmentBinding;
+import mx.com.adolfogarcia.popularmovies.net.FetchConfigurationTask;
 import mx.com.adolfogarcia.popularmovies.net.FetchMovieTask;
 
 /**
@@ -49,6 +57,25 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     private static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
     private static final int MY_LOADER_ID = 2576;
+
+    // TODO: Put preference constants in appropriate class in package data
+
+    public static final String PREFERENCES_KEY_LAST_UPDATE = "date_last_update";
+
+    public static final long PREFERENCES_DEFAULT_LAST_UPDATE = 0;
+
+    public static final String PREFERENCES_KEY_IMAGE_URL = "image_secure_base_url";
+
+    public static final String PREFERENCES_DEFAULT_IMAGE_URL = "https://image.tmdb.org/t/p/";
+
+    public static final String PREFERENCES_KEY_POSTER_SIZES = "poster_sizes";
+
+    public static final Set<String> PREFERENCES_DEFAULT_POSTER_SIZES = null;
+
+    public static final String PREFERENCES_KEY_BACKDROP_SIZES = "backdrop_sizes";
+
+    public static final Set<String> PREFERENCES_DEFAULT_BACKDROP_SIZES = null;
+
 
     private MainFragmentBinding mBinding = null;
 
@@ -85,13 +112,26 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
 
     @Override
-    public void onStart() {
+    public void onStart() { //TODO: Remove updates from here. Do not use the changeListener.
         super.onStart();
-        updateMovies(); // FIXME: Remove from here
+        SharedPreferences settings =
+                PreferenceManager.getDefaultSharedPreferences(getActivity());
+        settings.registerOnSharedPreferenceChangeListener((sharedPreferences, key) -> {
+            if (PREFERENCES_KEY_IMAGE_URL.equals(key)) {
+                updateMovies();
+            }
+        });
+        updateApiConfig();
+    }
+
+    private void updateApiConfig() {
+        FetchConfigurationTask fetchConfigurationTask =
+                new FetchConfigurationTask(getActivity(), mConfiguration);
+        fetchConfigurationTask.execute();
     }
 
     private void updateMovies() {
-        // TODO: Get new taks using Dart (especially since this may move elsewhere to get the pages)
+        // TODO: Get new taks using Dagger (especially since this may move elsewhere to get the pages)
         FetchMovieTask fetchMovieTask =
                 new FetchMovieTask(getActivity(), mConfiguration);
         fetchMovieTask.execute();

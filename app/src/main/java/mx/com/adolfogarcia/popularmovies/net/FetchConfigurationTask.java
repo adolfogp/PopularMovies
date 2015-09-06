@@ -16,28 +16,27 @@
 
 package mx.com.adolfogarcia.popularmovies.net;
 
-import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 import javax.inject.Inject;
 
 import mx.com.adolfogarcia.popularmovies.Configuration;
+import mx.com.adolfogarcia.popularmovies.fragment.MainActivityFragment;
+import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
 import mx.com.adolfogarcia.popularmovies.model.transport.MoviePageJsonModel;
-
-import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
-import mx.com.adolfogarcia.popularmovies.model.transport.MovieJsonModel;
 import retrofit.Call;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
+public class FetchConfigurationTask extends AsyncTask<Void, Void, Void> {
 
     private static final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
@@ -45,7 +44,7 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
     @Inject Configuration mConfiguration;
     @Inject Context mContext;
 
-    public FetchMovieTask(Context context, Configuration configuration) {
+    public FetchConfigurationTask(Context context, Configuration configuration) {
         mContext = context;
         mConfiguration = configuration;
     }
@@ -57,42 +56,32 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         TheMovieDbApi service = retrofit.create(TheMovieDbApi.class);
-        Call<MoviePageJsonModel> configCall = service.getMoviePage(1
-                , TheMovieDbApi.SORT_BY_POPULARITY
-                , mConfiguration.getMovieApiKey());
+        Call<GeneralConfigurationJsonModel> configCall =
+                service.getConfiguration(mConfiguration.getMovieApiKey());
         try {
-            Response<MoviePageJsonModel> response = configCall.execute();
+            Response<GeneralConfigurationJsonModel> response = configCall.execute();
             if (response.isSuccess()) {
                 Log.d(LOG_TAG, "SUCCESS! " + response.body().toString());
-                insertMoviesInProvider(response.body());
+                GeneralConfigurationJsonModel configuration = response.body();
+                SharedPreferences settings =
+                        PreferenceManager.getDefaultSharedPreferences(mContext);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString(MainActivityFragment.PREFERENCES_KEY_IMAGE_URL
+                        , configuration.getImageConfiguration().getSecureBaseUrl());
+                editor.putStringSet(MainActivityFragment.PREFERENCES_KEY_POSTER_SIZES
+                        , new HashSet<>(configuration.getImageConfiguration().getPosterSizes()));
+                editor.putStringSet(MainActivityFragment.PREFERENCES_KEY_BACKDROP_SIZES
+                        , new HashSet<>(configuration.getImageConfiguration().getBackdropSizes()));
+                editor.putLong(MainActivityFragment.PREFERENCES_KEY_LAST_UPDATE
+                        , System.currentTimeMillis());
+                editor.commit();
             } else {
                 Log.d(LOG_TAG, "FAILURE! " + response.errorBody().string());
             }
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error getting page of movies", e);
+            Log.e(LOG_TAG, "Error getting RESTful API configuration.", e);
         }
         return null;
     }
-
-    private void insertMoviesInProvider(MoviePageJsonModel response) {
-        // TODO: Use an array to begin with
-        List<ContentValues> cvList = new ArrayList<>(response.getMovies().size());
-        for (MovieJsonModel result : response.getMovies()) {
-            ContentValues contentValues = new ContentValues();
-            contentValues.put(CachedMovieEntry._ID, result.getId());
-            contentValues.put(CachedMovieEntry.COLUMN_ORIGINAL_TITLE, result.getOriginalTitle());
-            contentValues.put(CachedMovieEntry.COLUMN_OVERVIEW, result.getOverview());
-            contentValues.put(CachedMovieEntry.COLUMN_BACKDROP_PATH, result.getBackdropPath());
-            contentValues.put(CachedMovieEntry.COLUMN_POPULARITY, result.getPopularity());
-            contentValues.put(CachedMovieEntry.COLUMN_VOTE_AVERAGE, result.getVoteAverage());
-            contentValues.put(CachedMovieEntry.COLUMN_POSTER_PATH, result.getPosterPath());
-            cvList.add(contentValues);
-        }
-        if (cvList.size() > 0 ) {
-            mContext.getContentResolver().bulkInsert(CachedMovieEntry.CONTENT_URI
-                    , cvList.toArray(new ContentValues[cvList.size()]));
-        }
-    }
-
 
 }
