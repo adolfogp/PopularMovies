@@ -27,7 +27,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import mx.com.adolfogarcia.popularmovies.Configuration;
+import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.model.transport.MoviePageJsonModel;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
@@ -42,10 +42,11 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
     private static final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
     // TODO: Inject with Dagger 2 and get instances of FetchMovieTask with Dagger 2.
-    @Inject Configuration mConfiguration;
+    @Inject
+    RestfulServiceConfiguration mConfiguration;
     @Inject Context mContext;
 
-    public FetchMovieTask(Context context, Configuration configuration) {
+    public FetchMovieTask(Context context, RestfulServiceConfiguration configuration) {
         mContext = context;
         mConfiguration = configuration;
     }

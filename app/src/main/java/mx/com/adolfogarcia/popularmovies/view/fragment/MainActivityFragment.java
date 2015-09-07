@@ -36,9 +36,9 @@ import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEn
 
 import javax.inject.Inject;
 
-import mx.com.adolfogarcia.popularmovies.Configuration;
 import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
+import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.view.adapter.MovieAdapter;
 import mx.com.adolfogarcia.popularmovies.databinding.MainFragmentBinding;
 import mx.com.adolfogarcia.popularmovies.net.FetchConfigurationTask;
@@ -57,28 +57,12 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     // TODO: Put preference constants in appropriate class in package data
 
-    public static final String PREFERENCES_KEY_LAST_UPDATE = "date_last_update";
-
-    public static final long PREFERENCES_DEFAULT_LAST_UPDATE = 0;
-
-    public static final String PREFERENCES_KEY_IMAGE_URL = "image_secure_base_url";
-
-    public static final String PREFERENCES_DEFAULT_IMAGE_URL = "https://image.tmdb.org/t/p/";
-
-    public static final String PREFERENCES_KEY_POSTER_SIZES = "poster_sizes";
-
-    public static final Set<String> PREFERENCES_DEFAULT_POSTER_SIZES = null;
-
-    public static final String PREFERENCES_KEY_BACKDROP_SIZES = "backdrop_sizes";
-
-    public static final Set<String> PREFERENCES_DEFAULT_BACKDROP_SIZES = null;
-
 
     private MainFragmentBinding mBinding = null;
 
     private MovieAdapter mMovieAdapter;
 
-    @Inject Configuration mConfiguration;
+    @Inject RestfulServiceConfiguration mConfiguration;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -101,7 +85,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         Cursor cursor = getActivity().getContentResolver().query(
                 CachedMovieEntry.CONTENT_URI, null, null, null, null); // FIXME: Wrong query
-        mMovieAdapter = new MovieAdapter(getActivity(), cursor, 0);
+        mMovieAdapter = new MovieAdapter(mConfiguration, getActivity(), cursor, 0);
         mBinding.posterGridView.setAdapter(mMovieAdapter); // TODO: Verify if this can be done with DataBinding
         mBinding.posterGridView.setOnItemClickListener(
                 (adapterView, view, position, l) -> Log.d(LOG_TAG, "Clicked.")); // TODO: Move to DataBinding
@@ -114,7 +98,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         SharedPreferences settings =
                 PreferenceManager.getDefaultSharedPreferences(getActivity());
         settings.registerOnSharedPreferenceChangeListener((sharedPreferences, key) -> {
-            if (PREFERENCES_KEY_IMAGE_URL.equals(key)) {
+            if (RestfulServiceConfiguration.PREFERENCES_KEY_IMAGE_URL.equals(key)) {
                 updateMovies();
             }
         });

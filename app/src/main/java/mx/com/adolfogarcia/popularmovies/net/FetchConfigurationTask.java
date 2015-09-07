@@ -27,7 +27,8 @@ import java.util.HashSet;
 
 import javax.inject.Inject;
 
-import mx.com.adolfogarcia.popularmovies.Configuration;
+import static mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration.*;
+import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.view.fragment.MainActivityFragment;
 import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
 import retrofit.Call;
@@ -40,14 +41,16 @@ public class FetchConfigurationTask extends AsyncTask<Void, Void, Void> {
     private static final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
     // TODO: Inject with Dagger 2 and get instances of FetchMovieTask with Dagger 2.
-    @Inject Configuration mConfiguration;
+    @Inject
+    RestfulServiceConfiguration mConfiguration;
     @Inject Context mContext;
 
-    public FetchConfigurationTask(Context context, Configuration configuration) {
+    public FetchConfigurationTask(Context context, RestfulServiceConfiguration configuration) {
         mContext = context;
         mConfiguration = configuration;
     }
 
+    // FIXME: Use setter methods in configuration.
     @Override
     protected Void doInBackground(Void... params) {
         Retrofit retrofit = new Retrofit.Builder()
@@ -65,13 +68,13 @@ public class FetchConfigurationTask extends AsyncTask<Void, Void, Void> {
                 SharedPreferences settings =
                         PreferenceManager.getDefaultSharedPreferences(mContext);
                 SharedPreferences.Editor editor = settings.edit();
-                editor.putString(MainActivityFragment.PREFERENCES_KEY_IMAGE_URL
+                editor.putString(PREFERENCES_KEY_IMAGE_URL
                         , configuration.getImageConfiguration().getSecureBaseUrl());
-                editor.putStringSet(MainActivityFragment.PREFERENCES_KEY_POSTER_SIZES
+                editor.putStringSet(PREFERENCES_KEY_POSTER_SIZES
                         , new HashSet<>(configuration.getImageConfiguration().getPosterSizes()));
-                editor.putStringSet(MainActivityFragment.PREFERENCES_KEY_BACKDROP_SIZES
+                editor.putStringSet(PREFERENCES_KEY_BACKDROP_SIZES
                         , new HashSet<>(configuration.getImageConfiguration().getBackdropSizes()));
-                editor.putLong(MainActivityFragment.PREFERENCES_KEY_LAST_UPDATE
+                editor.putLong(PREFERENCES_KEY_LAST_UPDATE
                         , System.currentTimeMillis());
                 editor.commit();
             } else {

@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 
 /**
  * Module used by <a href="">Dagger 2</a> to provide dependencies in the
@@ -38,7 +39,7 @@ public class PopularMoviesApplicationModule {
      */
     private final PopularMoviesApplication mApplication;
 
-    private final Configuration mConfiguration;
+    private final RestfulServiceConfiguration mConfiguration;
 
     /**
      * Creates a new instance of {@link PopularMoviesApplicationModule}, given the
@@ -48,7 +49,7 @@ public class PopularMoviesApplicationModule {
      */
     public PopularMoviesApplicationModule(PopularMoviesApplication application) {
         mApplication = application;
-        mConfiguration = new Configuration(application);
+        mConfiguration = new RestfulServiceConfiguration(application);
     }
 
     /**
@@ -60,13 +61,13 @@ public class PopularMoviesApplicationModule {
         return mApplication;
     }
 
-    // TODO: Change to use the @Inject annotation on Configuration
+    // TODO: Change to use the @Inject annotation on RestfulServiceConfiguration
     /**
      * Provides the application's system wide configuration data.
      *
      * @return the application's system wide configuration data.
      */
-    @Provides @Singleton Configuration provideConfiguration() {
+    @Provides @Singleton RestfulServiceConfiguration provideConfiguration() {
         return mConfiguration;
     }
 
