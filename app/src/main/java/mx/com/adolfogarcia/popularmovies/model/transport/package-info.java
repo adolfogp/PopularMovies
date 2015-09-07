@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package mx.com.adolfogarcia.popularmovies;
-
-import javax.inject.Singleton;
-
-import dagger.Component;
-import mx.com.adolfogarcia.popularmovies.view.fragment.MainActivityFragment;
-
-@Singleton
-@Component(modules = PopularMoviesApplicationModule.class)
-public interface ApplicationComponent {
-    void inject(MainActivityFragment mainActivityFragment);
-}
+/**
+ * Provides <a href="https://en.wikipedia.org/wiki/Data_transfer_object">transfer
+ * objects</a>.
+ *
+ * @author Jesús Adolfo García Pasquel
+ */
+package mx.com.adolfogarcia.popularmovies.model.transport;

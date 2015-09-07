@@ -28,9 +28,8 @@ import java.util.HashSet;
 import javax.inject.Inject;
 
 import mx.com.adolfogarcia.popularmovies.Configuration;
-import mx.com.adolfogarcia.popularmovies.fragment.MainActivityFragment;
+import mx.com.adolfogarcia.popularmovies.view.fragment.MainActivityFragment;
 import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
-import mx.com.adolfogarcia.popularmovies.model.transport.MoviePageJsonModel;
 import retrofit.Call;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;

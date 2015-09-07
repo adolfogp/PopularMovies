@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package mx.com.adolfogarcia.popularmovies;
-
-import javax.inject.Singleton;
-
-import dagger.Component;
-import mx.com.adolfogarcia.popularmovies.view.fragment.MainActivityFragment;
-
-@Singleton
-@Component(modules = PopularMoviesApplicationModule.class)
-public interface ApplicationComponent {
-    void inject(MainActivityFragment mainActivityFragment);
-}
+/**
+ * Provides classes that handle data storage.
+ *
+ * @author Jesús Adolfo García Pasquel
+ */
+package mx.com.adolfogarcia.popularmovies.data;

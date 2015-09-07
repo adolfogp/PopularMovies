@@ -5,13 +5,13 @@
     <data class="MainFragmentBinding">
     </data>
 
-    <GridView android:id="@+id/gridview"
+    <!-- TODO: Use a RecyclerView instead. -->
+    <!-- TODO: Change number of columns depending on width of screen and portrait/landscape -->
+    <GridView android:id="@+id/poster_grid_view"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:columnWidth="90dp"
+              android:columnWidth="180dp"
               android:numColumns="auto_fit"
-              android:verticalSpacing="10dp"
-              android:horizontalSpacing="10dp"
               android:stretchMode="columnWidth"
               android:gravity="center">
     </GridView>

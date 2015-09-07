@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package mx.com.adolfogarcia.popularmovies;
-
-import javax.inject.Singleton;
-
-import dagger.Component;
-import mx.com.adolfogarcia.popularmovies.view.fragment.MainActivityFragment;
-
-@Singleton
-@Component(modules = PopularMoviesApplicationModule.class)
-public interface ApplicationComponent {
-    void inject(MainActivityFragment mainActivityFragment);
-}
+/**
+ * Contains the fragments created for the <i>Popular Movies</i> project.
+ *
+ * @see android.app.Fragment
+ * @author Jesús Adolfo García Pasquel
+ */
+package mx.com.adolfogarcia.popularmovies.view.fragment;

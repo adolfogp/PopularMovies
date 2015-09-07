@@ -15,9 +15,8 @@
  */
 
 /**
- * Contains the activities of the <i>Popular Movies</i> project.
+ * Contains the classes created for the <i>Popular Movies</i> project.
  *
- * @see android.app.Activity
  * @author Jesús Adolfo García Pasquel
  */
-package mx.com.adolfogarcia.popularmovies.activity;
+package mx.com.adolfogarcia.popularmovies;

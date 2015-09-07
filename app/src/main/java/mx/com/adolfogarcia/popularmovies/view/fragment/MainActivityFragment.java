@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mx.com.adolfogarcia.popularmovies.fragment;
+package mx.com.adolfogarcia.popularmovies.view.fragment;
 
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -30,9 +30,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Collections;
 import java.util.Set;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
@@ -42,7 +39,7 @@ import javax.inject.Inject;
 import mx.com.adolfogarcia.popularmovies.Configuration;
 import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
-import mx.com.adolfogarcia.popularmovies.adapter.MovieAdapter;
+import mx.com.adolfogarcia.popularmovies.view.adapter.MovieAdapter;
 import mx.com.adolfogarcia.popularmovies.databinding.MainFragmentBinding;
 import mx.com.adolfogarcia.popularmovies.net.FetchConfigurationTask;
 import mx.com.adolfogarcia.popularmovies.net.FetchMovieTask;
@@ -105,8 +102,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         Cursor cursor = getActivity().getContentResolver().query(
                 CachedMovieEntry.CONTENT_URI, null, null, null, null); // FIXME: Wrong query
         mMovieAdapter = new MovieAdapter(getActivity(), cursor, 0);
-        mBinding.gridview.setAdapter(mMovieAdapter); // TODO: Verify if this can be done with DataBinding
-        mBinding.gridview.setOnItemClickListener(
+        mBinding.posterGridView.setAdapter(mMovieAdapter); // TODO: Verify if this can be done with DataBinding
+        mBinding.posterGridView.setOnItemClickListener(
                 (adapterView, view, position, l) -> Log.d(LOG_TAG, "Clicked.")); // TODO: Move to DataBinding
         return mBinding.getRoot();
     }
@@ -122,6 +119,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             }
         });
         updateApiConfig();
+        updateMovies();
     }
 
     private void updateApiConfig() {

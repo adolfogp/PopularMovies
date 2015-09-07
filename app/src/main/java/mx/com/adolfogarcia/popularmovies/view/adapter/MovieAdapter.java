@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package mx.com.adolfogarcia.popularmovies.adapter;
+package mx.com.adolfogarcia.popularmovies.view.adapter;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
-import android.graphics.Point;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,17 +30,14 @@ import android.widget.CursorAdapter;
 
 import com.squareup.picasso.Picasso;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
-
 import java.util.Set;
 
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.databinding.MovieListItemBinding;
-import mx.com.adolfogarcia.popularmovies.fragment.MainActivityFragment;
+import mx.com.adolfogarcia.popularmovies.view.fragment.MainActivityFragment;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
-import static mx.com.adolfogarcia.popularmovies.fragment.MainActivityFragment.*;
+import static mx.com.adolfogarcia.popularmovies.view.fragment.MainActivityFragment.*;
 
 // TODO: Reconsider package
 public class MovieAdapter extends CursorAdapter {
@@ -74,14 +69,19 @@ public class MovieAdapter extends CursorAdapter {
                 getImageBaseUrl(context)
                 + getBestPosterThumbnailSizeName(context)
                 + cursor.getString(idx);
-        Picasso.with(context).load(posterImageUrl).into(binding.posterImageView);
+        // FIXME: Calculate only once and cache the value for the following calls
+        int optimalWidthPixels = (int) Math.ceil(TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP
+                , POSTER_THUMBNAIL_WIDTH_DIP
+                , context.getResources().getDisplayMetrics()));
+        Picasso.with(context).load(posterImageUrl).resize(optimalWidthPixels, 0).into(binding.posterImageView);
     }
 
     // TODO: Place constant in a class in package data
     /**
      * The width of the poster image measured in <i>Device Independent Pixels</i>.
      */
-    public static final int POSTER_THUMBNAIL_WIDTH_DIP = 92;
+    public static final int POSTER_THUMBNAIL_WIDTH_DIP = 180;
 
     // TODO: Place method in a class in package data (singleton handled with Dagger, have Dagger give it the Context)
     public String getImageBaseUrl(Context context) {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mx.com.adolfogarcia.popularmovies.activity;
+package mx.com.adolfogarcia.popularmovies.view.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

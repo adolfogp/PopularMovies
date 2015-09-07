@@ -15,9 +15,9 @@
  */
 
 /**
- * Contains the fragments of the <i>Popular Movies</i> project.
+ * Contains the activities of the <i>Popular Movies</i> project.
  *
- * @see android.app.Fragment
+ * @see android.app.Activity
  * @author Jesús Adolfo García Pasquel
  */
-package mx.com.adolfogarcia.popularmovies.fragment;
+package mx.com.adolfogarcia.popularmovies.view.activity;
