@@ -19,6 +19,7 @@ package mx.com.adolfogarcia.popularmovies.data;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
 import android.util.TypedValue;
 
@@ -30,6 +31,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import mx.com.adolfogarcia.popularmovies.R;
+import mx.com.adolfogarcia.popularmovies.model.transport.ImageConfigurationJsonModel;
 
 /**
  * Handles access to storage of
@@ -53,12 +55,6 @@ public class RestfulServiceConfiguration {
      * was last updated, stored in the application's {@link SharedPreferences}.
      */
     private static final String PREFERENCES_KEY_LAST_UPDATE = "date_last_update";
-
-    /**
-     * Key used to access the default value for the time when the configuration
-     * was last updated, from {@link #mConfigurationProperties}.
-     */
-    private static final String PROPERTIES_KEY_DEFAULT_LAST_UPDATE = "date_last_update";
 
     /**
      * <p>
@@ -194,8 +190,17 @@ public class RestfulServiceConfiguration {
     private static final Properties mConfigurationProperties = new Properties();
 
     /**
+     * Used to cache image size code names that best match sizes measured in
+     * <i>Device Independent Pixels</i>. The code names are those used by
+     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
+     */
+    private SparseArrayCompat<String> mBestImageSizeNameCache =
+            new SparseArrayCompat<>(2);
+
+    /**
      * Creates a new instance of {@link RestfulServiceConfiguration}
-     * @param context
+     * @param context the {@link Context} used to access the application's
+     *                {@link SharedPreferences}.
      */
     public RestfulServiceConfiguration(Context context) {
         this.mContext = context;
@@ -203,7 +208,7 @@ public class RestfulServiceConfiguration {
     }
 
     private void initProperties() {
-        InputStream is = null; // TODO: Use try-with-resources (Android Studio shows errors in spite of Retrolambda)
+        InputStream is = null;
         try {
             is = mContext.getResources().openRawResource(R.raw.configuration);
             mConfigurationProperties.loadFromXML(is);
@@ -229,37 +234,152 @@ public class RestfulServiceConfiguration {
         SharedPreferences settings =
                 PreferenceManager.getDefaultSharedPreferences(mContext);
         return settings.getString(PREFERENCES_KEY_IMAGE_URL
-                , PROPERTIES_KEY_DEFAULT_IMAGE_URL);
+                , mConfigurationProperties.getProperty(PROPERTIES_KEY_DEFAULT_IMAGE_URL));
     }
 
-    // FIXME: Add setters to store values in SharedPreferences and use in FetchConfigurationTask.
+    /**
+     * Sets the base URL used to retrieve images from the API.
+     *
+     * @param url the base URL to be used for image retrieval.
+     */
+    public void setImageBaseUrl(String url) {
+        SharedPreferences preferences =
+                PreferenceManager.getDefaultSharedPreferences(mContext);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(PREFERENCES_KEY_IMAGE_URL, url);
+        editor.putLong(PREFERENCES_KEY_LAST_UPDATE, System.currentTimeMillis());
+        editor.apply();
+    }
 
     /**
-     * Returns the name of the poster image size provided by
-     * <a href="https://www.themoviedb.org/">themoviedb.org/</a>'s API that is
-     * closest in size to the one passed as argument. Returns {@code null} if
-     * none is found.
+     * Returns the set of available image sizes for the movie posters. The
+     * sizes are specified by the code names used in
+     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API
+     * (usually the width in pixels, prefixed by the character 'w').
      *
+     * @return the set of available image sizes for the movie posters as
+     *     previously saved, or the default values.
+     */
+    public Set<String> getPosterSizes() {
+        SharedPreferences settings =
+                PreferenceManager.getDefaultSharedPreferences(mContext);
+        return settings.getStringSet(PREFERENCES_KEY_POSTER_SIZES
+                , getDefaultSetValue(PROPERTIES_KEY_DEFAULT_POSTER_SIZES));
+    }
+
+    /**
+     * Sets the collection of available image sizes for the movie posters. The
+     * sizes must be specified by the code names used in
+     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API
+     * (usually the width in pixels, prefixed by the character 'w').
+     *
+     * @param posterSizes the collection of available image sizes for the movie
+     *                    posters.
+     */
+    public void setPosterSizes(Set<String> posterSizes) {
+        SharedPreferences settings =
+                PreferenceManager.getDefaultSharedPreferences(mContext);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putStringSet(PREFERENCES_KEY_POSTER_SIZES, posterSizes);
+        editor.putLong(PREFERENCES_KEY_LAST_UPDATE, System.currentTimeMillis());
+        editor.apply();
+    }
+
+    /**
+     * Returns the set of available image sizes for the movie backdrops. The
+     * sizes are specified by the code names used in
+     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API
+     * (usually the width in pixels, prefixed by the character 'w').
+     *
+     * @return the set of available image sizes for the movie backdrops as
+     *     previously saved, or the default values.
+     */
+    public Set<String> getBackdropSizes() {
+        SharedPreferences settings =
+                PreferenceManager.getDefaultSharedPreferences(mContext);
+        return settings.getStringSet(PREFERENCES_KEY_BACKDROP_SIZES
+                , getDefaultSetValue(PROPERTIES_KEY_DEFAULT_BACKDROP_SIZES));
+    }
+
+    /**
+     * Sets the collection of available image sizes for the movie backdrops. The
+     * sizes must be specified by the code names used in
+     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API
+     * (usually the width in pixels, prefixed by the character 'w').
+     *
+     * @param backdropSizes the collection of available image sizes for the movie
+     *                    backdrops.
+     */
+    public void setBackdropSizes(Set<String> backdropSizes) {
+        SharedPreferences settings =
+                PreferenceManager.getDefaultSharedPreferences(mContext);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putStringSet(PREFERENCES_KEY_BACKDROP_SIZES, backdropSizes);
+        editor.putLong(PREFERENCES_KEY_LAST_UPDATE, System.currentTimeMillis());
+        editor.apply();
+    }
+
+    /**
+     * <p>
+     *   Sets all the image related configuration. That is, the default base URL
+     *   for retrieving images, as well as the sizes available for movie poster
+     *   and backdrop images. The following attributes must be present in the
+     *   object passed:
+     * </p>
+     * <ul>
+     *   <li>{@link ImageConfigurationJsonModel#getSecureBaseUrl()}</li>
+     *   <li>{@link ImageConfigurationJsonModel#getPosterSizes()}</li>
+     *   <li>{@link ImageConfigurationJsonModel#getBackdropSizes()}</li>
+     * </ul>
+     *
+     * @param configuration object containing the default base URL for
+     *     retrieving images, as well as the sizes available for movie poster
+     *     and backdrop images.
+     * @see #setImageBaseUrl(String)
+     * @see #setPosterSizes(Set)
+     * @see #setBackdropSizes(Set)
+     */
+    public void setImageConfiguration(ImageConfigurationJsonModel configuration) {
+        SharedPreferences settings =
+                PreferenceManager.getDefaultSharedPreferences(mContext);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString(PREFERENCES_KEY_IMAGE_URL
+                , configuration.getSecureBaseUrl());
+        editor.putStringSet(PREFERENCES_KEY_POSTER_SIZES
+                , new HashSet<>(configuration.getPosterSizes()));
+        editor.putStringSet(PREFERENCES_KEY_BACKDROP_SIZES
+                , new HashSet<>(configuration.getBackdropSizes()));
+        editor.putLong(PREFERENCES_KEY_LAST_UPDATE, System.currentTimeMillis());
+        editor.apply();
+    }
+
+    /**
+     * Returns the name of the image size that is closest to the one requested.
+     * The set must contain size the size code names provided by
+     * <a href="https://www.themoviedb.org/">themoviedb.org/</a>'s API, and the
+     * requested size must be provided in device independent pixels.
+     *
+     * @param imageSizes the size code names to choose from, as provided by the
+     *     <a href="https://www.themoviedb.org/">themoviedb.org/</a>'s API.
      * @param dipWidth the desired width of the poster in <i>Device Independent
      *                 Pixels</i>.
      * @return the name of the size that fits the device best or or {@code null}
      *     if none is found.
      */
-    private String getBestPosterSizeName(int dipWidth) {
-        // TODO: Calculate best and set it in an instance variable to avoid recalculation
+    private String getBestImageSizeName(Set<String> imageSizes, int dipWidth) {
+        String cachedResult = mBestImageSizeNameCache.get(dipWidth);
+        if (cachedResult != null && imageSizes.contains(cachedResult)) {
+            return cachedResult;
+        }
+
         int optimalWidthPixels = (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP
                 , dipWidth
                 , mContext.getResources().getDisplayMetrics());
-        SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
-        Set<String> apiPosterSizes =
-                settings.getStringSet(PREFERENCES_KEY_POSTER_SIZES
-                        , getDefaultSetValue(PROPERTIES_KEY_DEFAULT_POSTER_SIZES));
 
         int minDiff = Integer.MAX_VALUE;
         String bestSizeName = null;
-        for (String sizeName : apiPosterSizes) {
+        for (String sizeName : imageSizes) {
             try {
                 int size = Integer.parseInt(sizeName.substring(1));
                 int diff = Math.abs(optimalWidthPixels - size);
@@ -268,9 +388,10 @@ public class RestfulServiceConfiguration {
                     bestSizeName = sizeName;
                 }
             } catch (NumberFormatException nfe) {
-                Log.w(LOG_TAG, "Ignoring poster size: " + sizeName);
+                Log.w(LOG_TAG, "Ignoring image size: " + sizeName);
             }
         }
+        mBestImageSizeNameCache.put(dipWidth, bestSizeName);
         return bestSizeName;
     }
 
@@ -298,14 +419,30 @@ public class RestfulServiceConfiguration {
      *     <a href="https://www.themoviedb.org/">themoviedb.org/</a>.
      * @param dipWidth the desired width of the poster in <i>Device Independent
      *     Pixels</i>.
-     * @return the name of the size that fits the device best or or {@code null}
-     *     if none is found.
-     * @throws IllegalStateException if there is no configuration data available,
-     *     and the URL cannot be built.
+     * @return the URL ofthe image that fits the device best.
      *
      */
     public String getBestFittingPosterUrl(String relativePath, int dipWidth) {
-        return getImageBaseUrl() + getBestPosterSizeName(dipWidth) + relativePath;
+        return getImageBaseUrl()
+                + getBestImageSizeName(getPosterSizes(), dipWidth)
+                + relativePath;
+    }
+
+    /**
+     * Returns the URL for the movie backdrop image provided by
+     * <a href="https://www.themoviedb.org/">themoviedb.org/</a> that is
+     * closest in size to the one requested.
+     *
+     * @param relativePath relative path to the desired image in
+     *     <a href="https://www.themoviedb.org/">themoviedb.org/</a>.
+     * @param dipWidth the desired width of the poster in <i>Device Independent
+     *     Pixels</i>.
+     * @return the URL ofthe image that fits the device best.
+     */
+    public String getBestFittingBackdropUrl(String relativePath, int dipWidth) {
+        return getImageBaseUrl()
+                + getBestImageSizeName(getBackdropSizes(), dipWidth)
+                + relativePath;
     }
 
     /**
@@ -317,6 +454,19 @@ public class RestfulServiceConfiguration {
      */
     public String getMovieApiKey() {
         return mConfigurationProperties.getProperty(PROPERTIES_KEY_API_ACCESS);
+    }
+
+    /**
+     * Returns the epoch time at which the configuration was last updated or
+     * zero if it has never been set.
+     *
+     * @return the epoch time at which the configuration was last updated or
+     *     zero if it has never been set.
+     */
+    public Long getLastUpdateTime() {
+        SharedPreferences settings =
+                PreferenceManager.getDefaultSharedPreferences(mContext);
+        return settings.getLong(PREFERENCES_KEY_LAST_UPDATE, 0);
     }
 
 }

@@ -17,19 +17,14 @@
 package mx.com.adolfogarcia.popularmovies.net;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.IOException;
-import java.util.HashSet;
 
 import javax.inject.Inject;
 
-import static mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration.*;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
-import mx.com.adolfogarcia.popularmovies.view.fragment.MainActivityFragment;
 import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
 import retrofit.Call;
 import retrofit.GsonConverterFactory;
@@ -63,21 +58,8 @@ public class FetchConfigurationTask extends AsyncTask<Void, Void, Void> {
         try {
             Response<GeneralConfigurationJsonModel> response = configCall.execute();
             if (response.isSuccess()) {
-                Log.d(LOG_TAG, "SUCCESS! " + response.body().toString());
-                GeneralConfigurationJsonModel configuration = response.body();
-                // FIXME -
-//                SharedPreferences settings =
-//                        PreferenceManager.getDefaultSharedPreferences(mContext);
-//                SharedPreferences.Editor editor = settings.edit();
-//                editor.putString(PREFERENCES_KEY_IMAGE_URL
-//                        , configuration.getImageConfiguration().getSecureBaseUrl());
-//                editor.putStringSet(PREFERENCES_KEY_POSTER_SIZES
-//                        , new HashSet<>(configuration.getImageConfiguration().getPosterSizes()));
-//                editor.putStringSet(PREFERENCES_KEY_BACKDROP_SIZES
-//                        , new HashSet<>(configuration.getImageConfiguration().getBackdropSizes()));
-//                editor.putLong(PREFERENCES_KEY_LAST_UPDATE
-//                        , System.currentTimeMillis());
-//                editor.commit();
+                mConfiguration.setImageConfiguration(
+                        response.body().getImageConfiguration());
             } else {
                 Log.d(LOG_TAG, "FAILURE! " + response.errorBody().string());
             }
