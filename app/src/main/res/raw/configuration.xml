@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-    <comment>Configuration values for the Popular Movies application</comment>
-    <entry key="apikey.themoviedb"></entry>
+    <comment>Configuration values for themoviedb.org</comment>
+    <entry key="api_key"></entry>
+    <entry key="date_last_update">0</entry>
+    <entry key="image_secure_base_url">https://image.tmdb.org/t/p/</entry>
+    <entry key="backdrop_sizes">w300,w780,w1280,original</entry>
+    <entry key="poster_sizes">w92,w154,w185,w342,w500,w780,original</entry>
 </properties>

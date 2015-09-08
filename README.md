@@ -15,7 +15,7 @@ Before you build the application, edit `app/src/main/res/raw/configuration.xml`
 and add your access key for themoviedatabase.org's RESTful API. For example:
 
     ...
-    <entry key="apikey.themoviedb">4N4W350M3K3Y</entry>
+    <entry key="api_key">4N4W350M3K3Y</entry>
     ...
 
 ## Building the application

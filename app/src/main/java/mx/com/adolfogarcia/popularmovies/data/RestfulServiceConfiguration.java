@@ -24,17 +24,19 @@ import android.util.TypedValue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
 import mx.com.adolfogarcia.popularmovies.R;
 
 /**
- * Handles storage of <a href="https://www.themoviedb.org/">themoviedb.org</a>'s
- * RESTful API configuration and provides utility methods related to it. The
- * data is stored in the application's {@link SharedPreferences}, using the
- * keys defined as constants. Utility methods are provided for storage and
- * retrieval.
+ * Handles access to storage of
+ * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API
+ * configuration and provides utility methods related to it. The data is stored
+ * in the application's {@link SharedPreferences}, using the keys defined as
+ * constants. Utility methods are provided for storage and retrieval.
  *
  * @author  Jesús Adolfo García Pasquel
  */
@@ -43,24 +45,26 @@ public class RestfulServiceConfiguration {
     /**
      * Identifies the messages written to the log by this class.
      */
-    private static final String LOG_TAG = "";
+    private static final String LOG_TAG =
+            RestfulServiceConfiguration.class.getSimpleName();
 
     /**
-     * Key used to access the time when the configuration was last updated.
-     * @see #PREFERENCES_DEFAULT_LAST_UPDATE
+     * Key used to access the default value for the time when the configuration
+     * was last updated, stored in the application's {@link SharedPreferences}.
      */
-    public static final String PREFERENCES_KEY_LAST_UPDATE = "date_last_update";
+    private static final String PREFERENCES_KEY_LAST_UPDATE = "date_last_update";
 
     /**
-     * Default value for the time when the configuration was last updated.
-     * @see #PREFERENCES_KEY_LAST_UPDATE
+     * Key used to access the default value for the time when the configuration
+     * was last updated, from {@link #mConfigurationProperties}.
      */
-    public static final long PREFERENCES_DEFAULT_LAST_UPDATE = 0;
+    private static final String PROPERTIES_KEY_DEFAULT_LAST_UPDATE = "date_last_update";
 
     /**
      * <p>
-     *   Key used to access the base URL used to retrieve images from the API.
-     *   To build an image URL, 3 elements are required:
+     *   Key used to access the base URL used to retrieve images from the API,
+     *   stored in the application's {@link SharedPreferences}. To build an
+     *   image URL, 3 elements are required:
      * </p>
      * <ul>
      *   <li>Base URL.</li>
@@ -71,16 +75,14 @@ public class RestfulServiceConfiguration {
      *   The first two are defined in the API's configuration, and the file path
      *   on the element the image belongs to.
      * </p>
-     * @see #PREFERENCES_DEFAULT_LAST_UPDATE
-     * @see #PREFERENCES_KEY_POSTER_SIZES
-     * @see #PREFERENCES_DEFAULT_POSTER_SIZES
      */
-    public static final String PREFERENCES_KEY_IMAGE_URL = "image_secure_base_url";
+    private static final String PREFERENCES_KEY_IMAGE_URL = "image_secure_base_url";
 
     /**
      * <p>
-     *   Default value for the base URL used to retrieve images from the API.
-     *   To build an image URL, 3 elements are required:
+     *   Key used to access the default value for the base URL used to retrieve
+     *   images from the API, stored in {@link #mConfigurationProperties}. To
+     *   build an image URL, 3 elements are required:
      * </p>
      * <ul>
      *   <li>Base URL.</li>
@@ -91,56 +93,15 @@ public class RestfulServiceConfiguration {
      *   The first two are defined in the API's configuration, and the file path
      *   on the element the image belongs to.
      * </p>
-     * @see #PREFERENCES_DEFAULT_LAST_UPDATE
-     * @see #PREFERENCES_KEY_POSTER_SIZES
-     * @see #PREFERENCES_DEFAULT_POSTER_SIZES
      */
-    public static final String PREFERENCES_DEFAULT_IMAGE_URL = "https://image.tmdb.org/t/p/";
-
-    /**
-     * <p>
-     *   Key used to access the set of available image sizes for the movie posters.
-     *   To build an image URL,3 elements are required:
-     * </p>
-     * <ul>
-     *   <li>Base URL.</li>
-     *   <li>Image size</li>
-     *   <li>File path</li>
-     * </ul>
-     * <p>
-     *   The first two are defined in the API's configuration and the file path on
-     *   the element the image belongs to.
-     * </p>
-     * @see #PREFERENCES_DEFAULT_POSTER_SIZES
-     * @see #PREFERENCES_KEY_IMAGE_URL
-     * @see #PREFERENCES_DEFAULT_IMAGE_URL
-     */
-    public static final String PREFERENCES_KEY_POSTER_SIZES = "poster_sizes";
-
-    /**
-     * <p>
-     *   Default value for the set of available image sizes for the movie posters.
-     *   To build an image URL,3 elements are required:
-     * </p>
-     * <ul>
-     *   <li>Base URL.</li>
-     *   <li>Image size</li>
-     *   <li>File path</li>
-     * </ul>
-     * <p>
-     *   The first two are defined in the API's configuration and the file path
-     *   on the element the image belongs to.
-     * </p>
-     * @see #PREFERENCES_KEY_POSTER_SIZES
-     * @see #PREFERENCES_KEY_IMAGE_URL
-     * @see #PREFERENCES_DEFAULT_IMAGE_URL
-     */
-    public static final Set<String> PREFERENCES_DEFAULT_POSTER_SIZES = null;
+    private static final String PROPERTIES_KEY_DEFAULT_IMAGE_URL =
+            "image_secure_base_url";
 
     /**
      * <p>
      *   Key used to access the set of available image sizes for the movie
-     *   backdrops. To build an image URL, 3 elements are required:
+     *   posters, on the application's {@link SharedPreferences}. To build an
+     *   image URL, 3 elements are required:
      * </p>
      * <ul>
      *   <li>Base URL.</li>
@@ -148,19 +109,17 @@ public class RestfulServiceConfiguration {
      *   <li>File path</li>
      * </ul>
      * <p>
-     *   The first two are defined in the API's configuration and the file
-     *   path on the element the image belongs to.
+     *   The first two are defined in the API's configuration, and the file path
+     *   on the element the image belongs to.
      * </p>
-     * @see #PREFERENCES_DEFAULT_BACKDROP_SIZES
-     * @see #PREFERENCES_KEY_IMAGE_URL
-     * @see #PREFERENCES_DEFAULT_IMAGE_URL
      */
-    public static final String PREFERENCES_KEY_BACKDROP_SIZES = "backdrop_sizes";
+    private static final String PREFERENCES_KEY_POSTER_SIZES = "poster_sizes";
 
     /**
      * <p>
-     *   Default value for the set of available image sizes for the movie
-     *   backdrops. To build an image URL,3 elements are required:
+     *   Key used to access the default value for the set of available image
+     *   sizes for the movie  posters, in {@link #mConfigurationProperties}. To
+     *   build an image URL, 3 elements are required:
      * </p>
      * <ul>
      *   <li>Base URL.</li>
@@ -168,14 +127,60 @@ public class RestfulServiceConfiguration {
      *   <li>File path</li>
      * </ul>
      * <p>
-     *   The first two are defined in the API's configuration and the file
-     *   path on the element the image belongs to.
+     *   The first two are defined in the API's configuration, and the file path
+     *   on the element the image belongs to.
      * </p>
-     * @see #PREFERENCES_KEY_BACKDROP_SIZES
-     * @see #PREFERENCES_KEY_IMAGE_URL
-     * @see #PREFERENCES_DEFAULT_IMAGE_URL
      */
-    public static final Set<String> PREFERENCES_DEFAULT_BACKDROP_SIZES = null;
+    private static final String PROPERTIES_KEY_DEFAULT_POSTER_SIZES =
+            "poster_sizes";
+
+    /**
+     * Character used to separate entry values in the properties that
+     * contain default sets of values.
+     */
+    private static final String SET_ENTRY_SEPARATOR = ",";
+
+    /**
+     * <p>
+     *   Key used to access the set of available image sizes for the movie
+     *   backdrops, on the application's {@link SharedPreferences}. To build an
+     *   image URL, 3 elements are required:
+     * </p>
+     * <ul>
+     *   <li>Base URL.</li>
+     *   <li>Image size</li>
+     *   <li>File path</li>
+     * </ul>
+     * <p>
+     *   The first two are defined in the API's configuration, and the file path
+     *   on the element the image belongs to.
+     * </p>
+     */
+    private static final String PREFERENCES_KEY_BACKDROP_SIZES = "backdrop_sizes";
+
+    /**
+     * <p>
+     *   Key used to access the default value for the set of available image
+     *   sizes for the movie  backdrops, in {@link #mConfigurationProperties}.
+     *   To build an image URL, 3 elements are required:
+     * </p>
+     * <ul>
+     *   <li>Base URL.</li>
+     *   <li>Image size</li>
+     *   <li>File path</li>
+     * </ul>
+     * <p>
+     *   The first two are defined in the API's configuration, and the file path
+     *   on the element the image belongs to.
+     * </p>
+     */
+    private static final String PROPERTIES_KEY_DEFAULT_BACKDROP_SIZES =
+            "backdrop_sizes";
+
+    /**
+     *
+     */
+    private static final String PROPERTIES_KEY_API_ACCESS = "api_key";
 
     /**
      * The {@link Context} used to retrieve and store the configuration values.
@@ -186,7 +191,7 @@ public class RestfulServiceConfiguration {
      * Holds default configuration values and the key required to access the
      * RESTful API.
      */
-    private static final Properties configurationProperties = new Properties();
+    private static final Properties mConfigurationProperties = new Properties();
 
     /**
      * Creates a new instance of {@link RestfulServiceConfiguration}
@@ -201,7 +206,7 @@ public class RestfulServiceConfiguration {
         InputStream is = null; // TODO: Use try-with-resources (Android Studio shows errors in spite of Retrolambda)
         try {
             is = mContext.getResources().openRawResource(R.raw.configuration);
-            configurationProperties.loadFromXML(is);
+            mConfigurationProperties.loadFromXML(is);
         } catch (IOException ioe) {
             Log.e(LOG_TAG, "Failed to load configuration file.", ioe);
         } finally {
@@ -220,12 +225,14 @@ public class RestfulServiceConfiguration {
      * @return the base URL used to retrieve images from the API or a default
      *     value if one has not been previously stored.
      */
-    public String getImageBaseUrl(Context context) {
+    public String getImageBaseUrl() {
         SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(context);
+                PreferenceManager.getDefaultSharedPreferences(mContext);
         return settings.getString(PREFERENCES_KEY_IMAGE_URL
-                , PREFERENCES_DEFAULT_IMAGE_URL);
+                , PROPERTIES_KEY_DEFAULT_IMAGE_URL);
     }
+
+    // FIXME: Add setters to store values in SharedPreferences and use in FetchConfigurationTask.
 
     /**
      * Returns the name of the poster image size provided by
@@ -238,7 +245,7 @@ public class RestfulServiceConfiguration {
      * @return the name of the size that fits the device best or or {@code null}
      *     if none is found.
      */
-    public String getBestPosterSizeName(int dipWidth) {
+    private String getBestPosterSizeName(int dipWidth) {
         // TODO: Calculate best and set it in an instance variable to avoid recalculation
         int optimalWidthPixels = (int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP
@@ -246,12 +253,9 @@ public class RestfulServiceConfiguration {
                 , mContext.getResources().getDisplayMetrics());
         SharedPreferences settings =
                 PreferenceManager.getDefaultSharedPreferences(mContext);
-        Set<String> apiPosterSizes = settings.getStringSet(PREFERENCES_KEY_POSTER_SIZES
-                , PREFERENCES_DEFAULT_POSTER_SIZES);
-        if (apiPosterSizes == null) {
-            Log.e(LOG_TAG, "No poster sizes found");
-            return null;
-        }
+        Set<String> apiPosterSizes =
+                settings.getStringSet(PREFERENCES_KEY_POSTER_SIZES
+                        , getDefaultSetValue(PROPERTIES_KEY_DEFAULT_POSTER_SIZES));
 
         int minDiff = Integer.MAX_VALUE;
         String bestSizeName = null;
@@ -268,6 +272,21 @@ public class RestfulServiceConfiguration {
             }
         }
         return bestSizeName;
+    }
+
+    /**
+     * Returns the values stored in the specified property as a set,
+     * considering item are separated by {@link #SET_ENTRY_SEPARATOR}.
+     *
+     * @param key the key to access the desired value from
+     *     {@link #mConfigurationProperties}.
+     * @return the values stored in the specified property as a set,
+     *     considering item are separated by {@link #SET_ENTRY_SEPARATOR}.
+     */
+    private Set<String> getDefaultSetValue(String key) {
+        String defaultSizesProperty = mConfigurationProperties.getProperty(key);
+        return new HashSet<>(Arrays.asList(
+                defaultSizesProperty.split(SET_ENTRY_SEPARATOR)));
     }
 
     /**
@@ -286,35 +305,7 @@ public class RestfulServiceConfiguration {
      *
      */
     public String getBestFittingPosterUrl(String relativePath, int dipWidth) {
-        // TODO: Calculate best and cache results to avoid recalculation
-        int optimalWidthPixels = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP
-                , dipWidth
-                , mContext.getResources().getDisplayMetrics());
-        SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
-        Set<String> apiPosterSizes = settings.getStringSet(PREFERENCES_KEY_POSTER_SIZES
-                , PREFERENCES_DEFAULT_POSTER_SIZES);
-        if (apiPosterSizes == null) {
-            Log.e(LOG_TAG, "No poster sizes found");
-            return null;
-        }
-
-        int minDiff = Integer.MAX_VALUE;
-        String bestSizeName = null;
-        for (String sizeName : apiPosterSizes) {
-            try {
-                int size = Integer.parseInt(sizeName.substring(1));
-                int diff = Math.abs(optimalWidthPixels - size);
-                if (minDiff > diff) {
-                    minDiff = diff;
-                    bestSizeName = sizeName;
-                }
-            } catch (NumberFormatException nfe) {
-                Log.w(LOG_TAG, "Ignoring poster size: " + sizeName);
-            }
-        }
-        return bestSizeName;
+        return getImageBaseUrl() + getBestPosterSizeName(dipWidth) + relativePath;
     }
 
     /**
@@ -325,7 +316,7 @@ public class RestfulServiceConfiguration {
      * <a href="http://www.themoviedb.org">themoviedb.org</a>.
      */
     public String getMovieApiKey() {
-        return configurationProperties.getProperty("apikey.themoviedb"); // TODO: Move key to constant and load defaults from properties.
+        return mConfigurationProperties.getProperty(PROPERTIES_KEY_API_ACCESS);
     }
 
 }

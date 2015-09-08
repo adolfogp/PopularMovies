@@ -93,15 +93,11 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     }
 
     @Override
-    public void onStart() { //TODO: Remove updates from here. Do not use the changeListener.
+    public void onStart() { //TODO: Remove updates from here
         super.onStart();
         SharedPreferences settings =
                 PreferenceManager.getDefaultSharedPreferences(getActivity());
-        settings.registerOnSharedPreferenceChangeListener((sharedPreferences, key) -> {
-            if (RestfulServiceConfiguration.PREFERENCES_KEY_IMAGE_URL.equals(key)) {
-                updateMovies();
-            }
-        });
+        // TODO: Check last date sync, download config if necessary and after, update movies
         updateApiConfig();
         updateMovies();
     }

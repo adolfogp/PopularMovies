@@ -65,18 +65,19 @@ public class FetchConfigurationTask extends AsyncTask<Void, Void, Void> {
             if (response.isSuccess()) {
                 Log.d(LOG_TAG, "SUCCESS! " + response.body().toString());
                 GeneralConfigurationJsonModel configuration = response.body();
-                SharedPreferences settings =
-                        PreferenceManager.getDefaultSharedPreferences(mContext);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putString(PREFERENCES_KEY_IMAGE_URL
-                        , configuration.getImageConfiguration().getSecureBaseUrl());
-                editor.putStringSet(PREFERENCES_KEY_POSTER_SIZES
-                        , new HashSet<>(configuration.getImageConfiguration().getPosterSizes()));
-                editor.putStringSet(PREFERENCES_KEY_BACKDROP_SIZES
-                        , new HashSet<>(configuration.getImageConfiguration().getBackdropSizes()));
-                editor.putLong(PREFERENCES_KEY_LAST_UPDATE
-                        , System.currentTimeMillis());
-                editor.commit();
+                // FIXME -
+//                SharedPreferences settings =
+//                        PreferenceManager.getDefaultSharedPreferences(mContext);
+//                SharedPreferences.Editor editor = settings.edit();
+//                editor.putString(PREFERENCES_KEY_IMAGE_URL
+//                        , configuration.getImageConfiguration().getSecureBaseUrl());
+//                editor.putStringSet(PREFERENCES_KEY_POSTER_SIZES
+//                        , new HashSet<>(configuration.getImageConfiguration().getPosterSizes()));
+//                editor.putStringSet(PREFERENCES_KEY_BACKDROP_SIZES
+//                        , new HashSet<>(configuration.getImageConfiguration().getBackdropSizes()));
+//                editor.putLong(PREFERENCES_KEY_LAST_UPDATE
+//                        , System.currentTimeMillis());
+//                editor.commit();
             } else {
                 Log.d(LOG_TAG, "FAILURE! " + response.errorBody().string());
             }
