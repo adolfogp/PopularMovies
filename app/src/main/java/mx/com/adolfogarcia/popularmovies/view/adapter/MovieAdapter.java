@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
 import mx.com.adolfogarcia.popularmovies.R;
@@ -76,7 +77,10 @@ public class MovieAdapter extends CursorAdapter {
                 TypedValue.COMPLEX_UNIT_DIP
                 , POSTER_THUMBNAIL_WIDTH_DIP
                 , context.getResources().getDisplayMetrics()));
-        Picasso.with(context).load(posterImageUrl).resize(optimalWidthPixels, 0).into(binding.posterImageView);
+        Picasso.with(context)
+                .load(posterImageUrl)
+                .resize(optimalWidthPixels, 0)
+                .into(binding.posterImageView);
     }
 
 }

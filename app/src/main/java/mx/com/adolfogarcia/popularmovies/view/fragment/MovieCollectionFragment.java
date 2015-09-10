@@ -31,6 +31,7 @@ import javax.inject.Inject;
 
 import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
+import mx.com.adolfogarcia.popularmovies.data.MovieContract;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.databinding.MovieCollectionFragmentBinding;
 import mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel;
@@ -44,12 +45,14 @@ import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEn
  *
  * @author Jesús Adolfo García Pasquel
  */
-public class MovieCollectionFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieCollectionFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * Identifies the messages written to the log by this class.
      */
-    private static final String LOG_TAG = MovieCollectionFragment.class.getSimpleName();
+    private static final String LOG_TAG =
+            MovieCollectionFragment.class.getSimpleName();
 
     /**
      * Identifies the {@link Loader} that retrieves the movie data cached in
@@ -100,10 +103,11 @@ public class MovieCollectionFragment extends Fragment implements LoaderManager.L
         mViewModel = new MovieCollectionViewModel(getActivity(), mConfiguration);
         mBinding.setViewModel(mViewModel); // TODO: Try to get view model instance from with dagger.
         Cursor cursor = getActivity().getContentResolver().query(
-                CachedMovieEntry.CONTENT_URI, null, null, null, null); // FIXME: Wrong query
+                CachedMovieEntry.CONTENT_URI, null, null, null, CachedMovieEntry.COLUMN_POPULARITY + " DESC"); // FIXME: Wrong query
         mMovieAdapter = new MovieAdapter(mConfiguration, getActivity(), cursor, 0);
         mBinding.posterGridView.setAdapter(mMovieAdapter);
-        mBinding.posterGridView.setOnItemClickListener(mBinding.getViewModel());
+        mBinding.posterGridView.setOnItemClickListener(mViewModel);
+        mBinding.posterGridView.setOnScrollListener(mViewModel);
         return mBinding.getRoot();
     }
 
@@ -112,7 +116,7 @@ public class MovieCollectionFragment extends Fragment implements LoaderManager.L
         super.onStart();
         // TODO: Check last date sync, download config if necessary and after, update movies
         mViewModel.updateApiConfig();
-        mViewModel.updateMovies();
+        mViewModel.downloadNextMoviePage();
     }
 
     @Override
@@ -120,16 +124,22 @@ public class MovieCollectionFragment extends Fragment implements LoaderManager.L
         // TODO: Specify projection (place projection in Adapter class)
         // TODO: Specify order
         return new CursorLoader(this.getActivity(), CachedMovieEntry.CONTENT_URI
-                , null, null, null, null);  // FIXME: Wrong query
+                , null, null, null, CachedMovieEntry.COLUMN_POPULARITY + " DESC");  // FIXME: Wrong query
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mMovieAdapter.swapCursor(data);
+        Cursor oldCursor = mMovieAdapter.swapCursor(data);
+        if (oldCursor != null) {
+            oldCursor.close();
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        mMovieAdapter.swapCursor(null);
+        Cursor oldCursor = mMovieAdapter.swapCursor(null);
+        if (oldCursor != null) {
+            oldCursor.close();
+        }
     }
 }

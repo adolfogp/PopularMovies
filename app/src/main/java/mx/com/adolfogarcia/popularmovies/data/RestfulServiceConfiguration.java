@@ -174,9 +174,24 @@ public class RestfulServiceConfiguration {
             "backdrop_sizes";
 
     /**
-     *
+     * Key used to retrieve the hash required to access the RESTful API, from
+     * {@link #mConfigurationProperties}.
      */
     private static final String PROPERTIES_KEY_API_ACCESS = "api_key";
+
+    /**
+     * Key used to access the number of the page last retrieved from the RESTful
+     * API, as stored in the {@link SharedPreferences}.
+     */
+    private static final String PREFERENCES_KEY_LAST_MOVIE_PAGE_RETRIEVED =
+            "last_movie_page_retrieved";
+
+    /**
+     * Key used to access the total number of movie pages available in the RESTful
+     * API, as stored in the {@link SharedPreferences}.
+     */
+    private static final String PREFERENCES_KEY_TOTAL_MOVIE_PAGES_AVAILABLE =
+            "total_movie_pages_available";
 
     /**
      * The {@link Context} used to retrieve and store the configuration values.
@@ -458,7 +473,10 @@ public class RestfulServiceConfiguration {
 
     /**
      * Returns the epoch time at which the configuration was last updated or
-     * zero if it has never been set.
+     * zero if it has never been set. Note that this only applies to the
+     * properties (those that appear in {@link ImageConfigurationJsonModel}),
+     * if other attributes (e.g. the last movie page retrieved) are changed,
+     * the time is not updated.
      *
      * @return the epoch time at which the configuration was last updated or
      *     zero if it has never been set.
@@ -467,6 +485,67 @@ public class RestfulServiceConfiguration {
         SharedPreferences settings =
                 PreferenceManager.getDefaultSharedPreferences(mContext);
         return settings.getLong(PREFERENCES_KEY_LAST_UPDATE, 0);
+    }
+
+    /**
+     * Returns the number of the page last retrieved from the RESTful
+     * API, as stored in the {@link SharedPreferences}, or zero if none have
+     * been retrieved.
+     *
+     * @return the number of the page last retrieved from the RESTful
+     * API, as stored in the {@link SharedPreferences}, or zero if none have
+     * been retrieved.
+     */
+    public int getLastMoviePageRetrieved() {
+        SharedPreferences settings =
+                PreferenceManager.getDefaultSharedPreferences(mContext);
+        return settings.getInt(PREFERENCES_KEY_LAST_MOVIE_PAGE_RETRIEVED, 0);
+    }
+
+    /**
+     * Sets the number of the page last retrieved from the RESTful
+     * API. That is, stores the value in the application's
+     * {@link SharedPreferences}.
+     *
+     * @param page the value to store.
+     */
+    public void setLastMoviePageRetrieved(int page) {
+        SharedPreferences preferences =
+                PreferenceManager.getDefaultSharedPreferences(mContext);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(PREFERENCES_KEY_LAST_MOVIE_PAGE_RETRIEVED, page);
+        editor.apply();
+    }
+
+    /**
+     * Returns the total number of movie pages available in the RESTful
+     * API, as stored in the {@link SharedPreferences}, or
+     * {@link Integer#MAX_VALUE} if the value has not been set.
+     *
+     * @return the total number of movie pages available in the RESTful
+     *     API, as stored in the {@link SharedPreferences}, or
+     *     {@link Integer#MAX_VALUE} if the value has not been set.
+     */
+    public int getTotalMoviePagesAvailable() {
+        SharedPreferences settings =
+                PreferenceManager.getDefaultSharedPreferences(mContext);
+        return settings.getInt(PREFERENCES_KEY_TOTAL_MOVIE_PAGES_AVAILABLE
+                , Integer.MAX_VALUE);
+    }
+
+    /**
+     * Sets the number of the page last retrieved from the RESTful
+     * API. That is, stores the value in the application's
+     * {@link SharedPreferences}.
+     *
+     * @param total the value to store.
+     */
+    public void setTotalMoviePagesAvailable(int total) {
+        SharedPreferences preferences =
+                PreferenceManager.getDefaultSharedPreferences(mContext);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(PREFERENCES_KEY_TOTAL_MOVIE_PAGES_AVAILABLE, total);
+        editor.apply();
     }
 
 }

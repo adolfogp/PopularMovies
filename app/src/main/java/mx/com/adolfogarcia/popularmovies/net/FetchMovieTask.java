@@ -37,7 +37,11 @@ import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
-public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
+// TODO: Rename to FetchMoviePageTask
+/*
+ Receives the page number to load.
+ */
+public class FetchMovieTask extends AsyncTask<Integer, Void, Void> {
 
     private static final String LOG_TAG = FetchMovieTask.class.getSimpleName();
 
@@ -52,15 +56,18 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... params) {
+    protected Void doInBackground(Integer... params) {
+        Log.d(LOG_TAG, "Starting download of movie page: " + params[0]);
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(TheMovieDbApi.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         TheMovieDbApi service = retrofit.create(TheMovieDbApi.class);
-        Call<MoviePageJsonModel> configCall = service.getMoviePage(1
+        Call<MoviePageJsonModel> configCall = service.getMoviePage(
+                mConfiguration.getMovieApiKey()
                 , TheMovieDbApi.SORT_BY_POPULARITY
-                , mConfiguration.getMovieApiKey());
+                , params[0]
+        );
         try {
             Response<MoviePageJsonModel> response = configCall.execute();
             if (response.isSuccess()) {
@@ -92,6 +99,8 @@ public class FetchMovieTask extends AsyncTask<Void, Void, Void> {
         if (cvList.size() > 0 ) {
             mContext.getContentResolver().bulkInsert(CachedMovieEntry.CONTENT_URI
                     , cvList.toArray(new ContentValues[cvList.size()]));
+            mConfiguration.setTotalMoviePagesAvailable(response.getTotalPages());
+            mConfiguration.setLastMoviePageRetrieved(response.getPageNumber());
         }
     }
 
