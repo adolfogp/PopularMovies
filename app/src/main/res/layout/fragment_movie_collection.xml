@@ -2,7 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".PortfolioActivity">
 
-    <data class="MainFragmentBinding">
+    <data class="MovieCollectionFragmentBinding">
+        <import type="mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel"/>
+        <variable name="viewModel" type="MovieCollectionViewModel"/>
     </data>
 
     <!-- TODO: Use a RecyclerView instead. -->

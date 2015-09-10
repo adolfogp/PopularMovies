@@ -16,52 +16,65 @@
 
 package mx.com.adolfogarcia.popularmovies.view.fragment;
 
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
-import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.Set;
-
-import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 import javax.inject.Inject;
 
 import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
+import mx.com.adolfogarcia.popularmovies.databinding.MovieCollectionFragmentBinding;
+import mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel;
 import mx.com.adolfogarcia.popularmovies.view.adapter.MovieAdapter;
-import mx.com.adolfogarcia.popularmovies.databinding.MainFragmentBinding;
-import mx.com.adolfogarcia.popularmovies.net.FetchConfigurationTask;
-import mx.com.adolfogarcia.popularmovies.net.FetchMovieTask;
+
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 /**
- * A placeholder fragment containing a simple view.
+ * Displays a collection of movie posters in a grid, retrieving the information
+ * from <a href="https://www.themoviedb.org/">themoviedb.org</a>.
  *
  * @author Jesús Adolfo García Pasquel
  */
-public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieCollectionFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
+    /**
+     * Identifies the messages written to the log by this class.
+     */
+    private static final String LOG_TAG = MovieCollectionFragment.class.getSimpleName();
 
-    private static final int MY_LOADER_ID = 2576;
+    /**
+     * Identifies the {@link Loader} that retrieves the movie data cached in
+     * the local database.
+     */
+    private static final int MOVIE_LOADER_ID = 2576;
 
-    // TODO: Put preference constants in appropriate class in package data
+    /**
+     * Binds the view to the view model.
+     * @see mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel
+     */
+    private MovieCollectionFragmentBinding mBinding = null;
 
-
-    private MainFragmentBinding mBinding = null;
-
+    /**
+     * Adapter that provides the {@link View}s for presenting each movie.
+     */
     private MovieAdapter mMovieAdapter;
 
+    private MovieCollectionViewModel mViewModel;
+
+    /**
+     * The configuration information required to retrieve movie data and images
+     * using <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful
+     * API.
+     */
     @Inject RestfulServiceConfiguration mConfiguration;
 
     @Override
@@ -73,46 +86,33 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(MY_LOADER_ID, null, this);
+        getLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_main, container, false);
-        // TODO: Set View Models for mBinding, move events to the View Models
-
+        mBinding = DataBindingUtil.inflate(inflater
+                , R.layout.fragment_movie_collection
+                , container
+                , false);
+        mViewModel = new MovieCollectionViewModel(getActivity(), mConfiguration);
+        mBinding.setViewModel(mViewModel); // TODO: Try to get view model instance from with dagger.
         Cursor cursor = getActivity().getContentResolver().query(
                 CachedMovieEntry.CONTENT_URI, null, null, null, null); // FIXME: Wrong query
         mMovieAdapter = new MovieAdapter(mConfiguration, getActivity(), cursor, 0);
-        mBinding.posterGridView.setAdapter(mMovieAdapter); // TODO: Verify if this can be done with DataBinding
-        mBinding.posterGridView.setOnItemClickListener(
-                (adapterView, view, position, l) -> Log.d(LOG_TAG, "Clicked.")); // TODO: Move to DataBinding
+        mBinding.posterGridView.setAdapter(mMovieAdapter);
+        mBinding.posterGridView.setOnItemClickListener(mBinding.getViewModel());
         return mBinding.getRoot();
     }
 
     @Override
     public void onStart() { //TODO: Remove updates from here
         super.onStart();
-        SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(getActivity());
         // TODO: Check last date sync, download config if necessary and after, update movies
-        updateApiConfig();
-        updateMovies();
-    }
-
-    private void updateApiConfig() {
-        FetchConfigurationTask fetchConfigurationTask =
-                new FetchConfigurationTask(getActivity(), mConfiguration);
-        fetchConfigurationTask.execute();
-    }
-
-    private void updateMovies() {
-        // TODO: Get new taks using Dagger (especially since this may move elsewhere to get the pages)
-        FetchMovieTask fetchMovieTask =
-                new FetchMovieTask(getActivity(), mConfiguration);
-        fetchMovieTask.execute();
+        mViewModel.updateApiConfig();
+        mViewModel.updateMovies();
     }
 
     @Override
@@ -120,7 +120,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         // TODO: Specify projection (place projection in Adapter class)
         // TODO: Specify order
         return new CursorLoader(this.getActivity(), CachedMovieEntry.CONTENT_URI
-                , null, null, null, null);
+                , null, null, null, null);  // FIXME: Wrong query
     }
 
     @Override

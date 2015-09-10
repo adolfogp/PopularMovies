@@ -17,11 +17,8 @@
 package mx.com.adolfogarcia.popularmovies.view.adapter;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,15 +27,11 @@ import android.widget.CursorAdapter;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.Set;
-
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.databinding.MovieListItemBinding;
-import mx.com.adolfogarcia.popularmovies.view.fragment.MainActivityFragment;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
-import static mx.com.adolfogarcia.popularmovies.view.fragment.MainActivityFragment.*;
 
 // TODO: Reconsider package
 public class MovieAdapter extends CursorAdapter {
