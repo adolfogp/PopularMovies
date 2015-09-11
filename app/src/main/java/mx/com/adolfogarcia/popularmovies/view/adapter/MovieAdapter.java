@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 
-import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 
 import mx.com.adolfogarcia.popularmovies.R;
@@ -80,6 +79,8 @@ public class MovieAdapter extends CursorAdapter {
         Picasso.with(context)
                 .load(posterImageUrl)
                 .resize(optimalWidthPixels, 0)
+                .placeholder(R.drawable.poster_placeholder)
+                .error(R.drawable.logo_the_movie_db_180dp)
                 .into(binding.posterImageView);
     }
 
