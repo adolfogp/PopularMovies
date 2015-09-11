@@ -9,7 +9,7 @@ The XSLT file used to generate the HTML Checkstyle report,
 (checkstyle-noframes-sorted.xsl) was taken from:
 https://svn.apache.org/repos/asf/hive/trunk/checkstyle/
 
-poster_placeholder.png is based on the public domain Ajax-loader.png, available
-at https://commons.wikimedia.org/wiki/File:Ajax-loader.png
+poster_placeholder.png is based on the CC-BY-SA licensed SVG image available at
+http://sv-ti.com/2013/10/16/creating-an-ajax-loader-in-svg/
 
 "This product uses the TMDb API but is not endorsed or certified by TMDb."

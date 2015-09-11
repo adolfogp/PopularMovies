@@ -79,7 +79,7 @@ public class MovieAdapter extends CursorAdapter {
         Picasso.with(context)
                 .load(posterImageUrl)
                 .resize(optimalWidthPixels, 0)
-                .placeholder(R.drawable.poster_placeholder)
+                .placeholder(R.anim.poster_loading)
                 .error(R.drawable.logo_the_movie_db_180dp)
                 .into(binding.posterImageView);
     }
