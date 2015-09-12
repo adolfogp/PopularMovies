@@ -23,15 +23,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import org.parceler.Parcels;
 
 import javax.inject.Inject;
 
 import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
-import mx.com.adolfogarcia.popularmovies.data.MovieContract;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.databinding.MovieCollectionFragmentBinding;
 import mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel;
@@ -61,6 +63,11 @@ public class MovieCollectionFragment extends Fragment
     private static final int MOVIE_LOADER_ID = 2576;
 
     /**
+     * Key used to save and retrieve the serialized {@link #mViewModel}.
+     */
+    private static final String STATE_VIEW_MODEL = "state_view_model";
+
+    /**
      * Binds the view to the view model.
      * @see mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel
      */
@@ -84,6 +91,22 @@ public class MovieCollectionFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((PopularMoviesApplication) getActivity().getApplication()).getComponent().inject(this);
+        restoreState(savedInstanceState);
+    }
+
+    private void restoreState(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            return;
+        }
+        mViewModel = Parcels.unwrap(savedInstanceState.getParcelable(STATE_VIEW_MODEL));
+        mViewModel.setConfiguration(mConfiguration);
+        mViewModel.setContext(getActivity());
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(STATE_VIEW_MODEL, Parcels.wrap(mViewModel));
     }
 
     @Override
@@ -92,7 +115,6 @@ public class MovieCollectionFragment extends Fragment
         getLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -100,8 +122,10 @@ public class MovieCollectionFragment extends Fragment
                 , R.layout.fragment_movie_collection
                 , container
                 , false);
-        mViewModel = new MovieCollectionViewModel(getActivity(), mConfiguration);
-        mBinding.setViewModel(mViewModel); // TODO: Try to get view model instance from with dagger.
+        if (mViewModel == null) {
+            mViewModel = new MovieCollectionViewModel(getActivity(), mConfiguration); // TODO: Try to get the view model instance from dagger or let dagger inject the configuration directly.
+        }
+        mBinding.setViewModel(mViewModel);
         Cursor cursor = getActivity().getContentResolver().query(
                 CachedMovieEntry.CONTENT_URI, null, null, null, CachedMovieEntry.COLUMN_POPULARITY + " DESC"); // FIXME: Wrong query
         mMovieAdapter = new MovieAdapter(mConfiguration, getActivity(), cursor, 0);

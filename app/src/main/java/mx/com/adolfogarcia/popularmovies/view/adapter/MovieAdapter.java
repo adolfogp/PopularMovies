@@ -44,7 +44,7 @@ public class MovieAdapter extends CursorAdapter {
     /**
      * The width of the poster image measured in <i>Device Independent Pixels</i>.
      */
-    public static final int POSTER_THUMBNAIL_WIDTH_DIP = 180;
+    public static final int POSTER_THUMBNAIL_WIDTH_DIP = 180; // TODO - Use constant in resources and change also the constant in the detail view model.
 
     private final RestfulServiceConfiguration mConfiguration;
 

@@ -18,10 +18,13 @@ package mx.com.adolfogarcia.popularmovies.view.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import de.greenrobot.event.EventBus;
 import mx.com.adolfogarcia.popularmovies.R;
+import mx.com.adolfogarcia.popularmovies.model.event.MovieSelectionEvent;
 
 /**
  * TODO - Document.
@@ -30,12 +33,28 @@ import mx.com.adolfogarcia.popularmovies.R;
  */
 public class MainActivity extends AppCompatActivity {
 
+    /**
+     * Identifies the messages written to the log by this class.
+     */
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
 
+    @Override
+    protected void onResume() {
+        EventBus.getDefault().register(this);
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -57,5 +76,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Displays the detail view of the selected movie.
+     * @param event
+     */
+    public void onEvent(MovieSelectionEvent event){
+        Log.d(LOG_TAG, "id of the selected movie: " + event.getSelectedMovie().getId()); // TODO: Delete
     }
 }

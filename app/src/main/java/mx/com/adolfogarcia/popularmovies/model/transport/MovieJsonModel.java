@@ -1,6 +1,8 @@
 
 package mx.com.adolfogarcia.popularmovies.model.transport;
 
+import android.util.Log;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -8,8 +10,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 /**
  * Transfer object for the movie data returned by
@@ -19,6 +25,21 @@ import java.util.List;
  * @author Jesús Adolfo García Pasquel
  */
 public class MovieJsonModel {
+
+    /**
+     * Identifies the messages written to the log by this class.
+     */
+    private static String LOG_TAG = MovieJsonModel.class.getSimpleName();
+
+    /**
+     * The format used by date attributes, like {@link #getReleaseDate()}.
+     */
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
+
+    /**
+     * The name of the UTC time zone.
+     */
+    public static final String UTC_TIME_ZONE = "UTC";
 
     /**
      * Identifies if the movie is adult content.
@@ -47,7 +68,7 @@ public class MovieJsonModel {
      */
     @SerializedName("id")
     @Expose
-    private Integer mId;
+    private Long mId;
 
     /**
      * ISO 639-2 code of the film's language.
@@ -144,11 +165,11 @@ public class MovieJsonModel {
         this.mGenreIds = genreIds;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return mId;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.mId = id;
     }
 
@@ -178,6 +199,29 @@ public class MovieJsonModel {
 
     public String getReleaseDate() {
         return mReleaseDate;
+    }
+
+    /**
+     * Returns the movie's release date in <a href="">Epoch time</a>,
+     * considering the time zone is UTC.
+     *
+     * @return the movie's release date in <a href="">Epoch time</a>,
+     * considering the time zone is UTC.
+     */
+    public long getReleaseDateEpochTimeUtc() {
+        if (mReleaseDate == null) {
+            return 0;
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat(DATE_FORMAT);
+        formatter.setTimeZone(TimeZone.getTimeZone(UTC_TIME_ZONE));
+        Date date = null;
+        try {
+            date = formatter.parse(mReleaseDate);
+        } catch (ParseException pe) {
+            Log.e(LOG_TAG, "Unable to parse date: " + mReleaseDate, pe);
+            return 0;
+        }
+        return date.getTime();
     }
 
     public void setReleaseDate(String releaseDate) {

@@ -71,13 +71,13 @@ public class FetchMovieTask extends AsyncTask<Integer, Void, Void> {
         try {
             Response<MoviePageJsonModel> response = configCall.execute();
             if (response.isSuccess()) {
-                Log.d(LOG_TAG, "SUCCESS! " + response.body().toString());
+                Log.i(LOG_TAG, "Successfully downloaded movie page " + params[0]);
                 insertMoviesInProvider(response.body());
             } else {
-                Log.d(LOG_TAG, "FAILURE! " + response.errorBody().string());
+                Log.w(LOG_TAG, "Failed to download movie page " + params[0]);
             }
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error getting page of movies", e);
+            Log.e(LOG_TAG, "Error getting movie page " + params[0], e);
         }
         return null;
     }
@@ -87,13 +87,22 @@ public class FetchMovieTask extends AsyncTask<Integer, Void, Void> {
         List<ContentValues> cvList = new ArrayList<>(response.getMovies().size());
         for (MovieJsonModel result : response.getMovies()) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(CachedMovieEntry._ID, result.getId());
-            contentValues.put(CachedMovieEntry.COLUMN_ORIGINAL_TITLE, result.getOriginalTitle());
-            contentValues.put(CachedMovieEntry.COLUMN_OVERVIEW, result.getOverview());
-            contentValues.put(CachedMovieEntry.COLUMN_BACKDROP_PATH, result.getBackdropPath());
-            contentValues.put(CachedMovieEntry.COLUMN_POPULARITY, result.getPopularity());
-            contentValues.put(CachedMovieEntry.COLUMN_VOTE_AVERAGE, result.getVoteAverage());
-            contentValues.put(CachedMovieEntry.COLUMN_POSTER_PATH, result.getPosterPath());
+            contentValues.put(CachedMovieEntry._ID
+                    , result.getId());
+            contentValues.put(CachedMovieEntry.COLUMN_ORIGINAL_TITLE
+                    , result.getOriginalTitle());
+            contentValues.put(CachedMovieEntry.COLUMN_RELEASE_DATE
+                    , result.getReleaseDateEpochTimeUtc());
+            contentValues.put(CachedMovieEntry.COLUMN_OVERVIEW
+                    , result.getOverview());
+            contentValues.put(CachedMovieEntry.COLUMN_BACKDROP_PATH
+                    , result.getBackdropPath());
+            contentValues.put(CachedMovieEntry.COLUMN_POPULARITY
+                    , result.getPopularity());
+            contentValues.put(CachedMovieEntry.COLUMN_VOTE_AVERAGE
+                    , result.getVoteAverage());
+            contentValues.put(CachedMovieEntry.COLUMN_POSTER_PATH
+                    , result.getPosterPath());
             cvList.add(contentValues);
         }
         if (cvList.size() > 0 ) {

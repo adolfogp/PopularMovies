@@ -22,7 +22,15 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 
+import org.parceler.Parcel;
+import org.parceler.Transient;
+
+import static org.parceler.Parcel.Serialization;
+
+import de.greenrobot.event.EventBus;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
+import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
+import mx.com.adolfogarcia.popularmovies.model.event.MovieSelectionEvent;
 import mx.com.adolfogarcia.popularmovies.net.FetchConfigurationTask;
 import mx.com.adolfogarcia.popularmovies.net.FetchMovieTask;
 
@@ -30,9 +38,15 @@ import static android.os.AsyncTask.Status;
 
 /**
  * View model for the movie collection's view. Provides data and behaviour.
+ * If an item is clicked (see {@link #onItemClick(AdapterView, View, int, long)}),
+ * a {@link MovieSelectionEvent} is published on the {@link EventBus}.
+ * When reconstructing (deserializaing), make sure you set the transient
+ * attributes: {@link #setContext(Context)} and
+ * {@link #setConfiguration(RestfulServiceConfiguration)}.
  *
- * Created by Jesús Adolfo García Pasquel on 8/09/15.
+ * @autor Jesús Adolfo García Pasquel
  */
+@Parcel(Serialization.BEAN)
 public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
         , AbsListView.OnScrollListener {
 
@@ -48,11 +62,23 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
     private static final String LOG_TAG =
             MovieCollectionViewModel.class.getSimpleName();
 
-    private final Context mContext;
+    private Context mContext;
 
-    private final RestfulServiceConfiguration mConfiguration;
+    private RestfulServiceConfiguration mConfiguration;
 
+    /**
+     * Current movie downloading task. A reference is kept to avoid
+     * creating multiple download tasks for the same page.
+     */
     private FetchMovieTask mFetchMovieTask = null;
+
+    /**
+     * Creates a new instance of {@link Movie} with the default values for
+     * all its attributes.
+     */
+    public MovieCollectionViewModel() {
+        // Empty bean constructor.
+    }
 
     // TODO: Try to create the ViewModel with Dagger.
     public MovieCollectionViewModel(Context context
@@ -62,8 +88,11 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
     }
 
     public void updateApiConfig() {
+        if (mConfiguration == null) {
+            throw new IllegalStateException("The configuration may not be null.");
+        }
         FetchConfigurationTask fetchConfigurationTask =
-                new FetchConfigurationTask(mContext, mConfiguration);
+                new FetchConfigurationTask(mConfiguration);
         fetchConfigurationTask.execute();
     }
 
@@ -74,6 +103,9 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
      * still pages to be downloaded. Does nothing otherwise.
      */
     public void downloadNextMoviePage() {
+        if (mContext == null || mConfiguration == null) {
+            throw new IllegalStateException("The context and configuration may not be null.");
+        }
         if (mConfiguration.getTotalMoviePagesAvailable()
                 <= mConfiguration.getLastMoviePageRetrieved()) {
             Log.i(LOG_TAG, "No more movie pages to download.");
@@ -91,8 +123,9 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        // TODO: Implement
-        Log.d(LOG_TAG, "Clicked");
+        Movie selectedMovie = new Movie();
+        selectedMovie.setId(id);
+        EventBus.getDefault().post(new MovieSelectionEvent(selectedMovie));
     }
 
     @Override
@@ -111,4 +144,21 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
         // Not used. Only included to implement OnScrollListener
     }
 
+    @Transient
+    public Context getContext() {
+        return mContext;
+    }
+
+    public void setContext(Context context) {
+        mContext = context;
+    }
+
+    @Transient
+    public RestfulServiceConfiguration getConfiguration() {
+        return mConfiguration;
+    }
+
+    public void setConfiguration(RestfulServiceConfiguration configuration) {
+        mConfiguration = configuration;
+    }
 }

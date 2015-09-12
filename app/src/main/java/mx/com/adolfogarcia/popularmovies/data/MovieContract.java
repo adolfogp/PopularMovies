@@ -85,6 +85,12 @@ public final class MovieContract {
         public static final String COLUMN_ORIGINAL_TITLE = "original_title";
 
         /**
+         * The movie's release date. A {@code long} representing the date
+         * in Epock time format with milliseconds and UTC time zone.
+         */
+        public static final String COLUMN_RELEASE_DATE = "release_date";
+
+        /**
          * The movie's plot synopsis.
          */
         public static final String COLUMN_OVERVIEW = "overview";

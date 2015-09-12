@@ -38,10 +38,8 @@ public class FetchConfigurationTask extends AsyncTask<Void, Void, Void> {
     // TODO: Inject with Dagger 2 and get instances of FetchMovieTask with Dagger 2.
     @Inject
     RestfulServiceConfiguration mConfiguration;
-    @Inject Context mContext;
 
-    public FetchConfigurationTask(Context context, RestfulServiceConfiguration configuration) {
-        mContext = context;
+    public FetchConfigurationTask(RestfulServiceConfiguration configuration) {
         mConfiguration = configuration;
     }
 

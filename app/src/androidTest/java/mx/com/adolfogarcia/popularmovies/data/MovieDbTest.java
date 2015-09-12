@@ -72,6 +72,7 @@ public class MovieDbTest extends AndroidTestCase {
         Set<String> columnNameSet = new HashSet<>();
         columnNameSet.add(CachedMovieEntry._ID);
         columnNameSet.add(CachedMovieEntry.COLUMN_BACKDROP_PATH);
+        columnNameSet.add(CachedMovieEntry.COLUMN_RELEASE_DATE);
         columnNameSet.add(CachedMovieEntry.COLUMN_ORIGINAL_TITLE);
         columnNameSet.add(CachedMovieEntry.COLUMN_OVERVIEW);
         columnNameSet.add(CachedMovieEntry.COLUMN_POPULARITY);

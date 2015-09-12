@@ -45,6 +45,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + CachedMovieEntry.TABLE_NAME + " ("
             + CachedMovieEntry._ID + " INTEGER, "
             + CachedMovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL, "
+            + CachedMovieEntry.COLUMN_RELEASE_DATE + " INTEGER, "
             + CachedMovieEntry.COLUMN_OVERVIEW + " TEXT, "
             + CachedMovieEntry.COLUMN_BACKDROP_PATH + " TEXT, "
             + CachedMovieEntry.COLUMN_POSTER_PATH + " TEXT, "

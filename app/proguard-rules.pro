@@ -24,3 +24,9 @@
 
 # Required by Picasso
 -dontwarn com.squareup.okhttp.**
+
+# Required by Parceler
+-keep class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator *;
+}
+-keep class org.parceler.Parceler$$Parcels
