@@ -23,7 +23,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +36,7 @@ import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.databinding.MovieCollectionFragmentBinding;
 import mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel;
-import mx.com.adolfogarcia.popularmovies.view.adapter.MovieAdapter;
+import mx.com.adolfogarcia.popularmovies.view.adapter.MoviePosterAdapter;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
@@ -68,6 +67,13 @@ public class MovieCollectionFragment extends Fragment
     private static final String STATE_VIEW_MODEL = "state_view_model";
 
     /**
+     * Used on the query to {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider},
+     * to order the results from most to least popular.
+     */
+    private static final String ORDER_BY_POPULARITY_DESCENDING =
+            CachedMovieEntry.COLUMN_POPULARITY + " DESC";
+
+    /**
      * Binds the view to the view model.
      * @see mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel
      */
@@ -76,7 +82,7 @@ public class MovieCollectionFragment extends Fragment
     /**
      * Adapter that provides the {@link View}s for presenting each movie.
      */
-    private MovieAdapter mMovieAdapter;
+    private MoviePosterAdapter mMoviePosterAdapter;
 
     private MovieCollectionViewModel mViewModel;
 
@@ -94,6 +100,14 @@ public class MovieCollectionFragment extends Fragment
         restoreState(savedInstanceState);
     }
 
+    /**
+     * Loads the previous state, stored in the {@link Bundle} passed as argument,
+     * into to {@link MovieCollectionFragment}. {@link #mViewModel} in particular.
+     * If the argument is {@code null}, nothing is done.
+     *
+     * @param savedInstanceState the {@link MovieCollectionFragment}'s previous
+     *                           state.
+     */
     private void restoreState(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             return;
@@ -126,10 +140,8 @@ public class MovieCollectionFragment extends Fragment
             mViewModel = new MovieCollectionViewModel(getActivity(), mConfiguration); // TODO: Try to get the view model instance from dagger or let dagger inject the configuration directly.
         }
         mBinding.setViewModel(mViewModel);
-        Cursor cursor = getActivity().getContentResolver().query(
-                CachedMovieEntry.CONTENT_URI, null, null, null, CachedMovieEntry.COLUMN_POPULARITY + " DESC"); // FIXME: Wrong query
-        mMovieAdapter = new MovieAdapter(mConfiguration, getActivity(), cursor, 0);
-        mBinding.posterGridView.setAdapter(mMovieAdapter);
+        mMoviePosterAdapter = new MoviePosterAdapter(mConfiguration, getActivity(), null, 0);
+        mBinding.posterGridView.setAdapter(mMoviePosterAdapter);
         mBinding.posterGridView.setOnItemClickListener(mViewModel);
         mBinding.posterGridView.setOnScrollListener(mViewModel);
         return mBinding.getRoot();
@@ -147,13 +159,17 @@ public class MovieCollectionFragment extends Fragment
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         // TODO: Specify projection (place projection in Adapter class)
         // TODO: Specify order
-        return new CursorLoader(this.getActivity(), CachedMovieEntry.CONTENT_URI
-                , null, null, null, CachedMovieEntry.COLUMN_POPULARITY + " DESC");  // FIXME: Wrong query
+        return new CursorLoader(this.getActivity()
+                , CachedMovieEntry.CONTENT_URI
+                , MoviePosterAdapter.PROJECTION_MOVIE_POSTERS
+                , null
+                , null
+                , ORDER_BY_POPULARITY_DESCENDING);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Cursor oldCursor = mMovieAdapter.swapCursor(data);
+        Cursor oldCursor = mMoviePosterAdapter.swapCursor(data);
         if (oldCursor != null) {
             oldCursor.close();
         }
@@ -161,7 +177,7 @@ public class MovieCollectionFragment extends Fragment
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        Cursor oldCursor = mMovieAdapter.swapCursor(null);
+        Cursor oldCursor = mMoviePosterAdapter.swapCursor(null);
         if (oldCursor != null) {
             oldCursor.close();
         }

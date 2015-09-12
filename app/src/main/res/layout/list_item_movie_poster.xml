@@ -18,10 +18,10 @@
         xmlns:tools="http://schemas.android.com/tools"
         tools:context=".PortfolioActivity">
 
-    <data class="MovieListItemBinding">
+    <data class="MoviePosterListItemBinding">
     </data>
 
     <ImageView android:id="@+id/poster_image_view"
-               android:layout_width="180dp"
-               android:layout_height="270dp"/> <!-- TODO: Put sizes in constants and use in code too. -->
+               android:layout_width="@dimen/movie_poster_thumbnail_width"
+               android:layout_height="@dimen/movie_poster_thumbnail_height"/>
 </layout>

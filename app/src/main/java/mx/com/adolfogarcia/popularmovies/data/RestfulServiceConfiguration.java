@@ -206,7 +206,7 @@ public class RestfulServiceConfiguration {
 
     /**
      * Used to cache image size code names that best match sizes measured in
-     * <i>Device Independent Pixels</i>. The code names are those used by
+     * pixels (not dp). The code names are those used by
      * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
      */
     private SparseArrayCompat<String> mBestImageSizeNameCache =
@@ -376,28 +376,22 @@ public class RestfulServiceConfiguration {
      *
      * @param imageSizes the size code names to choose from, as provided by the
      *     <a href="https://www.themoviedb.org/">themoviedb.org/</a>'s API.
-     * @param dipWidth the desired width of the poster in <i>Device Independent
-     *                 Pixels</i>.
+     * @param pixelWidth the desired width of the poster in pixels (not dp).
      * @return the name of the size that fits the device best or or {@code null}
      *     if none is found.
      */
-    private String getBestImageSizeName(Set<String> imageSizes, int dipWidth) {
-        String cachedResult = mBestImageSizeNameCache.get(dipWidth);
+    private String getBestImageSizeName(Set<String> imageSizes, int pixelWidth) {
+        String cachedResult = mBestImageSizeNameCache.get(pixelWidth);
         if (cachedResult != null && imageSizes.contains(cachedResult)) {
             return cachedResult;
         }
-
-        int optimalWidthPixels = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP
-                , dipWidth
-                , mContext.getResources().getDisplayMetrics());
 
         int minDiff = Integer.MAX_VALUE;
         String bestSizeName = null;
         for (String sizeName : imageSizes) {
             try {
                 int size = Integer.parseInt(sizeName.substring(1));
-                int diff = Math.abs(optimalWidthPixels - size);
+                int diff = Math.abs(pixelWidth - size);
                 if (minDiff > diff) {
                     minDiff = diff;
                     bestSizeName = sizeName;
@@ -406,7 +400,7 @@ public class RestfulServiceConfiguration {
                 Log.w(LOG_TAG, "Ignoring image size: " + sizeName);
             }
         }
-        mBestImageSizeNameCache.put(dipWidth, bestSizeName);
+        mBestImageSizeNameCache.put(pixelWidth, bestSizeName);
         return bestSizeName;
     }
 
@@ -432,14 +426,13 @@ public class RestfulServiceConfiguration {
      *
      * @param relativePath relative path to the desired image in
      *     <a href="https://www.themoviedb.org/">themoviedb.org/</a>.
-     * @param dipWidth the desired width of the poster in <i>Device Independent
-     *     Pixels</i>.
+     * @param pixelWidth the desired width of the poster in pixels (not dp).
      * @return the URL ofthe image that fits the device best.
      *
      */
-    public String getBestFittingPosterUrl(String relativePath, int dipWidth) {
+    public String getBestFittingPosterUrl(String relativePath, int pixelWidth) {
         return getImageBaseUrl()
-                + getBestImageSizeName(getPosterSizes(), dipWidth)
+                + getBestImageSizeName(getPosterSizes(), pixelWidth)
                 + relativePath;
     }
 
@@ -450,13 +443,12 @@ public class RestfulServiceConfiguration {
      *
      * @param relativePath relative path to the desired image in
      *     <a href="https://www.themoviedb.org/">themoviedb.org/</a>.
-     * @param dipWidth the desired width of the poster in <i>Device Independent
-     *     Pixels</i>.
+     * @param pixelWidth the desired width of the poster in pixels (not dp).
      * @return the URL ofthe image that fits the device best.
      */
-    public String getBestFittingBackdropUrl(String relativePath, int dipWidth) {
+    public String getBestFittingBackdropUrl(String relativePath, int pixelWidth) {
         return getImageBaseUrl()
-                + getBestImageSizeName(getBackdropSizes(), dipWidth)
+                + getBestImageSizeName(getBackdropSizes(), pixelWidth)
                 + relativePath;
     }
 

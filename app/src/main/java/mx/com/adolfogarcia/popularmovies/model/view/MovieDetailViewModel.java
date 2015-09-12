@@ -26,6 +26,7 @@ import org.parceler.Transient;
 
 import static org.parceler.Parcel.Serialization;
 
+import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.MovieContract;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
@@ -47,10 +48,6 @@ public class MovieDetailViewModel { // TODO - Implement Observable, notify of ch
      */
     private static final String LOG_TAG = MovieDetailViewModel.class.getSimpleName();
 
-    private static final int MOVIE_POSTER_WIDTH_DIP = 180; // TODO: Use a resource constant and change the value in the adapter too
-
-    private static final int MOVIE_BACKDROP_WIDTH_DIP = 360; // TODO: Use a resource constant and change the value in the adapter too
-
     /**
      * Projection that includes the movie details to be presented. Used to
      * query {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
@@ -66,37 +63,37 @@ public class MovieDetailViewModel { // TODO - Implement Observable, notify of ch
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_ORIGINAL_TITLE} in
-     * {@link #PROJECTION_MOVIE_DETAILS}
+     * {@link #PROJECTION_MOVIE_DETAILS}.
      */
     public static final int COL_ORIGINAL_TITLE = 0;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_RELEASE_DATE} in
-     * {@link #PROJECTION_MOVIE_DETAILS}
+     * {@link #PROJECTION_MOVIE_DETAILS}.
      */
     public static final int COL_RELEASE_DATE = 1;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_OVERVIEW} in
-     * {@link #PROJECTION_MOVIE_DETAILS}
+     * {@link #PROJECTION_MOVIE_DETAILS}.
      */
     public static final int COL_OVERVIEW = 2;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_POSTER_PATH} in
-     * {@link #PROJECTION_MOVIE_DETAILS}
+     * {@link #PROJECTION_MOVIE_DETAILS}.
      */
     public static final int COL_POSTER_PATH = 3;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_BACKDROP_PATH} in
-     * {@link #PROJECTION_MOVIE_DETAILS}
+     * {@link #PROJECTION_MOVIE_DETAILS}.
      */
     public static final int COL_BACKDROP_PATH = 4;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_VOTE_AVERAGE} in
-     * {@link #PROJECTION_MOVIE_DETAILS}
+     * {@link #PROJECTION_MOVIE_DETAILS}.
      */
     public static final int COL_VOTE_AVERAGE = 5;
 
@@ -166,10 +163,14 @@ public class MovieDetailViewModel { // TODO - Implement Observable, notify of ch
         movie.setOriginalTitle(cursor.getString(COL_ORIGINAL_TITLE));
         movie.setReleaseDate(cursor.getLong(COL_RELEASE_DATE));
         movie.setOverview(cursor.getString(COL_OVERVIEW));
+        int posterPixelWidth = mContext.getResources().getDimensionPixelSize(
+                R.dimen.movie_poster_thumbnail_width);
         movie.setPoster(Uri.parse(mConfiguration.getBestFittingPosterUrl(
-                cursor.getString(COL_POSTER_PATH), MOVIE_POSTER_WIDTH_DIP)));
+                cursor.getString(COL_POSTER_PATH), posterPixelWidth)));
+        int backdropPixelWidth = mContext.getResources().getDimensionPixelSize(
+                R.dimen.movie_backdrop_width);
         movie.setBackdrop(Uri.parse(mConfiguration.getBestFittingPosterUrl(
-                cursor.getString(COL_BACKDROP_PATH), MOVIE_BACKDROP_WIDTH_DIP)));
+                cursor.getString(COL_BACKDROP_PATH), backdropPixelWidth)));
         movie.setVoteAverage(cursor.getDouble(COL_VOTE_AVERAGE));
     }
 

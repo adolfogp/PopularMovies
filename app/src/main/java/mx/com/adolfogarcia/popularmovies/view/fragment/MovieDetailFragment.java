@@ -50,9 +50,9 @@ public class MovieDetailFragment extends Fragment {
     private static final String ARG_MOVIE = "arg_movie";
 
     /**
-     *
+     * Key used to save and retrieve the serialized {@link #mViewModel}.
      */
-    private static final String STATE_MOVIE = "state_movie";
+    private static final String STATE_VIEW_MODEL = "state_view_model";
 
     /**
      * Provides data and behaviour to the {@link MovieDetailFragment}.
@@ -88,15 +88,36 @@ public class MovieDetailFragment extends Fragment {
             throw new IllegalStateException("No movie specified as Fragment argument.");
         }
         if (savedInstanceState == null) {
-            // TODO: Load the required information from the ContentProvider
-            Movie movie = getArguments().getParcelable(ARG_MOVIE);
-            mViewModel = new MovieDetailViewModel();
-            mViewModel.setContext(this.getActivity());
-            mViewModel.setConfiguration(this.mConfiguration);
-            mViewModel.setMovie(movie);
+            mViewModel = newViewModel();
         } else {
-//            mMovie = savedInstanceState.getParcelable(STATE_MOVIE);
+            restoreState(savedInstanceState);
         }
+    }
+
+    private MovieDetailViewModel newViewModel() {
+        Movie movie = getArguments().getParcelable(ARG_MOVIE);
+        MovieDetailViewModel viewModel = new MovieDetailViewModel();
+        viewModel.setContext(this.getActivity());
+        viewModel.setConfiguration(this.mConfiguration);
+        viewModel.setMovie(movie); // FIXME: Load movie data with loader and set movie to refresh data (implement Observer).
+        return viewModel;
+    }
+
+    /**
+     * Loads the previous state, stored in the {@link Bundle} passed as argument,
+     * into to {@link MovieCollectionFragment}. {@link #mViewModel} in particular.
+     * If the argument is {@code null}, nothing is done.
+     *
+     * @param savedInstanceState the {@link MovieCollectionFragment}'s previous
+     *                           state.
+     */
+    private void restoreState(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            return;
+        }
+        mViewModel = Parcels.unwrap(savedInstanceState.getParcelable(STATE_VIEW_MODEL));
+        mViewModel.setConfiguration(mConfiguration);
+        mViewModel.setContext(getActivity());
     }
 
     @Override
