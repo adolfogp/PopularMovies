@@ -220,6 +220,16 @@ public class MovieDetailViewModel extends BaseObservable {
                 : null;
     }
 
+    @Bindable
+    public String getBackdropUri() {
+        if (mMovie == null) {
+            return null;
+        }
+        return mMovie.getBackdropUri() != null
+                ? mMovie.getBackdropUri().toString()
+                : null;
+    }
+
     @BindingAdapter({"bind:posterUri"})
     public static void loadPosterImage(ImageView view, String posterUri) {
         Context context = view.getContext();
@@ -232,6 +242,21 @@ public class MovieDetailViewModel extends BaseObservable {
                 .resize(posterPixelWidth, posterPixelHeight)
                 .placeholder(R.anim.poster_loading)
                 .error(R.drawable.logo_the_movie_db_180dp)
+                .into(view);
+    }
+
+    @BindingAdapter({"bind:backdropUri"})
+    public static void loadBackdropImage(ImageView view, String backdropUri) {
+        Context context = view.getContext();
+        int backdropPixelWidth = context.getResources().getDimensionPixelSize(
+                R.dimen.movie_backdrop_width);
+        int backdropPixelHeight = context.getResources().getDimensionPixelSize(
+                R.dimen.movie_backdrop_height);
+        Picasso.with(context)
+                .load(backdropUri)
+                .resize(backdropPixelWidth, backdropPixelHeight)
+                .placeholder(R.anim.backdrop_loading)
+                .error(R.drawable.logo_the_movie_db_360dp)
                 .into(view);
     }
 

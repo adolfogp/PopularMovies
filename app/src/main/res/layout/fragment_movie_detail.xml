@@ -20,47 +20,65 @@
         tools:context="mx.com.adolfogarcia.popularmovies.view.fragment.MovieDetailFragment">
 
     <data class="MovieDetailFragmentBinding">
+
         <import type="mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel"/>
-        <variable name="viewModel" type="MovieDetailViewModel"/>
+
+        <variable
+            name="viewModel"
+            type="MovieDetailViewModel"/>
     </data>
 
-    <ScrollView android:layout_width="match_parent"
-                android:layout_height="match_parent">
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="?android:attr/listPreferredItemHeight"
-            android:text="@{viewModel.originalTitle}"/>
+            android:orientation="vertical">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="?android:attr/listPreferredItemHeight"
-            android:text="@{viewModel.releaseDate}"/>
+            <ImageView
+                android:layout_width="@dimen/movie_backdrop_width"
+                android:layout_height="@dimen/movie_backdrop_height"
+                app:backdropUri="@{viewModel.backdropUri}"
+                tools:src="@drawable/backdrop_placeholder"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="?android:attr/listPreferredItemHeight"
-            android:text="@{viewModel.voteAverage}"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?android:attr/listPreferredItemHeight"
+                android:text="@{viewModel.originalTitle}"
+                tools:text="Mad Max: Fury Road"/>
 
-        <ImageView
-            app:posterUri="@{viewModel.posterUri}"
-            android:id="@+id/poster_image_view"
-            android:layout_width="@dimen/movie_poster_thumbnail_width"
-            android:layout_height="@dimen/movie_poster_thumbnail_height"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?android:attr/listPreferredItemHeight"
+                android:text="@{viewModel.releaseDate}"
+                tools:text="2015-05-15"/>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="?android:attr/listPreferredItemHeight"
-            android:text="@{viewModel.overview}"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?android:attr/listPreferredItemHeight"
+                android:text="@{viewModel.voteAverage}"
+                tools:text="7.6"/>
 
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/poster_image_view"
+                android:layout_width="@dimen/movie_poster_thumbnail_width"
+                android:layout_height="@dimen/movie_poster_thumbnail_height"
+                app:posterUri="@{viewModel.posterUri}"
+                tools:src="@drawable/poster_placeholder"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?android:attr/listPreferredItemHeight"
+                android:text="@{viewModel.overview}"
+                tools:text="An apocalyptic story..."/>
+
+
+        </LinearLayout>
     </ScrollView>
 </layout>
