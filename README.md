@@ -7,7 +7,8 @@ to [get a key](https://www.themoviedb.org/documentation/api) and place it in the
 configuration properties file `app/src/main/res/raw/configuration.xml`.
 
 This application was developed as an assignment for [Udacity's Android Developer
-Nanodegree](https://www.udacity.com). A list of features that may be added in future versions can be found at `[TODO.txt](./TODO.txt)`.
+Nanodegree](https://www.udacity.com). A list of features that may be added in
+future versions can be found at [TODO.md](./TODO.md).
 
 ## Configuration
 
@@ -70,8 +71,8 @@ This application uses the following frameworks and libraries:
 
 ## Licencing and attributions
 
-For licencing information, read `[LICENSE.txt](./LICENSE.txt)` and
-`[NOTICE.txt](./NOTICE.txt)`.
+For licencing information, read [LICENSE.txt](./LICENSE.txt) and
+[NOTICE.txt](./NOTICE.txt).
 
     Copyright 2015 Jesús Adolfo García Pasquel
 
