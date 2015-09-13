@@ -18,16 +18,26 @@ package mx.com.adolfogarcia.popularmovies.model.view;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+import android.databinding.BindingAdapter;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcel;
 import org.parceler.Transient;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+
 import static org.parceler.Parcel.Serialization;
 
+import mx.com.adolfogarcia.popularmovies.BR;
 import mx.com.adolfogarcia.popularmovies.R;
-import mx.com.adolfogarcia.popularmovies.data.MovieContract;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
@@ -41,7 +51,7 @@ import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEn
  * @author Jesús Adolfo García Pasquel
  */
 @Parcel(Serialization.BEAN)
-public class MovieDetailViewModel { // TODO - Implement Observable, notify of changes to the view
+public class MovieDetailViewModel extends BaseObservable {
 
     /**
      * Identifies the messages written to the log by this class.
@@ -49,10 +59,16 @@ public class MovieDetailViewModel { // TODO - Implement Observable, notify of ch
     private static final String LOG_TAG = MovieDetailViewModel.class.getSimpleName();
 
     /**
+     * The name of the UTC time zone.
+     */
+    public static final String UTC_TIME_ZONE = "UTC";
+
+    /**
      * Projection that includes the movie details to be presented. Used to
      * query {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
      */
     public static final String[] PROJECTION_MOVIE_DETAILS = {
+            CachedMovieEntry._ID,
             CachedMovieEntry.COLUMN_ORIGINAL_TITLE,
             CachedMovieEntry.COLUMN_RELEASE_DATE,
             CachedMovieEntry.COLUMN_OVERVIEW,
@@ -62,40 +78,45 @@ public class MovieDetailViewModel { // TODO - Implement Observable, notify of ch
     };
 
     /**
+     * Index of {@link CachedMovieEntry#_ID} in {@link #PROJECTION_MOVIE_DETAILS}.
+     */
+    public static final int COL_ID = 0;
+
+    /**
      * Index of {@link CachedMovieEntry#COLUMN_ORIGINAL_TITLE} in
      * {@link #PROJECTION_MOVIE_DETAILS}.
      */
-    public static final int COL_ORIGINAL_TITLE = 0;
+    public static final int COL_ORIGINAL_TITLE = 1;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_RELEASE_DATE} in
      * {@link #PROJECTION_MOVIE_DETAILS}.
      */
-    public static final int COL_RELEASE_DATE = 1;
+    public static final int COL_RELEASE_DATE = 2;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_OVERVIEW} in
      * {@link #PROJECTION_MOVIE_DETAILS}.
      */
-    public static final int COL_OVERVIEW = 2;
+    public static final int COL_OVERVIEW = 3;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_POSTER_PATH} in
      * {@link #PROJECTION_MOVIE_DETAILS}.
      */
-    public static final int COL_POSTER_PATH = 3;
+    public static final int COL_POSTER_PATH = 4;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_BACKDROP_PATH} in
      * {@link #PROJECTION_MOVIE_DETAILS}.
      */
-    public static final int COL_BACKDROP_PATH = 4;
+    public static final int COL_BACKDROP_PATH = 5;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_VOTE_AVERAGE} in
      * {@link #PROJECTION_MOVIE_DETAILS}.
      */
-    public static final int COL_VOTE_AVERAGE = 5;
+    public static final int COL_VOTE_AVERAGE = 6;
 
     /**
      * The movie for which the detail data is being shown.
@@ -111,8 +132,14 @@ public class MovieDetailViewModel { // TODO - Implement Observable, notify of ch
     }
 
     public void setMovie(Movie movie) {
-        loadMovieData(movie);
+        if (movie == null) {
+            throw new IllegalArgumentException("The movie may not be null.");
+        }
         mMovie = movie;
+        // If at least the title is set, notify.
+        if (mMovie.getOriginalTitle() != null) {
+            notifyPropertyChanged(BR._all);
+        }
     }
 
     @Transient
@@ -134,44 +161,121 @@ public class MovieDetailViewModel { // TODO - Implement Observable, notify of ch
     }
 
     /**
-     * Queries {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider} for
-     * the movie with the id assigned to the instance passed as argument and
-     * sets its attributes to the values returned. This is performed only if the
-     * {@link Movie}'s original title is {@code null}.
+     * Returns the original title for the currently set {@link Movie}, possibly
+     * {@code null}.
      *
-     * @param movie
-     * @see #PROJECTION_MOVIE_DETAILS
+     * @return the original title for the currently set {@link Movie}, possibly
+     *     {@code null}.
      */
-    private void loadMovieData(Movie movie) {
-        // Verify the data has not been loaded already
-        if (movie.getId() > 0 &&  movie.getOriginalTitle() != null) {
-            return; // The rest of the values may be null
+    @Bindable
+    public String getOriginalTitle() {
+        return mMovie != null
+                ? mMovie.getOriginalTitle()
+                : null;
+    }
+
+    /**
+     * Returns the release date for the currently set {@link Movie}.
+     *
+     * @return the release date for the currently set {@link Movie}.
+     */
+    @Bindable
+    public String getReleaseDate() {
+        SimpleDateFormat formatter =
+                new SimpleDateFormat(mContext.getString(R.string.format_movie_release_date));
+        formatter.setTimeZone(TimeZone.getTimeZone(UTC_TIME_ZONE));
+        return mMovie != null
+                ? formatter.format(mMovie.getReleaseDate())
+                : null;
+    }
+
+    /**
+     * Returns the plot synopsis for the currently set {@link Movie}.
+     *
+     * @return the plot synopsis for the currently set {@link Movie}.
+     */
+    @Bindable
+    public String getOverview() {
+        return mMovie != null
+                ? mMovie.getOverview()
+                : null;
+    }
+
+    @Bindable
+    public String getVoteAverage() {
+        DecimalFormat formatter =
+                new DecimalFormat(mContext.getString(R.string.format_vote_average));
+        return mMovie != null
+                ? formatter.format(mMovie.getVoteAverage())
+                : null;
+    }
+
+    @Bindable
+    public String getPosterUri() {
+        if (mMovie == null) {
+            return null;
         }
-        if (mContext == null || mConfiguration == null) {
-            throw new IllegalStateException("The context and configuration may not be null.");
+        return mMovie.getPosterUri() != null
+                ? mMovie.getPosterUri().toString()
+                : null;
+    }
+
+    @BindingAdapter({"bind:posterUri"})
+    public static void loadPosterImage(ImageView view, String posterUri) {
+        Context context = view.getContext();
+        int posterPixelWidth = context.getResources().getDimensionPixelSize(
+                R.dimen.movie_poster_thumbnail_width);
+        int posterPixelHeight = context.getResources().getDimensionPixelSize(
+                R.dimen.movie_poster_thumbnail_height);
+        Picasso.with(context)
+                .load(posterUri)
+                .resize(posterPixelWidth, posterPixelHeight)
+                .placeholder(R.anim.poster_loading)
+                .error(R.drawable.logo_the_movie_db_180dp)
+                .into(view);
+    }
+
+    /**
+     * Retrieves the data from the cursor passed as argument and sets it onto the
+     * {@link MovieDetailViewModel}'s current {@link Movie}. The projection used
+     * must be {@link #PROJECTION_MOVIE_DETAILS}.
+     *
+     * @param cursor the {@link Cursor} containing the data  to load.
+     * @throws IllegalStateException if there is no {@link Movie} currently set
+     *     in the {@link MovieDetailViewModel}.
+     * @throws IllegalArgumentException if the data passed does not belong to
+     *     the {@link Movie} currently set (i.e. does not have the same id).
+     */
+    public void setMovieData(Cursor cursor) {
+        if (mMovie == null) {
+            throw new IllegalStateException("No movie currently set in MovieDetailViewModel.");
         }
-        Cursor cursor = mContext.getContentResolver().query(
-                MovieContract.CachedMovieEntry.buildMovieUri(movie.getId())
-                , PROJECTION_MOVIE_DETAILS
-                , null
-                , null
-                , null);
-        if (!cursor.moveToFirst()) {
-            Log.e(LOG_TAG, "No movie was found for id: " + movie.getId());
+        if (cursor == null) {
             return;
         }
-        movie.setOriginalTitle(cursor.getString(COL_ORIGINAL_TITLE));
-        movie.setReleaseDate(cursor.getLong(COL_RELEASE_DATE));
-        movie.setOverview(cursor.getString(COL_OVERVIEW));
+        if (!cursor.moveToFirst()) {
+            Log.w(LOG_TAG, "The cursor contains no data. Ignoring.");
+            return;
+        }
+        if (mMovie.getId() != cursor.getLong(COL_ID)) {
+            throw new IllegalArgumentException(
+                    "The data passed does not belong to movie " + mMovie.getId());
+        }
+        mMovie.setOriginalTitle(cursor.getString(COL_ORIGINAL_TITLE));
+        mMovie.setReleaseDate(cursor.getLong(COL_RELEASE_DATE));
+        mMovie.setOverview(cursor.getString(COL_OVERVIEW));
         int posterPixelWidth = mContext.getResources().getDimensionPixelSize(
                 R.dimen.movie_poster_thumbnail_width);
-        movie.setPoster(Uri.parse(mConfiguration.getBestFittingPosterUrl(
+        mMovie.setPosterUri(Uri.parse(mConfiguration.getBestFittingPosterUrl(
                 cursor.getString(COL_POSTER_PATH), posterPixelWidth)));
         int backdropPixelWidth = mContext.getResources().getDimensionPixelSize(
                 R.dimen.movie_backdrop_width);
-        movie.setBackdrop(Uri.parse(mConfiguration.getBestFittingPosterUrl(
+        mMovie.setBackdropUri(Uri.parse(mConfiguration.getBestFittingPosterUrl(
                 cursor.getString(COL_BACKDROP_PATH), backdropPixelWidth)));
-        movie.setVoteAverage(cursor.getDouble(COL_VOTE_AVERAGE));
+        mMovie.setVoteAverage(cursor.getDouble(COL_VOTE_AVERAGE));
+
+        notifyPropertyChanged(BR._all);
     }
+
 
 }

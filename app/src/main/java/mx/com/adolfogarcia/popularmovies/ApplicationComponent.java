@@ -20,9 +20,11 @@ import javax.inject.Singleton;
 
 import dagger.Component;
 import mx.com.adolfogarcia.popularmovies.view.fragment.MovieCollectionFragment;
+import mx.com.adolfogarcia.popularmovies.view.fragment.MovieDetailFragment;
 
 @Singleton
 @Component(modules = PopularMoviesApplicationModule.class)
 public interface ApplicationComponent {
     void inject(MovieCollectionFragment movieCollectionFragment);
+    void inject(MovieDetailFragment movieDetailFragment);
 }

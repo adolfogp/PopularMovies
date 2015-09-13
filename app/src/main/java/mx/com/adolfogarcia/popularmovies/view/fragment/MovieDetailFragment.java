@@ -16,10 +16,13 @@
 
 package mx.com.adolfogarcia.popularmovies.view.fragment;
 
-import android.app.Activity;
-import android.net.Uri;
+import android.database.Cursor;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,10 +31,14 @@ import org.parceler.Parcels;
 
 import javax.inject.Inject;
 
+import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
+import mx.com.adolfogarcia.popularmovies.databinding.MovieDetailFragmentBinding;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
 import mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel;
+
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 /**
  * Displays detailed information for a given {@link Movie}. New instances of
@@ -40,7 +47,14 @@ import mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel;
  *
  * @author Jesús Adolfo García Pasquel
  */
-public class MovieDetailFragment extends Fragment {
+public class MovieDetailFragment extends Fragment
+        implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    /**
+     * Identifies the {@link Loader} that retrieves the movie details cached in
+     * the local database.
+     */
+    private static final int MOVIE_DETAIL_LOADER_ID = 532232;
 
     /**
      * Key used to access the {@link Movie} specified as argument at creation
@@ -58,6 +72,12 @@ public class MovieDetailFragment extends Fragment {
      * Provides data and behaviour to the {@link MovieDetailFragment}.
      */
     private MovieDetailViewModel mViewModel;
+
+    /**
+     * Binds the view to the view model.
+     * @see MovieDetailViewModel
+     */
+    private MovieDetailFragmentBinding mBinding = null;
 
     /**
      * The configuration information required to retrieve movie data and images
@@ -87,19 +107,23 @@ public class MovieDetailFragment extends Fragment {
         if (getArguments() == null) {
             throw new IllegalStateException("No movie specified as Fragment argument.");
         }
-        if (savedInstanceState == null) {
-            mViewModel = newViewModel();
-        } else {
-            restoreState(savedInstanceState);
-        }
+        ((PopularMoviesApplication) getActivity().getApplication()).getComponent().inject(this);
+        restoreState(savedInstanceState);
     }
 
+    /**
+     * Returns a new {@link MovieDetailViewModel} based on the movie data passed
+     * in the {@link Fragment}'s arguments.
+     *
+     * @return a new {@link MovieDetailViewModel} based on the movie data passed
+     *     in the {@link Fragment}'s arguments.
+     */
     private MovieDetailViewModel newViewModel() {
-        Movie movie = getArguments().getParcelable(ARG_MOVIE);
+        Movie movie = Parcels.unwrap(getArguments().getParcelable(ARG_MOVIE));
         MovieDetailViewModel viewModel = new MovieDetailViewModel();
         viewModel.setContext(this.getActivity());
         viewModel.setConfiguration(this.mConfiguration);
-        viewModel.setMovie(movie); // FIXME: Load movie data with loader and set movie to refresh data (implement Observer).
+        viewModel.setMovie(movie);
         return viewModel;
     }
 
@@ -123,14 +147,47 @@ public class MovieDetailFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putParcelable(STATE_VIEW_MODEL, Parcels.wrap(mViewModel));
+    }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(MOVIE_DETAIL_LOADER_ID, null, this);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_movie_detail, container, false);
+        mBinding = DataBindingUtil.inflate(inflater
+                , R.layout.fragment_movie_detail
+                , container
+                , false);
+        if (mViewModel == null) {
+            mViewModel = newViewModel();
+        }
+        mBinding.setViewModel(mViewModel);
+        return mBinding.getRoot();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this.getActivity()
+                , CachedMovieEntry.buildMovieUri(mViewModel.getMovie().getId())
+                , MovieDetailViewModel.PROJECTION_MOVIE_DETAILS
+                , null
+                , null
+                , null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mViewModel.setMovieData(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mViewModel.setMovieData(null);
     }
 
 }

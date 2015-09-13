@@ -15,6 +15,7 @@
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         tools:context="mx.com.adolfogarcia.popularmovies.view.fragment.MovieDetailFragment">
 
@@ -23,14 +24,43 @@
         <variable name="viewModel" type="MovieDetailViewModel"/>
     </data>
 
-    <FrameLayout android:layout_width="match_parent"
-                 android:layout_height="match_parent">
+    <ScrollView android:layout_width="match_parent"
+                android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <!-- TODO: Update blank fragment layout -->
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:text="@string/hello_blank_fragment"/>
+            android:layout_height="wrap_content"
+            android:minHeight="?android:attr/listPreferredItemHeight"
+            android:text="@{viewModel.originalTitle}"/>
 
-    </FrameLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?android:attr/listPreferredItemHeight"
+            android:text="@{viewModel.releaseDate}"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?android:attr/listPreferredItemHeight"
+            android:text="@{viewModel.voteAverage}"/>
+
+        <ImageView
+            app:posterUri="@{viewModel.posterUri}"
+            android:id="@+id/poster_image_view"
+            android:layout_width="@dimen/movie_poster_thumbnail_width"
+            android:layout_height="@dimen/movie_poster_thumbnail_height"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?android:attr/listPreferredItemHeight"
+            android:text="@{viewModel.overview}"/>
+
+    </LinearLayout>
+    </ScrollView>
 </layout>

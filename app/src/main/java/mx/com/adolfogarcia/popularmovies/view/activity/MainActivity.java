@@ -16,8 +16,13 @@
 
 package mx.com.adolfogarcia.popularmovies.view.activity;
 
+import android.annotation.TargetApi;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.transition.Fade;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +30,8 @@ import android.view.MenuItem;
 import de.greenrobot.event.EventBus;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.model.event.MovieSelectionEvent;
+import mx.com.adolfogarcia.popularmovies.view.fragment.MovieCollectionFragment;
+import mx.com.adolfogarcia.popularmovies.view.fragment.MovieDetailFragment;
 
 /**
  * TODO - Document.
@@ -38,10 +45,27 @@ public class MainActivity extends AppCompatActivity {
      */
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    /**
+     * Identifies the {@code Fragment} used to present the collection of
+     * movies.
+     */
+    private static final String MOVIE_COLLECTION_FRAGMENT_TAG =
+            MovieCollectionFragment.class.getCanonicalName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager.findFragmentByTag(MOVIE_COLLECTION_FRAGMENT_TAG) == null) {
+            MovieCollectionFragment movieCollectionFragment =
+                    new MovieCollectionFragment();
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+            transaction.add(R.id.movie_collection_container
+                    , movieCollectionFragment
+                    , MOVIE_COLLECTION_FRAGMENT_TAG);
+            transaction.commit();
+        }
     }
 
     @Override
@@ -83,6 +107,12 @@ public class MainActivity extends AppCompatActivity {
      * @param event
      */
     public void onEvent(MovieSelectionEvent event){
-        Log.d(LOG_TAG, "id of the selected movie: " + event.getSelectedMovie().getId()); // TODO: Delete
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        MovieDetailFragment movieDetailFragment =
+                MovieDetailFragment.newInstance(event.getSelectedMovie());
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.movie_collection_container, movieDetailFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }

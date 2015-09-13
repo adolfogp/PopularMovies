@@ -55,12 +55,12 @@ public class Movie {
     /**
      * Uri of the movie's poster image.
      */
-    private Uri mPoster;
+    private Uri mPosterUri;
 
     /**
      * Uri of the movies backdrop image.
      */
-    private Uri mBackdrop;
+    private Uri mBackdropUri;
 
     /**
      * The movie's user rating.
@@ -107,20 +107,20 @@ public class Movie {
         mOverview = overview;
     }
 
-    public Uri getPoster() {
-        return mPoster;
+    public Uri getPosterUri() {
+        return mPosterUri;
     }
 
-    public void setPoster(Uri poster) {
-        mPoster = poster;
+    public void setPosterUri(Uri posterUri) {
+        mPosterUri = posterUri;
     }
 
-    public Uri getBackdrop() {
-        return mBackdrop;
+    public Uri getBackdropUri() {
+        return mBackdropUri;
     }
 
-    public void setBackdrop(Uri backdrop) {
-        mBackdrop = backdrop;
+    public void setBackdropUri(Uri backdropUri) {
+        mBackdropUri = backdropUri;
     }
 
     public double getVoteAverage() {
@@ -138,8 +138,8 @@ public class Movie {
                 .append(this.mOriginalTitle)
                 .append(this.mReleaseDate)
                 .append(this.mOverview)
-                .append(this.mPoster)
-                .append(this.mBackdrop)
+                .append(this.mPosterUri)
+                .append(this.mBackdropUri)
                 .append(this.mVoteAverage)
                 .toHashCode();
     }
@@ -158,8 +158,8 @@ public class Movie {
                 .append(this.mOriginalTitle, that.mOriginalTitle)
                 .append(this.mReleaseDate, that.mReleaseDate)
                 .append(this.mOverview, that.mOverview)
-                .append(this.mPoster, that.mPoster)
-                .append(this.mBackdrop, that.mBackdrop)
+                .append(this.mPosterUri, that.mPosterUri)
+                .append(this.mBackdropUri, that.mBackdropUri)
                 .append(this.mVoteAverage, that.mVoteAverage)
                 .isEquals();
     }
@@ -171,8 +171,8 @@ public class Movie {
                 .append("mOriginalTitle", this.mOriginalTitle)
                 .append("mReleaseDate", this.mReleaseDate)
                 .append("mOverview", this.mOverview)
-                .append("mPoster", this.mPoster)
-                .append("mBackdrop", this.mBackdrop)
+                .append("mPosterUri", this.mPosterUri)
+                .append("mBackdropUri", this.mBackdropUri)
                 .append("mVoteAverage", this.mVoteAverage)
                 .toString();
     }

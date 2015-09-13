@@ -59,7 +59,7 @@ public class MovieCollectionFragment extends Fragment
      * Identifies the {@link Loader} that retrieves the movie data cached in
      * the local database.
      */
-    private static final int MOVIE_LOADER_ID = 2576;
+    private static final int MOVIE_COLLECTION_LOADER_ID = 723452;
 
     /**
      * Key used to save and retrieve the serialized {@link #mViewModel}.
@@ -75,7 +75,7 @@ public class MovieCollectionFragment extends Fragment
 
     /**
      * Binds the view to the view model.
-     * @see mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel
+     * @see MovieCollectionViewModel
      */
     private MovieCollectionFragmentBinding mBinding = null;
 
@@ -126,7 +126,7 @@ public class MovieCollectionFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(MOVIE_LOADER_ID, null, this);
+        getLoaderManager().initLoader(MOVIE_COLLECTION_LOADER_ID, null, this);
     }
 
     @Override
@@ -157,8 +157,6 @@ public class MovieCollectionFragment extends Fragment
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        // TODO: Specify projection (place projection in Adapter class)
-        // TODO: Specify order
         return new CursorLoader(this.getActivity()
                 , CachedMovieEntry.CONTENT_URI
                 , MoviePosterAdapter.PROJECTION_MOVIE_POSTERS
