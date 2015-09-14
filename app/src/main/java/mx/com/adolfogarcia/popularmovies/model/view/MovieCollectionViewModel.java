@@ -51,16 +51,18 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
         , AbsListView.OnScrollListener {
 
     /**
-     * Number of movies yet to be displayed before requesting more data to
-     * be downloaded.
-     */
-    public static final int REMAINING_ITEMS_BEFORE_LOAD = 10;
-
-    /**
      * Identifies messages written to the log by this class.
      */
     private static final String LOG_TAG =
             MovieCollectionViewModel.class.getSimpleName();
+
+    /**
+     * Limit of unseen data that triggers the download of a new page of movies.
+     * The threshold is given in screens of unseen data. If less than
+     * {@link #DOWNLOAD_THRESHOLD} screens full of movies remain unseen, more
+     * data should be downloaded.
+     */
+    private static final int DOWNLOAD_THRESHOLD = 2;
 
     private Context mContext;
 
@@ -133,8 +135,11 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
             , int firstVisibleItem
             , int visibleItemCount
             , int totalItemCount) {
-        if (totalItemCount - visibleItemCount
-                <= firstVisibleItem + REMAINING_ITEMS_BEFORE_LOAD) {
+        // Download new items if: unseen < DOWNLOAD_THRESHOLD
+        boolean reachedNewDataDownloadThreshold =
+                totalItemCount - visibleItemCount - firstVisibleItem
+                        < DOWNLOAD_THRESHOLD * visibleItemCount;
+        if (totalItemCount > 0 && reachedNewDataDownloadThreshold) {
             downloadNextMoviePage();
         }
     }

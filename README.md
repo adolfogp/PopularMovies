@@ -29,6 +29,12 @@ and add your access key for themoviedatabase.org's RESTful API. For example:
 
 ### Compiling and installing
 
+**Important:** If you're using [Android Studio]
+(http://developer.android.com/tools/studio/index.html), make sure you have the
+latest version, and if the project shows error when you open it, clean the
+project and if needed, rebuild it. That is, go to _Build > Clean Project_, and
+if errors are still reported execute _Build > Rebuild Project_.
+
 This project uses [Gradle](https://gradle.org/) and the different build tasks may
 be executed using the provided Gradle Wrapper scripts. For example, to list the
 available tasks you may execute:

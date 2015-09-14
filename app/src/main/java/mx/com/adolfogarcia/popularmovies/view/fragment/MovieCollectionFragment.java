@@ -23,6 +23,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -140,19 +141,18 @@ public class MovieCollectionFragment extends Fragment
             mViewModel = new MovieCollectionViewModel(getActivity(), mConfiguration); // TODO: Try to get the view model instance from dagger or let dagger inject the configuration directly.
         }
         mBinding.setViewModel(mViewModel);
-        mMoviePosterAdapter = new MoviePosterAdapter(mConfiguration, getActivity(), null, 0);
+        mMoviePosterAdapter =
+                new MoviePosterAdapter(mConfiguration, getActivity(), null, 0);
         mBinding.posterGridView.setAdapter(mMoviePosterAdapter);
         mBinding.posterGridView.setOnItemClickListener(mViewModel);
         mBinding.posterGridView.setOnScrollListener(mViewModel);
+        mViewModel.updateApiConfig(); // TODO: Update config data only if old and if so, remove cached movies too
         return mBinding.getRoot();
     }
 
     @Override
     public void onStart() { //TODO: Remove updates from here
         super.onStart();
-        // TODO: Check last date sync, download config if necessary and after, update movies
-        mViewModel.updateApiConfig();
-        mViewModel.downloadNextMoviePage();
     }
 
     @Override
@@ -167,6 +167,10 @@ public class MovieCollectionFragment extends Fragment
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        // If no movie pages have been downloaded, download the first page.
+        if (data.getCount() == 0) {
+            mViewModel.downloadNextMoviePage();
+        }
         Cursor oldCursor = mMoviePosterAdapter.swapCursor(data);
         if (oldCursor != null) {
             oldCursor.close();
