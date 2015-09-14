@@ -3,7 +3,6 @@
 List of features that may be added in future versions.
 
 * Pending requirements for Udacity's first delivery:
-    - Screen for displaying the details for a selected movie.
     - UI element to toggle the sort order of the movies by: most popular,
       highest rated.
     - App queries the `/discover/movies` API in a background thread to retrieve

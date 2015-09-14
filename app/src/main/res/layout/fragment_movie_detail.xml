@@ -32,53 +32,66 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:columnCount="2">
 
             <ImageView
-                android:layout_width="@dimen/movie_backdrop_width"
-                android:layout_height="@dimen/movie_backdrop_height"
+                style="@style/MovieDetail.Backdrop"
+                android:layout_columnSpan="2"
                 app:backdropUri="@{viewModel.backdropUri}"
                 tools:src="@drawable/backdrop_placeholder"/>
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="?android:attr/listPreferredItemHeight"
+                style="@style/MovieDetail.Title"
+                android:layout_columnSpan="2"
                 android:text="@{viewModel.originalTitle}"
                 tools:text="Mad Max: Fury Road"/>
 
+            <ImageView
+                style="@style/MovieDetail.Poster"
+                android:id="@+id/poster_image_view"
+                android:layout_rowSpan="6"
+                app:posterUri="@{viewModel.posterUri}"
+                tools:src="@drawable/poster_placeholder"/>
+
+            <Space android:layout_rowWeight="1"/>
+
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="?android:attr/listPreferredItemHeight"
+                style="@style/MovieDetail.Label"
+                android:layout_rowWeight="1"
+                android:text="@string/label_release_date"/>
+
+            <TextView
+                style="@style/MovieDetail.Content"
+                android:layout_rowWeight="1"
                 android:text="@{viewModel.releaseDate}"
                 tools:text="2015-05-15"/>
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="?android:attr/listPreferredItemHeight"
+                style="@style/MovieDetail.Label"
+                android:layout_rowWeight="1"
+                android:text="@string/label_vote_average"/>
+
+            <TextView
+                style="@style/MovieDetail.Content"
+                android:layout_rowWeight="1"
                 android:text="@{viewModel.voteAverage}"
                 tools:text="7.6"/>
 
-            <ImageView
-                android:id="@+id/poster_image_view"
-                android:layout_width="@dimen/movie_poster_thumbnail_width"
-                android:layout_height="@dimen/movie_poster_thumbnail_height"
-                app:posterUri="@{viewModel.posterUri}"
-                tools:src="@drawable/poster_placeholder"/>
+            <Space android:layout_rowWeight="1"/>
 
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="?android:attr/listPreferredItemHeight"
+                style="@style/MovieDetail.Overview.Label"
+                android:text="@string/label_overview"/>
+
+            <TextView
+                style="@style/MovieDetail.Overview.Content"
                 android:text="@{viewModel.overview}"
                 tools:text="An apocalyptic story..."/>
 
 
-        </LinearLayout>
+        </GridLayout>
     </ScrollView>
 </layout>

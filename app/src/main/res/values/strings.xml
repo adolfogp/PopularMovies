@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">Popular Movies</string>
+    <string name="label_release_date">Release date</string>
     <string name="format_movie_release_date">yyyy-MM-dd</string>
+    <string name="label_vote_average">User rating</string>
     <string name="format_vote_average">#0.0</string>
+    <string name="label_overview">Plot synopsis</string>
 
     <!-- TODO: Remove the following:-->
     <string name="action_settings">Settings</string>
