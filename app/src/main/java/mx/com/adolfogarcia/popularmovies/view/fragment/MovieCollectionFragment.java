@@ -23,10 +23,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import org.parceler.Parcels;
 
@@ -98,6 +104,7 @@ public class MovieCollectionFragment extends Fragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ((PopularMoviesApplication) getActivity().getApplication()).getComponent().inject(this);
+        setHasOptionsMenu(true);
         restoreState(savedInstanceState);
     }
 
@@ -149,6 +156,20 @@ public class MovieCollectionFragment extends Fragment
         mViewModel.updateApiConfig(); // TODO: Update config data only if old and if so, remove cached movies too
         return mBinding.getRoot();
     }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_fragment_movie_collection, menu);
+        MenuItem item = menu.findItem(R.id.spinner);
+        Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity()
+                , android.R.layout.simple_list_item_1 // TODO: create a better layout
+                , getResources().getStringArray(R.array.pref_sort_order));
+        spinner.setAdapter(adapter);
+//        spinner.setOnItemSelectedListener(null); // TODO: Set listener from ViewModel
+//        spinner.setSelection(0); // TODO: Get selected index from ViewModel
+    }
+
 
     @Override
     public void onStart() { //TODO: Remove updates from here

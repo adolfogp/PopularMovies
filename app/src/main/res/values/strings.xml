@@ -5,7 +5,7 @@
     <string name="label_vote_average">User rating</string>
     <string name="format_vote_average">#0.0</string>
     <string name="label_overview">Plot synopsis</string>
-
-    <!-- TODO: Remove the following:-->
-    <string name="action_settings">Settings</string>
+    <string name="action_sort_order">Sort order</string>
+    <string name="label_sort_order_popular">Most popular</string>
+    <string name="label_sort_order_vote_average">Highest rated</string>
 </resources>
