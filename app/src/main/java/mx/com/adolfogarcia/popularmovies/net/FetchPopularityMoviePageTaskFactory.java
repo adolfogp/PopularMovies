@@ -50,7 +50,8 @@ public class FetchPopularityMoviePageTaskFactory
      * to order the results from most to least popular.
      */
     private static final String ORDER_BY_POPULARITY_DESCENDING =
-            MovieContract.CachedMovieEntry.COLUMN_POPULARITY + " DESC";
+            MovieContract.CachedMovieEntry.COLUMN_POPULARITY + " DESC"
+            + ", " + MovieContract.CachedMovieEntry._ID + " ASC";
 
     /**
      * Creates a new instance of {@link FetchPopularityMoviePageTaskFactory}

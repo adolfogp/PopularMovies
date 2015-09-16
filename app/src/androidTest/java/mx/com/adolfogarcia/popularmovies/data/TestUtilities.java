@@ -43,7 +43,7 @@ public final class TestUtilities {
      */
     static ContentValues createMadMaxMovieValues() {
         ContentValues testValues = new ContentValues();
-        testValues.put(CachedMovieEntry._ID, 76341);
+        testValues.put(CachedMovieEntry.COLUMN_API_ID, 76341);
         testValues.put(CachedMovieEntry.COLUMN_BACKDROP_PATH, "/tbhdm8UJAb4ViCTsulYFL3lxMCd.jpg");
         testValues.put(CachedMovieEntry.COLUMN_RELEASE_DATE, 1431648000000L);
         testValues.put(CachedMovieEntry.COLUMN_ORIGINAL_TITLE, "Mad Max: Fury Road");

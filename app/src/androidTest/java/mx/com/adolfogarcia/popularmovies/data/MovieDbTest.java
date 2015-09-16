@@ -71,6 +71,7 @@ public class MovieDbTest extends AndroidTestCase {
         // Build a HashSet of all of the column names we want to look for
         Set<String> columnNameSet = new HashSet<>();
         columnNameSet.add(CachedMovieEntry._ID);
+        columnNameSet.add(CachedMovieEntry.COLUMN_API_ID);
         columnNameSet.add(CachedMovieEntry.COLUMN_BACKDROP_PATH);
         columnNameSet.add(CachedMovieEntry.COLUMN_RELEASE_DATE);
         columnNameSet.add(CachedMovieEntry.COLUMN_ORIGINAL_TITLE);

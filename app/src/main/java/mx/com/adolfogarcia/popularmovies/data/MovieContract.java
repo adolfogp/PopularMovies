@@ -80,6 +80,12 @@ public final class MovieContract {
         // TODO: Keep the day the results were downloaded and last page retrieved and saved in shared preferences, along with the kind of list (popularity or rating)
 
         /**
+         * The movie's id in
+         * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
+         */
+        public static final String COLUMN_API_ID = "api_id";
+
+        /**
          * The movie's original title.
          */
         public static final String COLUMN_ORIGINAL_TITLE = "original_title";

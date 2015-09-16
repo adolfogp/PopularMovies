@@ -43,7 +43,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
      */
     private static final String SQL_CREATE_MOVIE_TABLE =
             "CREATE TABLE " + CachedMovieEntry.TABLE_NAME + " ("
-            + CachedMovieEntry._ID + " INTEGER, "
+            + CachedMovieEntry._ID + " INTEGER PRIMARY KEY, "
+            + CachedMovieEntry.COLUMN_API_ID + " INTEGER, "
             + CachedMovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL, "
             + CachedMovieEntry.COLUMN_RELEASE_DATE + " INTEGER, "
             + CachedMovieEntry.COLUMN_OVERVIEW + " TEXT, "
@@ -51,7 +52,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             + CachedMovieEntry.COLUMN_POSTER_PATH + " TEXT, "
             + CachedMovieEntry.COLUMN_POPULARITY + " REAL NOT NULL, "
             + CachedMovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, "
-            + "PRIMARY KEY (" + CachedMovieEntry._ID + ") ON CONFLICT REPLACE"
+            + "UNIQUE (" + CachedMovieEntry._ID + ") ON CONFLICT REPLACE"
             + ");";
 
     /**

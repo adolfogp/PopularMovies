@@ -143,7 +143,7 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
         for (int i = 0; i < cvArray.length; i++) {
             MovieJsonModel movie = movieList.get(i);
             ContentValues contentValues = new ContentValues();
-            contentValues.put(CachedMovieEntry._ID
+            contentValues.put(CachedMovieEntry.COLUMN_API_ID
                     , movie.getId());
             contentValues.put(CachedMovieEntry.COLUMN_ORIGINAL_TITLE
                     , movie.getOriginalTitle());

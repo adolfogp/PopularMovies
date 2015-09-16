@@ -33,9 +33,15 @@ import static org.parceler.Parcel.Serialization;
 public class Movie {
 
     /**
-     * The movie's identifier.
+     * The movie's local identifier.
      */
     private long mId;
+
+    /**
+     * The movie's identifier in
+     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API..
+     */
+    private long mApiId;
 
     /**
      * The movie's original title.
@@ -81,6 +87,14 @@ public class Movie {
 
     public void setId(long id) {
         mId = id;
+    }
+
+    public long getApiId() {
+        return mApiId;
+    }
+
+    public void setApiId(long apiId) {
+        mApiId = apiId;
     }
 
     public String getOriginalTitle() {

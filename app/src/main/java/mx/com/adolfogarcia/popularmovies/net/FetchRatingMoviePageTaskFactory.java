@@ -49,7 +49,8 @@ public class FetchRatingMoviePageTaskFactory implements FetchMoviePageTaskFactor
      * to order the results from highest to lowest rated.
      */
     private static final String ORDER_BY_VOTE_AVERAGE_DESCENDING =
-            MovieContract.CachedMovieEntry.COLUMN_VOTE_AVERAGE + " DESC" ;
+            MovieContract.CachedMovieEntry.COLUMN_VOTE_AVERAGE + " DESC"
+            + ", " + MovieContract.CachedMovieEntry._ID + " ASC";
 
     /**
      * Creates a new instance of {@link FetchRatingMoviePageTaskFactory}

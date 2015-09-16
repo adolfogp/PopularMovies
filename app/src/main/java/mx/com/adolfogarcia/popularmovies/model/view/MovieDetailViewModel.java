@@ -73,6 +73,7 @@ public class MovieDetailViewModel extends BaseObservable {
      */
     public static final String[] PROJECTION_MOVIE_DETAILS = {
             CachedMovieEntry._ID,
+            CachedMovieEntry.COLUMN_API_ID,
             CachedMovieEntry.COLUMN_ORIGINAL_TITLE,
             CachedMovieEntry.COLUMN_RELEASE_DATE,
             CachedMovieEntry.COLUMN_OVERVIEW,
@@ -87,40 +88,46 @@ public class MovieDetailViewModel extends BaseObservable {
     public static final int COL_ID = 0;
 
     /**
+     * Index of {@link CachedMovieEntry#COLUMN_API_ID} in
+     * {@link #PROJECTION_MOVIE_DETAILS}.
+     */
+    public static final int COL_API_ID = 1;
+
+    /**
      * Index of {@link CachedMovieEntry#COLUMN_ORIGINAL_TITLE} in
      * {@link #PROJECTION_MOVIE_DETAILS}.
      */
-    public static final int COL_ORIGINAL_TITLE = 1;
+    public static final int COL_ORIGINAL_TITLE = 2;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_RELEASE_DATE} in
      * {@link #PROJECTION_MOVIE_DETAILS}.
      */
-    public static final int COL_RELEASE_DATE = 2;
+    public static final int COL_RELEASE_DATE = 3;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_OVERVIEW} in
      * {@link #PROJECTION_MOVIE_DETAILS}.
      */
-    public static final int COL_OVERVIEW = 3;
+    public static final int COL_OVERVIEW = 4;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_POSTER_PATH} in
      * {@link #PROJECTION_MOVIE_DETAILS}.
      */
-    public static final int COL_POSTER_PATH = 4;
+    public static final int COL_POSTER_PATH = 5;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_BACKDROP_PATH} in
      * {@link #PROJECTION_MOVIE_DETAILS}.
      */
-    public static final int COL_BACKDROP_PATH = 5;
+    public static final int COL_BACKDROP_PATH = 6;
 
     /**
      * Index of {@link CachedMovieEntry#COLUMN_VOTE_AVERAGE} in
      * {@link #PROJECTION_MOVIE_DETAILS}.
      */
-    public static final int COL_VOTE_AVERAGE = 6;
+    public static final int COL_VOTE_AVERAGE = 7;
 
     /**
      * The movie for which the detail data is being shown.
@@ -312,6 +319,7 @@ public class MovieDetailViewModel extends BaseObservable {
         requireNonNullConfiguration();
         RestfulServiceConfiguration configuration = mWeakConfiguration.get();
         Context context = mWeakContext.get();
+        mMovie.setApiId(cursor.getLong(COL_API_ID));
         mMovie.setOriginalTitle(cursor.getString(COL_ORIGINAL_TITLE));
         mMovie.setReleaseDate(cursor.getLong(COL_RELEASE_DATE));
         mMovie.setOverview(cursor.getString(COL_OVERVIEW));
