@@ -111,7 +111,7 @@ public class MovieDetailFragment extends Fragment
         Movie movie = Parcels.unwrap(getArguments().getParcelable(ARG_MOVIE));
         MovieDetailViewModel viewModel = new MovieDetailViewModel();
         ((PopularMoviesApplication) getActivity().getApplication())
-                .getComponent().inject(mViewModel);
+                .getComponent().inject(viewModel);
         viewModel.setMovie(movie);
         return viewModel;
     }

@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import static org.parceler.Parcel.Serialization;
 
 import de.greenrobot.event.EventBus;
+import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
 import mx.com.adolfogarcia.popularmovies.model.event.MovieSelectionEvent;
@@ -71,12 +72,11 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
      */
     private static final int DOWNLOAD_THRESHOLD = 2;
 
-    // TODO: Inject
-    WeakReference<Context> mWeakContext; // TODO - Remove if not needed
+    @Inject WeakReference<Context> mWeakContext; // TODO - Remove if not needed
 
-    WeakReference<RestfulServiceConfiguration> mWeakConfiguration; // TODO: Inject
+    @Inject WeakReference<RestfulServiceConfiguration> mWeakConfiguration;
 
-    LabeledItem<FetchMoviePageTaskFactory>[] mSortOrderOptions; // TODO: Inject
+    @Inject LabeledItem<FetchMoviePageTaskFactory>[] mSortOrderOptions;
 
     private FetchMoviePageTaskFactory mSelectedFetchMoviePageTaskFactory;
 

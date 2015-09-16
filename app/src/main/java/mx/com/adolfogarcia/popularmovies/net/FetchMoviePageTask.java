@@ -91,6 +91,12 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
     public FetchMoviePageTask(RestfulServiceConfiguration configuration
             , String orderCriteria
             , Context context) {
+        if (configuration == null) {
+            throw new IllegalArgumentException("The Configuration may not be null");
+        }
+        if (context == null) {
+            throw new IllegalArgumentException("The Context may not be null");
+        }
         mWeakConfiguration = new WeakReference<>(configuration);
         mWeakContext = new WeakReference<>(context);
         mOrderCriteria = orderCriteria;

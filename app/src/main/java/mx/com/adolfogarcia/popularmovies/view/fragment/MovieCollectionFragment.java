@@ -96,7 +96,7 @@ public class MovieCollectionFragment extends Fragment
      * using <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful
      * API.
      */
-    WeakReference<RestfulServiceConfiguration> mWeakConfiguration; // TODO: Inject
+    @Inject WeakReference<RestfulServiceConfiguration> mWeakConfiguration;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

@@ -75,9 +75,9 @@ public class FetchPopularityMoviePageTaskFactory
 
     @Override
     public AsyncTask<Integer, ?, ?> newFetchMovieTask() {
-        return new FetchMoviePageTask(null
+        return new FetchMoviePageTask(mWeakConfiguration.get()
                 , TheMovieDbApi.SORT_BY_POPULARITY
-                , null);
+                , mWeakContext.get());
     }
 
 }

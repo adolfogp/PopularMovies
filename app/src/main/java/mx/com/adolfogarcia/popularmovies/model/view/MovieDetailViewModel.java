@@ -40,6 +40,7 @@ import javax.inject.Inject;
 import static org.parceler.Parcel.Serialization;
 
 import mx.com.adolfogarcia.popularmovies.BR;
+import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
@@ -126,9 +127,9 @@ public class MovieDetailViewModel extends BaseObservable {
      */
     private Movie mMovie;
 
-    WeakReference<Context> mWeakContext; // TODO: Inject
+    @Inject WeakReference<Context> mWeakContext;
 
-    WeakReference<RestfulServiceConfiguration> mWeakConfiguration; // TODO: Inject
+    @Inject WeakReference<RestfulServiceConfiguration> mWeakConfiguration;
 
     /**
      * Creates a new instance of {@link MovieCollectionViewModel} with the

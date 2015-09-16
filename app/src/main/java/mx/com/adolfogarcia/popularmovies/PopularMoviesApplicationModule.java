@@ -17,6 +17,7 @@
 package mx.com.adolfogarcia.popularmovies;
 
 import android.app.Application;
+import android.content.Context;
 
 import java.lang.ref.WeakReference;
 
@@ -30,6 +31,7 @@ import mx.com.adolfogarcia.popularmovies.net.FetchPopularityMoviePageTaskFactory
 import mx.com.adolfogarcia.popularmovies.net.FetchRatingMoviePageTaskFactory;
 import mx.com.adolfogarcia.popularmovies.view.adapter.LabeledItem;
 
+// TODO: Create different modules for different scopes (Application, Activity, etc.)
 /**
  * Module used by <a href="">Dagger 2</a> to provide dependencies in the
  * Popular Movies application.
@@ -62,36 +64,38 @@ public class PopularMoviesApplicationModule {
      *
      * @return the application's context.
      */
-    @Provides @Singleton PopularMoviesApplication provideApplicationContext() {
+    @Provides @Singleton Context provideApplicationContext() {
         return mApplication;
     }
 
-    // TODO: Change to use the @Inject annotation on RestfulServiceConfiguration
     /**
-     * Provides the application's system wide configuration data.
+     * Provides the application's system wide RESTful service configuration data.
      *
-     * @return the application's system wide configuration data.
+     * @return the application's system wide RESTful service configuration data.
      */
     @Provides @Singleton RestfulServiceConfiguration provideConfiguration() {
         return mConfiguration;
     }
 
     /**
-     * Provides the application's context for injection.
+     * Provides a {@link WeakReference} to the application's {@link Context}.
      *
-     * @return the application's context.
+     * @param context the application's {@link Context}.
+     * @return a {@link WeakReference} to the application's {@link Context}.
      */
-    @Provides WeakReference<PopularMoviesApplication> provideWeakApplicationContext(
-            PopularMoviesApplication application) {
-        return new WeakReference<>(application);
+    @Provides WeakReference<Context> provideApplicationContextReference(Context context) {
+        return new WeakReference<>(context);
     }
 
     /**
-     * Provides the application's system wide configuration data.
+     * Provides a {@link WeakReference} to the application's system wide RESTful
+     * service configuration data.
      *
-     * @return the application's system wide configuration data.
+     * @param configuration the application's system wide RESTful service configuration.
+     * @return a {@link WeakReference} to the application's system wide RESTful
+     *     service configuration data.
      */
-    @Provides WeakReference<RestfulServiceConfiguration> provideWeakConfiguration(
+    @Provides WeakReference<RestfulServiceConfiguration> provideConfigurationReference(
             RestfulServiceConfiguration configuration) {
         return new WeakReference<>(configuration);
     }
@@ -102,13 +106,16 @@ public class PopularMoviesApplicationModule {
      *
      * @return the application's system wide configuration data.
      */
-//    @Provides LabeledItem<FetchMoviePageTaskFactory>[] provideSortOrderOptions() {
-//        return new LabeledItem[] {
-//                new LabeledItem(mApplication.getString(R.string.label_sort_order_popular)
-//                        , new FetchPopularityMoviePageTaskFactory(mConfiguration, mApplication))
-//                , new LabeledItem(mApplication.getString(R.string.label_sort_order_vote_average)
-//                        , new FetchRatingMoviePageTaskFactory(mConfiguration, mApplication))
-//        };
-//    }
+    @SuppressWarnings("unchecked")
+    @Provides LabeledItem<FetchMoviePageTaskFactory>[] provideSortOrderOptions(
+            Context context
+            , RestfulServiceConfiguration configuration) {
+        return new LabeledItem[] {
+                new LabeledItem(mApplication.getString(R.string.label_sort_order_popular)
+                        , new FetchPopularityMoviePageTaskFactory(configuration, context))
+                , new LabeledItem(mApplication.getString(R.string.label_sort_order_vote_average)
+                        , new FetchRatingMoviePageTaskFactory(configuration, context))
+        };
+    }
 
 }

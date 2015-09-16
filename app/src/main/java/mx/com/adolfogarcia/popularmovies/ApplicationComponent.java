@@ -30,8 +30,8 @@ public interface ApplicationComponent {
 
     void inject(MovieCollectionFragment movieCollectionFragment);
 
-    void inject(MovieDetailViewModel movieDetailViewModel);
-
     void inject(MovieCollectionViewModel movieCollectionViewModel);
+
+    void inject(MovieDetailViewModel movieDetailViewModel);
 
 }
