@@ -31,7 +31,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
@@ -41,10 +40,12 @@ import java.lang.ref.WeakReference;
 
 import javax.inject.Inject;
 
+import de.greenrobot.event.EventBus;
 import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.databinding.MovieCollectionFragmentBinding;
+import mx.com.adolfogarcia.popularmovies.model.event.SortOrderSelectionEvent;
 import mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel;
 import mx.com.adolfogarcia.popularmovies.net.FetchMoviePageTaskFactory;
 import mx.com.adolfogarcia.popularmovies.view.adapter.LabeledItem;
@@ -168,7 +169,7 @@ public class MovieCollectionFragment extends Fragment
         mBinding.posterGridView.setAdapter(mMoviePosterAdapter);
         mBinding.posterGridView.setOnItemClickListener(mViewModel);
         mBinding.posterGridView.setOnScrollListener(mViewModel);
-        mViewModel.updateApiConfig(); // TODO: Update config data only if old and if so, remove cached movies too
+        mViewModel.updateApiConfig(); // FIXME: Update config data only if old and if so, remove cached movies too
         return mBinding.getRoot();
     }
 
@@ -183,17 +184,42 @@ public class MovieCollectionFragment extends Fragment
                         , mViewModel.getSortOrderOptions());
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(mViewModel);
-        spinner.setSelection(0); // TODO: Get selected index from ViewModel and verify that ViewModel works appropriately on setting the selection
+        spinner.setSelection(mViewModel.getSelectedSortOrderIndex());
+    }
+
+    @Override
+    public void onResume() {
+        EventBus.getDefault().register(this);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
+    }
+
+    /**
+     * Restarts the {@link Loader}, so the movies are presented in the newly
+     * selected order.
+     *
+     * @param event the change of sort order event.
+     */
+    public void onEvent(SortOrderSelectionEvent event) {
+        getLoaderManager().restartLoader(MOVIE_COLLECTION_LOADER_ID, null, this);
+        Log.v(LOG_TAG, "Restarted loader"); // TODO: Delete line
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Log.v(LOG_TAG, "Created new loader"); // TODO: Delete line
+        Log.v(LOG_TAG, "New order clause: " + mViewModel.getSelectedSortOrderClause()); // TODO: Delete line
         return new CursorLoader(this.getActivity()
                 , CachedMovieEntry.CONTENT_URI
                 , MoviePosterAdapter.PROJECTION_MOVIE_POSTERS
                 , null
                 , null
-                , mViewModel.getSelectedSortOrder());
+                , mViewModel.getSelectedSortOrderClause());
     }
 
     @Override

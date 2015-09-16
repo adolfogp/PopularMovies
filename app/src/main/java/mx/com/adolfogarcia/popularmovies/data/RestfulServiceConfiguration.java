@@ -32,6 +32,7 @@ import java.util.Set;
 
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.model.transport.ImageConfigurationJsonModel;
+import mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel;
 
 /**
  * Handles access to storage of
@@ -185,6 +186,15 @@ public class RestfulServiceConfiguration {
      */
     private static final String PREFERENCES_KEY_LAST_MOVIE_PAGE_RETRIEVED =
             "last_movie_page_retrieved";
+
+    /**
+     * Key used to access, the index number of the sort order options that
+     * contains the ordering to specify in the requests to the RESTful API,
+     * as stored in the {@link SharedPreferences}.
+     * @see MovieCollectionViewModel#getSortOrderOptions()
+     */
+    private static final String PREFERENCES_KEY_SELECTED_SORT_ORDER_INDEX =
+            "selected_sort_order_index";
 
     /**
      * Key used to access the total number of movie pages available in the RESTful
@@ -566,6 +576,35 @@ public class RestfulServiceConfiguration {
                 PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(PREFERENCES_KEY_TOTAL_MOVIE_PAGES_AVAILABLE, total);
+        editor.apply();
+    }
+
+    /**
+     * Returns the index of the sort order options that contains the ordering
+     * to specify in the requests to the RESTful API.
+     *
+     * @return the index of the sort order options that contains the ordering
+     * to specify in the requests to the RESTful API.
+     * @see MovieCollectionViewModel#getSortOrderOptions()
+     */
+    public int getSelectedSortOrderIndex() {
+        SharedPreferences settings =
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
+        return settings.getInt(PREFERENCES_KEY_SELECTED_SORT_ORDER_INDEX, 0);
+    }
+
+    /**
+     * Sets the index of the sort order options that contains the ordering
+     * to specify in the requests to the RESTful API. That is, stores the value
+     * in the application's {@link SharedPreferences}.
+     *
+     * @param sortOrderIndex the value to store.
+     */
+    public void setSelectedSortOrderIndex(int sortOrderIndex) {
+        SharedPreferences preferences =
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(PREFERENCES_KEY_SELECTED_SORT_ORDER_INDEX, sortOrderIndex);
         editor.apply();
     }
 

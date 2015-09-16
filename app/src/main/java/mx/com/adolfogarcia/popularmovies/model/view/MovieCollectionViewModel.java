@@ -34,12 +34,15 @@ import static org.parceler.Parcel.Serialization;
 
 import de.greenrobot.event.EventBus;
 import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
+import mx.com.adolfogarcia.popularmovies.data.MovieContract;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
 import mx.com.adolfogarcia.popularmovies.model.event.MovieSelectionEvent;
+import mx.com.adolfogarcia.popularmovies.model.event.SortOrderSelectionEvent;
 import mx.com.adolfogarcia.popularmovies.net.FetchConfigurationTask;
 import mx.com.adolfogarcia.popularmovies.net.FetchMoviePageTaskFactory;
 import mx.com.adolfogarcia.popularmovies.view.adapter.LabeledItem;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 import static android.os.AsyncTask.Status;
 
@@ -72,13 +75,18 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
      */
     private static final int DOWNLOAD_THRESHOLD = 2;
 
+
     @Inject WeakReference<Context> mWeakContext; // TODO - Remove if not needed
 
+    /**
+     * The RESTFul API's configuration.
+     */
     @Inject WeakReference<RestfulServiceConfiguration> mWeakConfiguration;
 
+    /**
+     * The movie sort order criteria the user may choose from.
+     */
     @Inject LabeledItem<FetchMoviePageTaskFactory>[] mSortOrderOptions;
-
-    private FetchMoviePageTaskFactory mSelectedFetchMoviePageTaskFactory;
 
     /**
      * Current movie downloading task. A reference is kept to avoid
@@ -127,6 +135,56 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
         fetchConfigurationTask.execute();
     }
 
+    /**
+     * Returns the {@link FetchMoviePageTaskFactory} for the currently selected
+     * sort order option.
+     *
+     * @return the {@link FetchMoviePageTaskFactory} for the currently selected
+     *     sort order option.
+     * @see #getSortOrderOptions()
+     */
+    public FetchMoviePageTaskFactory getSelectedSortOrderTaskFactory() {
+        int idx = getSelectedSortOrderIndex();
+        return mSortOrderOptions[idx].getItem();
+    }
+
+    /**
+     * Returns the index of the currently selected sort order option.
+     *
+     * @return the index of the currently selected sort order option.
+     * @see #getSortOrderOptions()
+     */
+    public int getSelectedSortOrderIndex() {
+        requireNonNullConfiguration();
+        return mWeakConfiguration.get().getSelectedSortOrderIndex();
+    }
+
+    /**
+     * Sets the index of the currently selected sort order option.
+     *
+     * @param idx the value to set as the currently selected sort order option.
+     */
+    public void setSelectedSortOrderIndex(int idx) {
+        if (idx < 0 || idx >= mSortOrderOptions.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        requireNonNullConfiguration();
+        requireNonNullContext();
+        RestfulServiceConfiguration configuration = mWeakConfiguration.get();
+        Context context = mWeakContext.get();
+        Log.v(LOG_TAG, "Selected sort order index: " + idx); // TODO: Delete this line
+        if (configuration.getSelectedSortOrderIndex() == idx) {
+            Log.d(LOG_TAG, "Ignoring sort order change.");
+            return;
+        }
+        configuration.setSelectedSortOrderIndex(idx);
+        configuration.setLastMoviePageRetrieved(0);
+        // Delete all cached movies
+        context.getContentResolver().delete(CachedMovieEntry.CONTENT_URI, null, null);
+        downloadNextMoviePage();
+        EventBus.getDefault().post(new SortOrderSelectionEvent());
+    }
+
     // TODO: If no connection, notify user (before calls to this method).
     /**
      * Downloads the next page of movie data from
@@ -146,7 +204,7 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
             Log.d(LOG_TAG, "Still downloading movie page. Ignoring request.");
             return;
         }
-        mFetchMoviePageTask = mSelectedFetchMoviePageTaskFactory.newFetchMovieTask();
+        mFetchMoviePageTask = getSelectedSortOrderTaskFactory().newFetchMovieTask();
         mFetchMoviePageTask.execute(configuration.getLastMoviePageRetrieved() + 1);
     }
 
@@ -181,25 +239,22 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
         return mSortOrderOptions;
     }
 
-
-    public String getSelectedSortOrder() {
-        if (mSelectedFetchMoviePageTaskFactory == null) {
-            // FIXME: Get last selection from settings
-            mSelectedFetchMoviePageTaskFactory = mSortOrderOptions[0].getItem(); // FIXME: Wrong assignment
-        }
-        return mSelectedFetchMoviePageTaskFactory.getMovieSortOrder();
+    /**
+     * Returns an order clause to be used on
+     * {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}, that
+     * corresponds to the currently selected item from
+     * {@link #getSortOrderOptions()}.
+     *
+     * @return an order clause to be used on
+     *     {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+     */
+    public String getSelectedSortOrderClause() {
+        return getSelectedSortOrderTaskFactory().getMovieSortOrder();
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        mSelectedFetchMoviePageTaskFactory =
-                ((LabeledItem<FetchMoviePageTaskFactory>) parent.getSelectedItem()).getItem();
-        // FIXME: check if selection is different to previous
-        // FIXME: delete cached movies
-        // FIXME: Set current page of movies to 0
-        // FIXME: Retrieve next page of movies
-        // FIXME: save new selection
-        // FIXME: Fire event to restart loader
+        setSelectedSortOrderIndex(position);
     }
 
     @Override
