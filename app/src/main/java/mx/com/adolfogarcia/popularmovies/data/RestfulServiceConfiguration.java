@@ -21,10 +21,10 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.util.SparseArrayCompat;
 import android.util.Log;
-import android.util.TypedValue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Properties;
@@ -194,9 +194,10 @@ public class RestfulServiceConfiguration {
             "total_movie_pages_available";
 
     /**
-     * The {@link Context} used to retrieve and store the configuration values.
+     * Reference to the {@link Context} used to retrieve and store the
+     * configuration values.
      */
-    private final Context mContext;
+    private final WeakReference<Context> mWeakContext;
 
     /**
      * Holds default configuration values and the key required to access the
@@ -218,14 +219,35 @@ public class RestfulServiceConfiguration {
      *                {@link SharedPreferences}.
      */
     public RestfulServiceConfiguration(Context context) {
-        this.mContext = context;
+        if (context == null) {
+            throw new IllegalArgumentException("The context may not be null");
+        }
+        this.mWeakContext = new WeakReference<>(context);
         initProperties();
     }
 
+    /**
+     * Verifies that the {@link Context} referenced by {@link #mWeakContext}
+     * is not null and throws {@link IllegalStateException} if it is.
+     *
+     * @throws IllegalStateException if the {@link Context} referenced by
+     *     {@link #mWeakContext} is null.
+     */
+    private void requireNonNullContext() {
+        if (mWeakContext.get() == null) {
+            throw new IllegalStateException("Cannot operate with a null context.");
+        }
+    }
+
+    /**
+     * Initializes {@link #mConfigurationProperties} with the values from the
+     * properties file.
+     */
     private void initProperties() {
+        requireNonNullContext();
         InputStream is = null;
         try {
-            is = mContext.getResources().openRawResource(R.raw.configuration);
+            is = mWeakContext.get().getResources().openRawResource(R.raw.configuration);
             mConfigurationProperties.loadFromXML(is);
         } catch (IOException ioe) {
             Log.e(LOG_TAG, "Failed to load configuration file.", ioe);
@@ -246,8 +268,9 @@ public class RestfulServiceConfiguration {
      *     value if one has not been previously stored.
      */
     public String getImageBaseUrl() {
+        requireNonNullContext();
         SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         return settings.getString(PREFERENCES_KEY_IMAGE_URL
                 , mConfigurationProperties.getProperty(PROPERTIES_KEY_DEFAULT_IMAGE_URL));
     }
@@ -258,8 +281,9 @@ public class RestfulServiceConfiguration {
      * @param url the base URL to be used for image retrieval.
      */
     public void setImageBaseUrl(String url) {
+        requireNonNullContext();
         SharedPreferences preferences =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString(PREFERENCES_KEY_IMAGE_URL, url);
         editor.putLong(PREFERENCES_KEY_LAST_UPDATE, System.currentTimeMillis());
@@ -276,8 +300,9 @@ public class RestfulServiceConfiguration {
      *     previously saved, or the default values.
      */
     public Set<String> getPosterSizes() {
+        requireNonNullContext();
         SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         return settings.getStringSet(PREFERENCES_KEY_POSTER_SIZES
                 , getDefaultSetValue(PROPERTIES_KEY_DEFAULT_POSTER_SIZES));
     }
@@ -292,8 +317,9 @@ public class RestfulServiceConfiguration {
      *                    posters.
      */
     public void setPosterSizes(Set<String> posterSizes) {
+        requireNonNullContext();
         SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         SharedPreferences.Editor editor = settings.edit();
         editor.putStringSet(PREFERENCES_KEY_POSTER_SIZES, posterSizes);
         editor.putLong(PREFERENCES_KEY_LAST_UPDATE, System.currentTimeMillis());
@@ -310,8 +336,9 @@ public class RestfulServiceConfiguration {
      *     previously saved, or the default values.
      */
     public Set<String> getBackdropSizes() {
+        requireNonNullContext();
         SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         return settings.getStringSet(PREFERENCES_KEY_BACKDROP_SIZES
                 , getDefaultSetValue(PROPERTIES_KEY_DEFAULT_BACKDROP_SIZES));
     }
@@ -326,8 +353,9 @@ public class RestfulServiceConfiguration {
      *                    backdrops.
      */
     public void setBackdropSizes(Set<String> backdropSizes) {
+        requireNonNullContext();
         SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         SharedPreferences.Editor editor = settings.edit();
         editor.putStringSet(PREFERENCES_KEY_BACKDROP_SIZES, backdropSizes);
         editor.putLong(PREFERENCES_KEY_LAST_UPDATE, System.currentTimeMillis());
@@ -355,8 +383,9 @@ public class RestfulServiceConfiguration {
      * @see #setBackdropSizes(Set)
      */
     public void setImageConfiguration(ImageConfigurationJsonModel configuration) {
+        requireNonNullContext();
         SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(PREFERENCES_KEY_IMAGE_URL
                 , configuration.getSecureBaseUrl());
@@ -475,7 +504,7 @@ public class RestfulServiceConfiguration {
      */
     public Long getLastUpdateTime() {
         SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         return settings.getLong(PREFERENCES_KEY_LAST_UPDATE, 0);
     }
 
@@ -490,7 +519,7 @@ public class RestfulServiceConfiguration {
      */
     public int getLastMoviePageRetrieved() {
         SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         return settings.getInt(PREFERENCES_KEY_LAST_MOVIE_PAGE_RETRIEVED, 0);
     }
 
@@ -503,7 +532,7 @@ public class RestfulServiceConfiguration {
      */
     public void setLastMoviePageRetrieved(int page) {
         SharedPreferences preferences =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(PREFERENCES_KEY_LAST_MOVIE_PAGE_RETRIEVED, page);
         editor.apply();
@@ -520,7 +549,7 @@ public class RestfulServiceConfiguration {
      */
     public int getTotalMoviePagesAvailable() {
         SharedPreferences settings =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         return settings.getInt(PREFERENCES_KEY_TOTAL_MOVIE_PAGES_AVAILABLE
                 , Integer.MAX_VALUE);
     }
@@ -534,7 +563,7 @@ public class RestfulServiceConfiguration {
      */
     public void setTotalMoviePagesAvailable(int total) {
         SharedPreferences preferences =
-                PreferenceManager.getDefaultSharedPreferences(mContext);
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(PREFERENCES_KEY_TOTAL_MOVIE_PAGES_AVAILABLE, total);
         editor.apply();

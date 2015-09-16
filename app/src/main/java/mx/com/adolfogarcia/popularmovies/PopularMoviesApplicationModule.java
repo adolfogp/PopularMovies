@@ -17,13 +17,18 @@
 package mx.com.adolfogarcia.popularmovies;
 
 import android.app.Application;
-import android.content.Context;
+
+import java.lang.ref.WeakReference;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
+import mx.com.adolfogarcia.popularmovies.net.FetchMoviePageTaskFactory;
+import mx.com.adolfogarcia.popularmovies.net.FetchPopularityMoviePageTaskFactory;
+import mx.com.adolfogarcia.popularmovies.net.FetchRatingMoviePageTaskFactory;
+import mx.com.adolfogarcia.popularmovies.view.adapter.LabeledItem;
 
 /**
  * Module used by <a href="">Dagger 2</a> to provide dependencies in the
@@ -57,7 +62,7 @@ public class PopularMoviesApplicationModule {
      *
      * @return the application's context.
      */
-    @Provides @Singleton Application provideApplicationContext() {
+    @Provides @Singleton PopularMoviesApplication provideApplicationContext() {
         return mApplication;
     }
 
@@ -70,5 +75,40 @@ public class PopularMoviesApplicationModule {
     @Provides @Singleton RestfulServiceConfiguration provideConfiguration() {
         return mConfiguration;
     }
+
+    /**
+     * Provides the application's context for injection.
+     *
+     * @return the application's context.
+     */
+    @Provides WeakReference<PopularMoviesApplication> provideWeakApplicationContext(
+            PopularMoviesApplication application) {
+        return new WeakReference<>(application);
+    }
+
+    /**
+     * Provides the application's system wide configuration data.
+     *
+     * @return the application's system wide configuration data.
+     */
+    @Provides WeakReference<RestfulServiceConfiguration> provideWeakConfiguration(
+            RestfulServiceConfiguration configuration) {
+        return new WeakReference<>(configuration);
+    }
+
+    /**
+     * Provides the sorting options used by
+     * {@link mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel}.
+     *
+     * @return the application's system wide configuration data.
+     */
+//    @Provides LabeledItem<FetchMoviePageTaskFactory>[] provideSortOrderOptions() {
+//        return new LabeledItem[] {
+//                new LabeledItem(mApplication.getString(R.string.label_sort_order_popular)
+//                        , new FetchPopularityMoviePageTaskFactory(mConfiguration, mApplication))
+//                , new LabeledItem(mApplication.getString(R.string.label_sort_order_vote_average)
+//                        , new FetchRatingMoviePageTaskFactory(mConfiguration, mApplication))
+//        };
+//    }
 
 }

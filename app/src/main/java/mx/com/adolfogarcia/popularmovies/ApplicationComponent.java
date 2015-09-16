@@ -19,12 +19,19 @@ package mx.com.adolfogarcia.popularmovies;
 import javax.inject.Singleton;
 
 import dagger.Component;
+import mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel;
+import mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel;
 import mx.com.adolfogarcia.popularmovies.view.fragment.MovieCollectionFragment;
 import mx.com.adolfogarcia.popularmovies.view.fragment.MovieDetailFragment;
 
 @Singleton
 @Component(modules = PopularMoviesApplicationModule.class)
 public interface ApplicationComponent {
+
     void inject(MovieCollectionFragment movieCollectionFragment);
-    void inject(MovieDetailFragment movieDetailFragment);
+
+    void inject(MovieDetailViewModel movieDetailViewModel);
+
+    void inject(MovieCollectionViewModel movieCollectionViewModel);
+
 }

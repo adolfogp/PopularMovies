@@ -15,9 +15,8 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <string-array name="pref_sort_order">
-        <item>@string/label_sort_order_popular</item>
-        <item>@string/label_sort_order_vote_average</item>
-    </string-array>
-</resources>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          style="@style/SortOrder.Option"
+          tools:text="@string/label_sort_order_popular"
+          tools:background="#000000" />

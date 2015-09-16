@@ -30,9 +30,12 @@ import com.squareup.picasso.Picasso;
 import org.parceler.Parcel;
 import org.parceler.Transient;
 
+import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
+
+import javax.inject.Inject;
 
 import static org.parceler.Parcel.Serialization;
 
@@ -44,9 +47,9 @@ import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEn
 
 /**
  * View model for the movie detail's view. Provides data and behaviour.
- * When reconstructing (deserializaing), make sure you set the transient
- * attributes, for example {@link #setContext(Context)} and
- * {@link #setConfiguration(RestfulServiceConfiguration)}.
+ * In order for this class to work, the {@link #mWeakContext} and
+ * {@link #mWeakConfiguration} must be injected. When creating or reconstructing
+ * deserializaing), make sure you inject those values.
  *
  * @author Jesús Adolfo García Pasquel
  */
@@ -123,9 +126,43 @@ public class MovieDetailViewModel extends BaseObservable {
      */
     private Movie mMovie;
 
-    private Context mContext;
+    WeakReference<Context> mWeakContext; // TODO: Inject
 
-    private RestfulServiceConfiguration mConfiguration;
+    WeakReference<RestfulServiceConfiguration> mWeakConfiguration; // TODO: Inject
+
+    /**
+     * Creates a new instance of {@link MovieCollectionViewModel} with the
+     * default values for all its attributes.
+     */
+    public MovieDetailViewModel() {
+        // Empty bean constructor.
+    }
+
+    /**
+     * Verifies that {@link #mWeakContext} is not {@code null}, nor the object
+     * it references, throws {@link IllegalStateException} otherwise.
+     *
+     * @throws IllegalStateException if {@link #mWeakContext} or the object it
+     *     references are {@code null}.
+     */
+    private void requireNonNullContext() {
+        if (mWeakContext == null || mWeakContext.get() == null) {
+            throw new IllegalStateException("The context may not be null.");
+        }
+    }
+
+    /**
+     * Verifies that {@link #mWeakConfiguration} is not {@code null}, nor the
+     * object it references, throws {@link IllegalStateException} otherwise.
+     *
+     * @throws IllegalStateException if {@link #mWeakConfiguration} or the
+     *     object it references are {@code null}.
+     */
+    private void requireNonNullConfiguration() {
+        if (mWeakConfiguration == null || mWeakConfiguration.get() == null) {
+            throw new IllegalStateException("The configuration may not be null.");
+        }
+    }
 
     public Movie getMovie() {
         return mMovie;
@@ -140,24 +177,6 @@ public class MovieDetailViewModel extends BaseObservable {
         if (mMovie.getOriginalTitle() != null) {
             notifyPropertyChanged(BR._all);
         }
-    }
-
-    @Transient
-    public Context getContext() {
-        return mContext;
-    }
-
-    public void setContext(Context context) {
-        mContext = context;
-    }
-
-    @Transient
-    public RestfulServiceConfiguration getConfiguration() {
-        return mConfiguration;
-    }
-
-    public void setConfiguration(RestfulServiceConfiguration configuration) {
-        mConfiguration = configuration;
     }
 
     /**
@@ -181,8 +200,9 @@ public class MovieDetailViewModel extends BaseObservable {
      */
     @Bindable
     public String getReleaseDate() {
-        SimpleDateFormat formatter =
-                new SimpleDateFormat(mContext.getString(R.string.format_movie_release_date));
+        requireNonNullContext();
+        SimpleDateFormat formatter = new SimpleDateFormat(mWeakContext.get()
+                .getString(R.string.format_movie_release_date));
         formatter.setTimeZone(TimeZone.getTimeZone(UTC_TIME_ZONE));
         return mMovie != null
                 ? formatter.format(mMovie.getReleaseDate())
@@ -203,8 +223,9 @@ public class MovieDetailViewModel extends BaseObservable {
 
     @Bindable
     public String getVoteAverage() {
-        DecimalFormat formatter =
-                new DecimalFormat(mContext.getString(R.string.format_vote_average));
+        requireNonNullContext();
+        DecimalFormat formatter = new DecimalFormat(mWeakContext.get()
+                .getString(R.string.format_vote_average));
         return mMovie != null
                 ? formatter.format(mMovie.getVoteAverage())
                 : null;
@@ -286,16 +307,20 @@ public class MovieDetailViewModel extends BaseObservable {
             throw new IllegalArgumentException(
                     "The data passed does not belong to movie " + mMovie.getId());
         }
+        requireNonNullContext();
+        requireNonNullConfiguration();
+        RestfulServiceConfiguration configuration = mWeakConfiguration.get();
+        Context context = mWeakContext.get();
         mMovie.setOriginalTitle(cursor.getString(COL_ORIGINAL_TITLE));
         mMovie.setReleaseDate(cursor.getLong(COL_RELEASE_DATE));
         mMovie.setOverview(cursor.getString(COL_OVERVIEW));
-        int posterPixelWidth = mContext.getResources().getDimensionPixelSize(
+        int posterPixelWidth = context.getResources().getDimensionPixelSize(
                 R.dimen.movie_poster_thumbnail_width);
-        mMovie.setPosterUri(Uri.parse(mConfiguration.getBestFittingPosterUrl(
+        mMovie.setPosterUri(Uri.parse(configuration.getBestFittingPosterUrl(
                 cursor.getString(COL_POSTER_PATH), posterPixelWidth)));
-        int backdropPixelWidth = mContext.getResources().getDimensionPixelSize(
+        int backdropPixelWidth = context.getResources().getDimensionPixelSize(
                 R.dimen.movie_backdrop_width);
-        mMovie.setBackdropUri(Uri.parse(mConfiguration.getBestFittingPosterUrl(
+        mMovie.setBackdropUri(Uri.parse(configuration.getBestFittingPosterUrl(
                 cursor.getString(COL_BACKDROP_PATH), backdropPixelWidth)));
         mMovie.setVoteAverage(cursor.getDouble(COL_VOTE_AVERAGE));
 

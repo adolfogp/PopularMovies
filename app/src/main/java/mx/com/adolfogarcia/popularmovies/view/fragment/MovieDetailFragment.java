@@ -29,11 +29,8 @@ import android.view.ViewGroup;
 
 import org.parceler.Parcels;
 
-import javax.inject.Inject;
-
 import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
-import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.databinding.MovieDetailFragmentBinding;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
 import mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel;
@@ -80,13 +77,6 @@ public class MovieDetailFragment extends Fragment
     private MovieDetailFragmentBinding mBinding = null;
 
     /**
-     * The configuration information required to retrieve movie data and images
-     * using <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful
-     * API.
-     */
-    @Inject RestfulServiceConfiguration mConfiguration;
-
-    /**
      * Creates a new instance of {@link MovieDetailFragment} for the specified
      * movie. You must use this factory method to create new instances.
      *
@@ -107,7 +97,6 @@ public class MovieDetailFragment extends Fragment
         if (getArguments() == null) {
             throw new IllegalStateException("No movie specified as Fragment argument.");
         }
-        ((PopularMoviesApplication) getActivity().getApplication()).getComponent().inject(this);
         restoreState(savedInstanceState);
     }
 
@@ -121,8 +110,8 @@ public class MovieDetailFragment extends Fragment
     private MovieDetailViewModel newViewModel() {
         Movie movie = Parcels.unwrap(getArguments().getParcelable(ARG_MOVIE));
         MovieDetailViewModel viewModel = new MovieDetailViewModel();
-        viewModel.setContext(this.getActivity());
-        viewModel.setConfiguration(this.mConfiguration);
+        ((PopularMoviesApplication) getActivity().getApplication())
+                .getComponent().inject(mViewModel);
         viewModel.setMovie(movie);
         return viewModel;
     }
@@ -140,8 +129,8 @@ public class MovieDetailFragment extends Fragment
             return;
         }
         mViewModel = Parcels.unwrap(savedInstanceState.getParcelable(STATE_VIEW_MODEL));
-        mViewModel.setConfiguration(mConfiguration);
-        mViewModel.setContext(getActivity());
+        ((PopularMoviesApplication) getActivity().getApplication())
+                .getComponent().inject(mViewModel);
     }
 
     @Override

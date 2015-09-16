@@ -16,7 +16,6 @@
 
 package mx.com.adolfogarcia.popularmovies.net;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -33,9 +32,9 @@ import retrofit.Retrofit;
 
 public class FetchConfigurationTask extends AsyncTask<Void, Void, Void> {
 
-    private static final String LOG_TAG = FetchMovieTask.class.getSimpleName();
+    private static final String LOG_TAG = FetchMoviePageTask.class.getSimpleName();
 
-    // TODO: Inject with Dagger 2 and get instances of FetchMovieTask with Dagger 2.
+    // TODO: Inject with Dagger 2 and get instances of FetchMoviePageTask with Dagger 2.
     @Inject
     RestfulServiceConfiguration mConfiguration;
 
@@ -43,7 +42,6 @@ public class FetchConfigurationTask extends AsyncTask<Void, Void, Void> {
         mConfiguration = configuration;
     }
 
-    // FIXME: Use setter methods in configuration.
     @Override
     protected Void doInBackground(Void... params) {
         Retrofit retrofit = new Retrofit.Builder()

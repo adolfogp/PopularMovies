@@ -31,10 +31,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import org.parceler.Parcels;
+
+import java.lang.ref.WeakReference;
 
 import javax.inject.Inject;
 
@@ -43,6 +46,8 @@ import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.databinding.MovieCollectionFragmentBinding;
 import mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel;
+import mx.com.adolfogarcia.popularmovies.net.FetchMoviePageTaskFactory;
+import mx.com.adolfogarcia.popularmovies.view.adapter.LabeledItem;
 import mx.com.adolfogarcia.popularmovies.view.adapter.MoviePosterAdapter;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
@@ -74,13 +79,6 @@ public class MovieCollectionFragment extends Fragment
     private static final String STATE_VIEW_MODEL = "state_view_model";
 
     /**
-     * Used on the query to {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider},
-     * to order the results from most to least popular.
-     */
-    private static final String ORDER_BY_POPULARITY_DESCENDING =
-            CachedMovieEntry.COLUMN_POPULARITY + " DESC";
-
-    /**
      * Binds the view to the view model.
      * @see MovieCollectionViewModel
      */
@@ -98,14 +96,20 @@ public class MovieCollectionFragment extends Fragment
      * using <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful
      * API.
      */
-    @Inject RestfulServiceConfiguration mConfiguration;
+    WeakReference<RestfulServiceConfiguration> mWeakConfiguration; // TODO: Inject
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ((PopularMoviesApplication) getActivity().getApplication()).getComponent().inject(this);
+        ((PopularMoviesApplication) getActivity().getApplication())
+                .getComponent().inject(this);
         setHasOptionsMenu(true);
         restoreState(savedInstanceState);
+        if (mViewModel == null) {
+            mViewModel = new MovieCollectionViewModel();
+            ((PopularMoviesApplication) getActivity().getApplication())
+                    .getComponent().inject(mViewModel);
+        }
     }
 
     /**
@@ -121,8 +125,8 @@ public class MovieCollectionFragment extends Fragment
             return;
         }
         mViewModel = Parcels.unwrap(savedInstanceState.getParcelable(STATE_VIEW_MODEL));
-        mViewModel.setConfiguration(mConfiguration);
-        mViewModel.setContext(getActivity());
+        ((PopularMoviesApplication) getActivity().getApplication())
+                .getComponent().inject(mViewModel);
     }
 
     @Override
@@ -137,19 +141,30 @@ public class MovieCollectionFragment extends Fragment
         getLoaderManager().initLoader(MOVIE_COLLECTION_LOADER_ID, null, this);
     }
 
+    /**
+     * Verifies that {@link #mWeakConfiguration} is not {@code null}, nor the
+     * object it references, throws {@link IllegalStateException} otherwise.
+     *
+     * @throws IllegalStateException if {@link #mWeakConfiguration} or the
+     *     object it references are {@code null}.
+     */
+    private void requireNonNullConfiguration() {
+        if (mWeakConfiguration == null || mWeakConfiguration.get() == null) {
+            throw new IllegalStateException("The configuration may not be null.");
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        requireNonNullConfiguration();
         mBinding = DataBindingUtil.inflate(inflater
                 , R.layout.fragment_movie_collection
                 , container
                 , false);
-        if (mViewModel == null) {
-            mViewModel = new MovieCollectionViewModel(getActivity(), mConfiguration); // TODO: Try to get the view model instance from dagger or let dagger inject the configuration directly.
-        }
         mBinding.setViewModel(mViewModel);
         mMoviePosterAdapter =
-                new MoviePosterAdapter(mConfiguration, getActivity(), null, 0);
+                new MoviePosterAdapter(mWeakConfiguration.get(), getActivity(), null, 0);
         mBinding.posterGridView.setAdapter(mMoviePosterAdapter);
         mBinding.posterGridView.setOnItemClickListener(mViewModel);
         mBinding.posterGridView.setOnScrollListener(mViewModel);
@@ -162,18 +177,13 @@ public class MovieCollectionFragment extends Fragment
         inflater.inflate(R.menu.menu_fragment_movie_collection, menu);
         MenuItem item = menu.findItem(R.id.spinner);
         Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity()
-                , android.R.layout.simple_list_item_1 // TODO: create a better layout
-                , getResources().getStringArray(R.array.pref_sort_order));
+        ArrayAdapter<LabeledItem<FetchMoviePageTaskFactory>> adapter =
+                new ArrayAdapter<>(getActivity()
+                        , R.layout.list_item_sort_order
+                        , mViewModel.getSortOrderOptions());
         spinner.setAdapter(adapter);
-//        spinner.setOnItemSelectedListener(null); // TODO: Set listener from ViewModel
-//        spinner.setSelection(0); // TODO: Get selected index from ViewModel
-    }
-
-
-    @Override
-    public void onStart() { //TODO: Remove updates from here
-        super.onStart();
+        spinner.setOnItemSelectedListener(mViewModel);
+        spinner.setSelection(0); // TODO: Get selected index from ViewModel and verify that ViewModel works appropriately on setting the selection
     }
 
     @Override
@@ -183,7 +193,7 @@ public class MovieCollectionFragment extends Fragment
                 , MoviePosterAdapter.PROJECTION_MOVIE_POSTERS
                 , null
                 , null
-                , ORDER_BY_POPULARITY_DESCENDING);
+                , mViewModel.getSelectedSortOrder());
     }
 
     @Override

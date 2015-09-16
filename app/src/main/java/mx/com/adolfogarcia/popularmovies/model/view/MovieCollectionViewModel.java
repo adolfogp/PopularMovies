@@ -17,6 +17,7 @@
 package mx.com.adolfogarcia.popularmovies.model.view;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
@@ -25,6 +26,10 @@ import android.widget.AdapterView;
 import org.parceler.Parcel;
 import org.parceler.Transient;
 
+import java.lang.ref.WeakReference;
+
+import javax.inject.Inject;
+
 import static org.parceler.Parcel.Serialization;
 
 import de.greenrobot.event.EventBus;
@@ -32,7 +37,8 @@ import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
 import mx.com.adolfogarcia.popularmovies.model.event.MovieSelectionEvent;
 import mx.com.adolfogarcia.popularmovies.net.FetchConfigurationTask;
-import mx.com.adolfogarcia.popularmovies.net.FetchMovieTask;
+import mx.com.adolfogarcia.popularmovies.net.FetchMoviePageTaskFactory;
+import mx.com.adolfogarcia.popularmovies.view.adapter.LabeledItem;
 
 import static android.os.AsyncTask.Status;
 
@@ -40,15 +46,16 @@ import static android.os.AsyncTask.Status;
  * View model for the movie collection's view. Provides data and behaviour.
  * If an item is clicked (see {@link #onItemClick(AdapterView, View, int, long)}),
  * a {@link MovieSelectionEvent} is published on the {@link EventBus}.
- * When reconstructing (deserializaing), make sure you set the transient
- * attributes: {@link #setContext(Context)} and
- * {@link #setConfiguration(RestfulServiceConfiguration)}.
+ * In order for this class to work, the {@link #mWeakContext},
+ * {@link #mWeakConfiguration} and {@link #mSortOrderOptions} must be injected.
+ * When creating or reconstructing (deserializaing), make sure you inject
+ * those values.
  *
  * @autor Jesús Adolfo García Pasquel
  */
 @Parcel(Serialization.BEAN)
 public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
-        , AbsListView.OnScrollListener {
+        , AbsListView.OnScrollListener, AdapterView.OnItemSelectedListener {
 
     /**
      * Identifies messages written to the log by this class.
@@ -64,37 +71,59 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
      */
     private static final int DOWNLOAD_THRESHOLD = 2;
 
-    private Context mContext;
+    // TODO: Inject
+    WeakReference<Context> mWeakContext; // TODO - Remove if not needed
 
-    private RestfulServiceConfiguration mConfiguration;
+    WeakReference<RestfulServiceConfiguration> mWeakConfiguration; // TODO: Inject
+
+    LabeledItem<FetchMoviePageTaskFactory>[] mSortOrderOptions; // TODO: Inject
+
+    private FetchMoviePageTaskFactory mSelectedFetchMoviePageTaskFactory;
 
     /**
      * Current movie downloading task. A reference is kept to avoid
      * creating multiple download tasks for the same page.
      */
-    private FetchMovieTask mFetchMovieTask = null;
+    private AsyncTask<Integer, ?, ?> mFetchMoviePageTask = null;
 
     /**
-     * Creates a new instance of {@link Movie} with the default values for
-     * all its attributes.
+     * Creates a new instance of {@link MovieCollectionViewModel} with the
+     * default values for all its attributes.
      */
     public MovieCollectionViewModel() {
         // Empty bean constructor.
     }
 
-    // TODO: Try to create the ViewModel with Dagger.
-    public MovieCollectionViewModel(Context context
-            , RestfulServiceConfiguration configuration) {
-        mContext = context;
-        mConfiguration = configuration;
+    /**
+     * Verifies that {@link #mWeakContext} is not {@code null}, nor the object
+     * it references, throws {@link IllegalStateException} otherwise.
+     *
+     * @throws IllegalStateException if {@link #mWeakContext} or the object it
+     *     references are {@code null}.
+     */
+    private void requireNonNullContext() {
+        if (mWeakContext == null || mWeakContext.get() == null) {
+            throw new IllegalStateException("The context may not be null.");
+        }
+    }
+
+    /**
+     * Verifies that {@link #mWeakConfiguration} is not {@code null}, nor the
+     * object it references, throws {@link IllegalStateException} otherwise.
+     *
+     * @throws IllegalStateException if {@link #mWeakConfiguration} or the
+     *     object it references are {@code null}.
+     */
+    private void requireNonNullConfiguration() {
+        if (mWeakConfiguration == null || mWeakConfiguration.get() == null) {
+            throw new IllegalStateException("The configuration may not be null.");
+        }
     }
 
     public void updateApiConfig() {
-        if (mConfiguration == null) {
-            throw new IllegalStateException("The configuration may not be null.");
-        }
+        requireNonNullConfiguration();
         FetchConfigurationTask fetchConfigurationTask =
-                new FetchConfigurationTask(mConfiguration);
+                new FetchConfigurationTask(mWeakConfiguration.get());
         fetchConfigurationTask.execute();
     }
 
@@ -105,22 +134,20 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
      * still pages to be downloaded. Does nothing otherwise.
      */
     public void downloadNextMoviePage() {
-        if (mContext == null || mConfiguration == null) {
-            throw new IllegalStateException("The context and configuration may not be null.");
-        }
-        if (mConfiguration.getTotalMoviePagesAvailable()
-                <= mConfiguration.getLastMoviePageRetrieved()) {
+        requireNonNullConfiguration();
+        RestfulServiceConfiguration configuration = mWeakConfiguration.get();
+        if (configuration.getTotalMoviePagesAvailable()
+                <= configuration.getLastMoviePageRetrieved()) {
             Log.i(LOG_TAG, "No more movie pages to download.");
             return;
         }
-        if (mFetchMovieTask != null
-                && mFetchMovieTask.getStatus() == Status.RUNNING) {
+        if (mFetchMoviePageTask != null
+                && mFetchMoviePageTask.getStatus() == Status.RUNNING) {
             Log.d(LOG_TAG, "Still downloading movie page. Ignoring request.");
             return;
         }
-        // TODO: Get new taks using Dagger
-        mFetchMovieTask = new FetchMovieTask(mContext, mConfiguration);
-        mFetchMovieTask.execute(mConfiguration.getLastMoviePageRetrieved() + 1);
+        mFetchMoviePageTask = mSelectedFetchMoviePageTaskFactory.newFetchMovieTask();
+        mFetchMoviePageTask.execute(configuration.getLastMoviePageRetrieved() + 1);
     }
 
     @Override
@@ -150,20 +177,34 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
     }
 
     @Transient
-    public Context getContext() {
-        return mContext;
+    public LabeledItem<FetchMoviePageTaskFactory>[] getSortOrderOptions() {
+        return mSortOrderOptions;
     }
 
-    public void setContext(Context context) {
-        mContext = context;
+
+    public String getSelectedSortOrder() {
+        if (mSelectedFetchMoviePageTaskFactory == null) {
+            // FIXME: Get last selection from settings
+            mSelectedFetchMoviePageTaskFactory = mSortOrderOptions[0].getItem(); // FIXME: Wrong assignment
+        }
+        return mSelectedFetchMoviePageTaskFactory.getMovieSortOrder();
     }
 
-    @Transient
-    public RestfulServiceConfiguration getConfiguration() {
-        return mConfiguration;
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        mSelectedFetchMoviePageTaskFactory =
+                ((LabeledItem<FetchMoviePageTaskFactory>) parent.getSelectedItem()).getItem();
+        // FIXME: check if selection is different to previous
+        // FIXME: delete cached movies
+        // FIXME: Set current page of movies to 0
+        // FIXME: Retrieve next page of movies
+        // FIXME: save new selection
+        // FIXME: Fire event to restart loader
     }
 
-    public void setConfiguration(RestfulServiceConfiguration configuration) {
-        mConfiguration = configuration;
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        Log.w(LOG_TAG, "No sort order selected, keeping last.");
     }
+
 }
