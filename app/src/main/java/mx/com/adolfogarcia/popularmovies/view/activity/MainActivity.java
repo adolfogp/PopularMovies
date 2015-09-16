@@ -29,11 +29,6 @@ import mx.com.adolfogarcia.popularmovies.model.event.MovieSelectionEvent;
 import mx.com.adolfogarcia.popularmovies.view.fragment.MovieCollectionFragment;
 import mx.com.adolfogarcia.popularmovies.view.fragment.MovieDetailFragment;
 
-/**
- * TODO - Document.
- *
- * @author Jesús Adolfo García Pasquel
- */
 public class MainActivity extends AppCompatActivity {
 
     /**

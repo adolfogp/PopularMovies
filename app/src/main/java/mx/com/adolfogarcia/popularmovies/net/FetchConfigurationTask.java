@@ -34,9 +34,7 @@ public class FetchConfigurationTask extends AsyncTask<Void, Void, Void> {
 
     private static final String LOG_TAG = FetchMoviePageTask.class.getSimpleName();
 
-    // TODO: Inject with Dagger 2 and get instances of FetchMoviePageTask with Dagger 2.
-    @Inject
-    RestfulServiceConfiguration mConfiguration;
+    @Inject RestfulServiceConfiguration mConfiguration;
 
     public FetchConfigurationTask(RestfulServiceConfiguration configuration) {
         mConfiguration = configuration;

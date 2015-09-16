@@ -2,12 +2,6 @@
 
 List of features that may be added in future versions.
 
-* Pending requirements for Udacity's first delivery:
-    - UI element to toggle the sort order of the movies by: most popular,
-      highest rated.
-    - App queries the `/discover/movies` API in a background thread to retrieve
-      movies for main activity, sorted (from left to right) by criteria selected.
-
 * Pending requirements for Udacity's second delivery:
     - Allow users to view and play trailers ( either in the youtube app or a web browser).
     - Allow users to read reviews of a selected movie.

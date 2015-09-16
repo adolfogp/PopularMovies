@@ -81,8 +81,11 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
      */
     private static final int DOWNLOAD_THRESHOLD = 2;
 
-
-    @Inject WeakReference<Context> mWeakContext; // TODO - Remove if not needed
+    /**
+     * Reference to the {@link Context} used to access the
+     * {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+     */
+    @Inject WeakReference<Context> mWeakContext;
 
     /**
      * The RESTFul API's configuration.
@@ -210,7 +213,6 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
         requireNonNullContext();
         RestfulServiceConfiguration configuration = mWeakConfiguration.get();
         Context context = mWeakContext.get();
-        Log.v(LOG_TAG, "Selected sort order index: " + idx); // TODO: Delete this line
         if (configuration.getSelectedSortOrderIndex() == idx) {
             Log.d(LOG_TAG, "Ignoring sort order change.");
             return;
