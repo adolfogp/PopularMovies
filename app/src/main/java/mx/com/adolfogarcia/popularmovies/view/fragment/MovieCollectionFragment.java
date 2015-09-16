@@ -169,7 +169,11 @@ public class MovieCollectionFragment extends Fragment
         mBinding.posterGridView.setAdapter(mMoviePosterAdapter);
         mBinding.posterGridView.setOnItemClickListener(mViewModel);
         mBinding.posterGridView.setOnScrollListener(mViewModel);
-        mViewModel.updateApiConfig(); // FIXME: Update config data only if old and if so, remove cached movies too
+        if (mViewModel.isApiConfigOld()) {
+            mViewModel.updateApiConfig();
+            mViewModel.deleteCachedMovieData();
+            mViewModel.downloadNextMoviePage();
+        }
         return mBinding.getRoot();
     }
 
@@ -207,13 +211,10 @@ public class MovieCollectionFragment extends Fragment
      */
     public void onEvent(SortOrderSelectionEvent event) {
         getLoaderManager().restartLoader(MOVIE_COLLECTION_LOADER_ID, null, this);
-        Log.v(LOG_TAG, "Restarted loader"); // TODO: Delete line
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, "Created new loader"); // TODO: Delete line
-        Log.v(LOG_TAG, "New order clause: " + mViewModel.getSelectedSortOrderClause()); // TODO: Delete line
         return new CursorLoader(this.getActivity()
                 , CachedMovieEntry.CONTENT_URI
                 , MoviePosterAdapter.PROJECTION_MOVIE_POSTERS

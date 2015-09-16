@@ -75,6 +75,13 @@ This application uses the following frameworks and libraries:
 * [Commons Lang](https://commons.apache.org/proper/commons-lang/) for common
   tasks, like implementing `equals`, `hashCode` and `toString`.
 
+## Notes
+
+* The cached movie data and RESTful API configuration information are kept for a maximum
+  of 24 hours, since the documentation suggests [checking for updates every few days]
+  (http://docs.themoviedb.apiary.io/#reference/configuration), and the lists
+  are [updated daily](http://docs.themoviedb.apiary.io/#reference/movies/moviepopular).
+
 ## Licencing and attributions
 
 For licencing information, read [LICENSE.txt](./LICENSE.txt) and

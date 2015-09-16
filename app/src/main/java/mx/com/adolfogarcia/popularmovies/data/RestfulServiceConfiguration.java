@@ -512,7 +512,7 @@ public class RestfulServiceConfiguration {
      * @return the epoch time at which the configuration was last updated or
      *     zero if it has never been set.
      */
-    public Long getLastUpdateTime() {
+    public long getLastUpdateTime() {
         SharedPreferences settings =
                 PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         return settings.getLong(PREFERENCES_KEY_LAST_UPDATE, 0);

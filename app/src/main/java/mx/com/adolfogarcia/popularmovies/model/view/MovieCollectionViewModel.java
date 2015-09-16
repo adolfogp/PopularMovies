@@ -68,6 +68,12 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
             MovieCollectionViewModel.class.getSimpleName();
 
     /**
+     * Number of milliseconds in 24 hours.
+     * @see #isApiConfigOld()
+     */
+    private static final long ONE_DAY_MILLISECONDS = 86400000L;
+
+    /**
      * Limit of unseen data that triggers the download of a new page of movies.
      * The threshold is given in screens of unseen data. If less than
      * {@link #DOWNLOAD_THRESHOLD} screens full of movies remain unseen, more
@@ -128,11 +134,41 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
         }
     }
 
+    /**
+     * Returns {@code true} if the RESTful API configuration information was
+     * cached 24 hours ago or more, {@code false} otherwise.
+     *
+     * @return {@code true} if the RESTful API configuration information was
+     *     cached 24 hours ago or more, {@code false} otherwise.
+     * @see #updateApiConfig()
+     */
+    public boolean isApiConfigOld() {
+        requireNonNullConfiguration();
+        return mWeakConfiguration.get().getLastUpdateTime()
+                < System.currentTimeMillis() - ONE_DAY_MILLISECONDS;
+    }
+
+    /**
+     * Downloads the <a href="https://www.themoviedb.org/">themoviedb.org</a>'s
+     * API configuration and caches it.
+     */
     public void updateApiConfig() {
         requireNonNullConfiguration();
         FetchConfigurationTask fetchConfigurationTask =
                 new FetchConfigurationTask(mWeakConfiguration.get());
         fetchConfigurationTask.execute();
+    }
+
+    /**
+     * Deletes all cached movie data and resets the last page of movies
+     * downloaded, back to zero.
+     */
+    public void deleteCachedMovieData() {
+        requireNonNullConfiguration();
+        requireNonNullContext();
+        mWeakContext.get().getContentResolver()
+                .delete(CachedMovieEntry.CONTENT_URI, null, null);
+        mWeakConfiguration.get().setLastMoviePageRetrieved(0);
     }
 
     /**
@@ -160,7 +196,9 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
     }
 
     /**
-     * Sets the index of the currently selected sort order option.
+     * Sets the index of the currently selected sort order option. If different
+     * that the currently selected index, the cached movie data is discarded and
+     * a new page of movie data is downloaded.
      *
      * @param idx the value to set as the currently selected sort order option.
      */
@@ -178,9 +216,7 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
             return;
         }
         configuration.setSelectedSortOrderIndex(idx);
-        configuration.setLastMoviePageRetrieved(0);
-        // Delete all cached movies
-        context.getContentResolver().delete(CachedMovieEntry.CONTENT_URI, null, null);
+        deleteCachedMovieData();
         downloadNextMoviePage();
         EventBus.getDefault().post(new SortOrderSelectionEvent());
     }
