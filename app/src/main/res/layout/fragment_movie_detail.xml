@@ -39,6 +39,7 @@
 
             <ImageView
                 style="@style/MovieDetail.Backdrop"
+                android:contentDescription="@string/content_description_backdrop_image"
                 android:layout_columnSpan="2"
                 app:backdropUri="@{viewModel.backdropUri}"
                 tools:src="@drawable/backdrop_placeholder"/>
@@ -51,6 +52,7 @@
 
             <ImageView
                 style="@style/MovieDetail.Poster"
+                android:contentDescription="@string/content_description_poster_image"
                 android:id="@+id/poster_image_view"
                 android:layout_rowSpan="6"
                 app:posterUri="@{viewModel.posterUri}"

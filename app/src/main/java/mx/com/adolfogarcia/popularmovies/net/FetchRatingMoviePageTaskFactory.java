@@ -34,6 +34,14 @@ import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 public class FetchRatingMoviePageTaskFactory implements FetchMoviePageTaskFactory {
 
     /**
+     * Used on the query to {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider},
+     * to order the results from highest to lowest rated.
+     */
+    private static final String ORDER_BY_VOTE_AVERAGE_DESCENDING =
+            MovieContract.CachedMovieEntry.COLUMN_VOTE_AVERAGE + " DESC"
+                    + ", " + MovieContract.CachedMovieEntry._ID + " ASC";
+
+    /**
      * The configuration of the RESTful API.
      */
     private WeakReference<RestfulServiceConfiguration> mWeakConfiguration;
@@ -43,14 +51,6 @@ public class FetchRatingMoviePageTaskFactory implements FetchMoviePageTaskFactor
      * {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
      */
     private WeakReference<Context> mWeakContext;
-
-    /**
-     * Used on the query to {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider},
-     * to order the results from highest to lowest rated.
-     */
-    private static final String ORDER_BY_VOTE_AVERAGE_DESCENDING =
-            MovieContract.CachedMovieEntry.COLUMN_VOTE_AVERAGE + " DESC"
-            + ", " + MovieContract.CachedMovieEntry._ID + " ASC";
 
     /**
      * Creates a new instance of {@link FetchRatingMoviePageTaskFactory}

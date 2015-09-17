@@ -22,6 +22,7 @@
     </data>
 
     <ImageView android:id="@+id/poster_image_view"
+               android:contentDescription="@string/content_description_poster_image"
                android:layout_width="@dimen/movie_poster_thumbnail_width"
                android:layout_height="@dimen/movie_poster_thumbnail_height"/>
 </layout>

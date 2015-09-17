@@ -45,6 +45,12 @@ public final class MovieContract {
      */
     public static final String PATH_CACHED_MOVIE = "cached_movie";
 
+    /**
+     * This class only provides constants and utility methods.
+     */
+    private MovieContract() {
+        // Empty constructor
+    }
 
     /**
      * Defines the contents of the table holding cached movie data.

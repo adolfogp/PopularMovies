@@ -83,18 +83,10 @@ public class MoviePageJsonModel {
     }
 
     @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("mPageNumber", this.mPageNumber)
-                .append("mMovies", this.mMovies)
-                .append("mTotalPages", this.mTotalPages)
-                .append("mTotalMovies", this.mTotalMovies)
-                .toString();
-    }
-
-    @Override
     public int hashCode() {
-        return new HashCodeBuilder(23, 61)
+        final int initial = 23;
+        final int multiplier = 61;
+        return new HashCodeBuilder(initial, multiplier)
                 .append(this.mPageNumber)
                 .append(this.mMovies)
                 .append(this.mTotalPages)
@@ -107,7 +99,7 @@ public class MoviePageJsonModel {
         if (obj == this) {
             return true;
         }
-        if ((obj instanceof MoviePageJsonModel) == false) {
+        if (!(obj instanceof MoviePageJsonModel)) {
             return false;
         }
         MoviePageJsonModel that = ((MoviePageJsonModel) obj);
@@ -117,6 +109,16 @@ public class MoviePageJsonModel {
                 .append(this.mTotalPages, that.mTotalPages)
                 .append(this.mTotalMovies, that.mTotalMovies)
                 .isEquals();
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("mPageNumber", this.mPageNumber)
+                .append("mMovies", this.mMovies)
+                .append("mTotalPages", this.mTotalPages)
+                .append("mTotalMovies", this.mTotalMovies)
+                .toString();
     }
 
 }

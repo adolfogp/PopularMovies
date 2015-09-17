@@ -19,13 +19,14 @@ package mx.com.adolfogarcia.popularmovies.view.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 
 import com.squareup.picasso.Picasso;
+
+import java.lang.ref.WeakReference;
 
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
@@ -48,11 +49,6 @@ import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEn
 public class MoviePosterAdapter extends CursorAdapter {
 
     /**
-     * Identifies messages written to the log.
-     */
-    private static final String LOG_TAG = MoviePosterAdapter.class.getSimpleName();
-
-    /**
      * Projection that includes the movie details to be presented. Used to
      * query {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
      */
@@ -73,24 +69,42 @@ public class MoviePosterAdapter extends CursorAdapter {
     public static final int COL_POSTER_PATH = 1;
 
     /**
+     * Identifies messages written to the log.
+     */
+    private static final String LOG_TAG = MoviePosterAdapter.class.getSimpleName();
+
+    /**
      * The optimal width of a movie poster in pixels, calculated for the device.
      * 0 if it has not been initialized.
      */
     private static int sOptimalWidthPixels = -1;
 
-    private final RestfulServiceConfiguration mConfiguration;
+    /**
+     * Reference to the RESTful API's configuration. Used to access the
+     * movie's poster image.
+     */
+    private final WeakReference<RestfulServiceConfiguration> mConfiguration;
 
+    /**
+     * Creates a new instance of {@link MoviePosterAdapter} that downloads the
+     * movie's poster images using the specified configuration.
+     *
+     * @param configuration the configuration of the RESTful API.
+     * @param context the {@link Context}.
+     * @param cursor the {@link Cursor} from which the data is retrieved.
+     * @param flags flags that determine the behaviour of the adapter.
+     */
     public MoviePosterAdapter(RestfulServiceConfiguration configuration
             , Context context, Cursor cursor, int flags) {
         super(context, cursor, flags);
-        mConfiguration = configuration;
+        mConfiguration = new WeakReference<>(configuration);
     }
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         LayoutInflater layoutInflater = LayoutInflater.from(context);
-        MoviePosterListItemBinding binding =
-                DataBindingUtil.inflate(layoutInflater, R.layout.list_item_movie_poster, parent, false);
+        MoviePosterListItemBinding binding = DataBindingUtil.inflate(
+                layoutInflater, R.layout.list_item_movie_poster, parent, false);
         binding.getRoot().setTag(binding);
         return binding.getRoot();
     }
@@ -103,7 +117,7 @@ public class MoviePosterAdapter extends CursorAdapter {
                 R.dimen.movie_poster_thumbnail_height);
         MoviePosterListItemBinding binding =
                 (MoviePosterListItemBinding) view.getTag();
-        String posterImageUrl = mConfiguration.getBestFittingPosterUrl(
+        String posterImageUrl = mConfiguration.get().getBestFittingPosterUrl(
                 cursor.getString(COL_POSTER_PATH)
                 , posterPixelWidth);
         Picasso.with(context)

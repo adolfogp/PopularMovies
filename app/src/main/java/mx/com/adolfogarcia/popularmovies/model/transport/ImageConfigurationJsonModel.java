@@ -126,7 +126,9 @@ public class ImageConfigurationJsonModel {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 59)
+        final int initial = 17;
+        final int multiplier = 59;
+        return new HashCodeBuilder(initial, multiplier)
                 .append(this.mBackdropSizes)
                 .append(this.mBaseUrl)
                 .append(this.mLogoSizes)
@@ -142,7 +144,7 @@ public class ImageConfigurationJsonModel {
         if (this == obj) {
             return true;
         }
-        if ((obj instanceof ImageConfigurationJsonModel) == false) {
+        if (!(obj instanceof ImageConfigurationJsonModel)) {
             return false;
         }
         ImageConfigurationJsonModel that = (ImageConfigurationJsonModel) obj;

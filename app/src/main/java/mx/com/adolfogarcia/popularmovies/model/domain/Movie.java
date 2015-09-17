@@ -147,7 +147,9 @@ public class Movie {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(19, 137)
+        final int initial = 19;
+        final int multiplier = 137;
+        return new HashCodeBuilder(initial, multiplier)
                 .append(this.mId)
                 .append(this.mOriginalTitle)
                 .append(this.mReleaseDate)
@@ -163,7 +165,7 @@ public class Movie {
         if (obj == this) {
             return true;
         }
-        if ((obj instanceof Movie) == false) {
+        if (!(obj instanceof Movie)) {
             return false;
         }
         Movie that = ((Movie) obj);

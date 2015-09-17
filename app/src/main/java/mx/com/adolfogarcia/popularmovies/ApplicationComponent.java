@@ -22,16 +22,39 @@ import dagger.Component;
 import mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel;
 import mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel;
 import mx.com.adolfogarcia.popularmovies.view.fragment.MovieCollectionFragment;
-import mx.com.adolfogarcia.popularmovies.view.fragment.MovieDetailFragment;
 
+/**
+ * Provides methods that inject dependencies into the object passed
+ * as argument.
+ *
+ * @author Jesús Adolfo García Pasquel
+ */
 @Singleton
 @Component(modules = PopularMoviesApplicationModule.class)
 public interface ApplicationComponent {
 
+    /**
+     * Injects the dependencies required by the {@link MovieCollectionFragment},
+     * like the RESTful API's configuration.
+     *
+     * @param movieCollectionFragment the object to inject dependencies into.
+     */
     void inject(MovieCollectionFragment movieCollectionFragment);
 
+    /**
+     * Injects the dependencies required by the {@link MovieCollectionViewModel},
+     * like the available sort orders.
+     *
+     * @param movieCollectionViewModel the object to inject dependencies into.
+     */
     void inject(MovieCollectionViewModel movieCollectionViewModel);
 
+    /**
+     * Injects the dependencies required by the {@link MovieDetailViewModel},
+     * like the RESTful API's configuration.
+     *
+     * @param movieDetailViewModel the object to inject dependencies into.
+     */
     void inject(MovieDetailViewModel movieDetailViewModel);
 
 }

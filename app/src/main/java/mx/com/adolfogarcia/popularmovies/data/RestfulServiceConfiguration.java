@@ -32,7 +32,6 @@ import java.util.Set;
 
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.model.transport.ImageConfigurationJsonModel;
-import mx.com.adolfogarcia.popularmovies.model.view.MovieCollectionViewModel;
 
 /**
  * Handles access to storage of
@@ -191,7 +190,7 @@ public class RestfulServiceConfiguration {
      * Key used to access, the index number of the sort order options that
      * contains the ordering to specify in the requests to the RESTful API,
      * as stored in the {@link SharedPreferences}.
-     * @see MovieCollectionViewModel#getSortOrderOptions()
+     * @see mx.com.adolfogarcia.popularmovies.PopularMoviesApplicationModule
      */
     private static final String PREFERENCES_KEY_SELECTED_SORT_ORDER_INDEX =
             "selected_sort_order_index";
@@ -204,16 +203,16 @@ public class RestfulServiceConfiguration {
             "total_movie_pages_available";
 
     /**
+     * Holds default configuration values and the key required to access the
+     * RESTful API.
+     */
+    private final Properties mConfigurationProperties = new Properties();
+
+    /**
      * Reference to the {@link Context} used to retrieve and store the
      * configuration values.
      */
     private final WeakReference<Context> mWeakContext;
-
-    /**
-     * Holds default configuration values and the key required to access the
-     * RESTful API.
-     */
-    private static final Properties mConfigurationProperties = new Properties();
 
     /**
      * Used to cache image size code names that best match sizes measured in
@@ -224,7 +223,8 @@ public class RestfulServiceConfiguration {
             new SparseArrayCompat<>(2);
 
     /**
-     * Creates a new instance of {@link RestfulServiceConfiguration}
+     * Creates a new instance of {@link RestfulServiceConfiguration}.
+     *
      * @param context the {@link Context} used to access the application's
      *                {@link SharedPreferences}.
      */
@@ -585,7 +585,7 @@ public class RestfulServiceConfiguration {
      *
      * @return the index of the sort order options that contains the ordering
      * to specify in the requests to the RESTful API.
-     * @see MovieCollectionViewModel#getSortOrderOptions()
+     * @see mx.com.adolfogarcia.popularmovies.PopularMoviesApplicationModule
      */
     public int getSelectedSortOrderIndex() {
         SharedPreferences settings =

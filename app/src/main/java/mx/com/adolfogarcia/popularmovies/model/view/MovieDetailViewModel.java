@@ -28,7 +28,6 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcel;
-import org.parceler.Transient;
 
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
@@ -37,14 +36,13 @@ import java.util.TimeZone;
 
 import javax.inject.Inject;
 
-import static org.parceler.Parcel.Serialization;
-
 import mx.com.adolfogarcia.popularmovies.BR;
-import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
+
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
+import static org.parceler.Parcel.Serialization;
 
 /**
  * View model for the movie detail's view. Provides data and behaviour.
@@ -56,11 +54,6 @@ import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEn
  */
 @Parcel(Serialization.BEAN)
 public class MovieDetailViewModel extends BaseObservable {
-
-    /**
-     * Identifies the messages written to the log by this class.
-     */
-    private static final String LOG_TAG = MovieDetailViewModel.class.getSimpleName();
 
     /**
      * The name of the UTC time zone.
@@ -130,13 +123,26 @@ public class MovieDetailViewModel extends BaseObservable {
     public static final int COL_VOTE_AVERAGE = 7;
 
     /**
+     * Identifies the messages written to the log by this class.
+     */
+    private static final String LOG_TAG = MovieDetailViewModel.class.getSimpleName();
+
+    /**
+     * Reference to the {@link Context} used to access resources and convert to
+     * devide dependent pixels.
+     */
+    @Inject WeakReference<Context> mWeakContext;
+
+    /**
+     * Reference to the {@link RestfulServiceConfiguration} used to access
+     * the movie's poster and backdrop images.
+     */
+    @Inject WeakReference<RestfulServiceConfiguration> mWeakConfiguration;
+
+    /**
      * The movie for which the detail data is being shown.
      */
     private Movie mMovie;
-
-    @Inject WeakReference<Context> mWeakContext;
-
-    @Inject WeakReference<RestfulServiceConfiguration> mWeakConfiguration;
 
     /**
      * Creates a new instance of {@link MovieCollectionViewModel} with the
@@ -172,10 +178,20 @@ public class MovieDetailViewModel extends BaseObservable {
         }
     }
 
+
     public Movie getMovie() {
         return mMovie;
     }
 
+    /**
+     * Sets the movie for which the detail data is shown. If the
+     * {@link Movie}'s original title has been set (is not {@code null}) it
+     * also notifies the data binding of the change, otherwise the binding is
+     * not notified.
+     *
+     * @param movie the movie for which the detail data should be shown.
+     * @see #setMovieData(Cursor)
+     */
     public void setMovie(Movie movie) {
         if (movie == null) {
             throw new IllegalArgumentException("The movie may not be null.");
@@ -202,9 +218,11 @@ public class MovieDetailViewModel extends BaseObservable {
     }
 
     /**
-     * Returns the release date for the currently set {@link Movie}.
+     * Returns the release date for the currently set {@link Movie}, formatted
+     * for display on the UI.
      *
-     * @return the release date for the currently set {@link Movie}.
+     * @return the release date for the currently set {@link Movie}, formatted
+     *     for display on the UI.
      */
     @Bindable
     public String getReleaseDate() {
@@ -229,6 +247,11 @@ public class MovieDetailViewModel extends BaseObservable {
                 : null;
     }
 
+    /**
+     * Returns the movie's user rating, formatted for display on the UI.
+     *
+     * @return the movie's user rating, formatted for display on the UI.
+     */
     @Bindable
     public String getVoteAverage() {
         requireNonNullContext();
@@ -239,6 +262,11 @@ public class MovieDetailViewModel extends BaseObservable {
                 : null;
     }
 
+    /**
+     * Returns the URI of the movie's poster image.
+     *
+     * @return the URI of the movie's poster image.
+     */
     @Bindable
     public String getPosterUri() {
         if (mMovie == null) {
@@ -249,6 +277,11 @@ public class MovieDetailViewModel extends BaseObservable {
                 : null;
     }
 
+    /**
+     * Returns the URI of the movie's backdrop image.
+     *
+     * @return the URI of the movie's backdrop image.
+     */
     @Bindable
     public String getBackdropUri() {
         if (mMovie == null) {
@@ -259,6 +292,13 @@ public class MovieDetailViewModel extends BaseObservable {
                 : null;
     }
 
+    /**
+     * Loads the movie's poster image from the specified URI into the
+     * {@link ImageView}. This method is used by the Data Binding Library.
+     *
+     * @param view {@link ImageView} to place the image into.
+     * @param posterUri where the image should be retrieved from.
+     */
     @BindingAdapter({"bind:posterUri"})
     public static void loadPosterImage(ImageView view, String posterUri) {
         Context context = view.getContext();
@@ -274,6 +314,13 @@ public class MovieDetailViewModel extends BaseObservable {
                 .into(view);
     }
 
+    /**
+     * Loads the movie's backdrop image from the specified URI into the
+     * {@link ImageView}. This method is used by the Data Binding Library.
+     *
+     * @param view {@link ImageView} to place the image into.
+     * @param backdropUri where the backdrop image should be retrieved from.
+     */
     @BindingAdapter({"bind:backdropUri"})
     public static void loadBackdropImage(ImageView view, String backdropUri) {
         Context context = view.getContext();
@@ -292,7 +339,8 @@ public class MovieDetailViewModel extends BaseObservable {
     /**
      * Retrieves the data from the cursor passed as argument and sets it onto the
      * {@link MovieDetailViewModel}'s current {@link Movie}. The projection used
-     * must be {@link #PROJECTION_MOVIE_DETAILS}.
+     * must be {@link #PROJECTION_MOVIE_DETAILS}. This method also notifies the
+     * data binding of the change, so the visual elements chan be updated.
      *
      * @param cursor the {@link Cursor} containing the data  to load.
      * @throws IllegalStateException if there is no {@link Movie} currently set

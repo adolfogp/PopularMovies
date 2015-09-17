@@ -24,6 +24,7 @@
 
     <application
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
@@ -38,6 +39,7 @@
             </intent-filter>
         </activity>
         <provider
+            android:exported="false"
             android:authorities="mx.com.adolfogarcia.popularmovies.provider"
             android:name=".data.MovieProvider" />
     </application>

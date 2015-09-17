@@ -35,6 +35,14 @@ public class FetchPopularityMoviePageTaskFactory
         implements FetchMoviePageTaskFactory {
 
     /**
+     * Used on the query to {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider},
+     * to order the results from most to least popular.
+     */
+    private static final String ORDER_BY_POPULARITY_DESCENDING =
+            MovieContract.CachedMovieEntry.COLUMN_POPULARITY + " DESC"
+                    + ", " + MovieContract.CachedMovieEntry._ID + " ASC";
+
+    /**
      * The configuration of the RESTful API.
      */
     private WeakReference<RestfulServiceConfiguration> mWeakConfiguration;
@@ -44,14 +52,6 @@ public class FetchPopularityMoviePageTaskFactory
      * {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
      */
     private WeakReference<Context> mWeakContext;
-
-    /**
-     * Used on the query to {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider},
-     * to order the results from most to least popular.
-     */
-    private static final String ORDER_BY_POPULARITY_DESCENDING =
-            MovieContract.CachedMovieEntry.COLUMN_POPULARITY + " DESC"
-            + ", " + MovieContract.CachedMovieEntry._ID + " ASC";
 
     /**
      * Creates a new instance of {@link FetchPopularityMoviePageTaskFactory}

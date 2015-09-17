@@ -30,11 +30,7 @@ import java.lang.ref.WeakReference;
 
 import javax.inject.Inject;
 
-import static org.parceler.Parcel.Serialization;
-
 import de.greenrobot.event.EventBus;
-import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
-import mx.com.adolfogarcia.popularmovies.data.MovieContract;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
 import mx.com.adolfogarcia.popularmovies.model.event.MovieSelectionEvent;
@@ -42,9 +38,10 @@ import mx.com.adolfogarcia.popularmovies.model.event.SortOrderSelectionEvent;
 import mx.com.adolfogarcia.popularmovies.net.FetchConfigurationTask;
 import mx.com.adolfogarcia.popularmovies.net.FetchMoviePageTaskFactory;
 import mx.com.adolfogarcia.popularmovies.view.adapter.LabeledItem;
-import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 import static android.os.AsyncTask.Status;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
+import static org.parceler.Parcel.Serialization;
 
 /**
  * View model for the movie collection's view. Provides data and behaviour.
@@ -55,7 +52,7 @@ import static android.os.AsyncTask.Status;
  * When creating or reconstructing (deserializaing), make sure you inject
  * those values.
  *
- * @autor Jesús Adolfo García Pasquel
+ * @author Jesús Adolfo García Pasquel
  */
 @Parcel(Serialization.BEAN)
 public class MovieCollectionViewModel implements AdapterView.OnItemClickListener

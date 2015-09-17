@@ -22,6 +22,7 @@ package mx.com.adolfogarcia.popularmovies.view.adapter;
  * {@link android.widget.ArrayAdapter}, with uses that value to represent
  * its entries.
  *
+ * @param <T> The type of the item being labeled.
  * @author Jesús Adolfo García Pasquel
  */
 public class LabeledItem<T> {

@@ -16,12 +16,10 @@
 
 package mx.com.adolfogarcia.popularmovies.view.activity;
 
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import de.greenrobot.event.EventBus;
 import mx.com.adolfogarcia.popularmovies.R;
@@ -29,6 +27,12 @@ import mx.com.adolfogarcia.popularmovies.model.event.MovieSelectionEvent;
 import mx.com.adolfogarcia.popularmovies.view.fragment.MovieCollectionFragment;
 import mx.com.adolfogarcia.popularmovies.view.fragment.MovieDetailFragment;
 
+/**
+ * Presents the user a collection of movies to select from and shows
+ * the details of the selected movie.
+ *
+ * @author Jesús Adolfo García Pasquel
+ */
 public class MainActivity extends AppCompatActivity {
 
     /**
@@ -76,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param event the movie selection event.
      */
-    public void onEvent(MovieSelectionEvent event){
+    public void onEvent(MovieSelectionEvent event) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         MovieDetailFragment movieDetailFragment =
                 MovieDetailFragment.newInstance(event.getSelectedMovie());

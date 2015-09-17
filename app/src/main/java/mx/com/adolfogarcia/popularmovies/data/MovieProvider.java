@@ -48,40 +48,30 @@ public class MovieProvider extends ContentProvider {
     static final int CACHED_MOVIE_ID = 200;
 
     /**
+     * Selection for a cached movie queried by id.
+     */
+    private static final String SELECTION_CACHED_MOVIE_ID =
+            CachedMovieEntry.TABLE_NAME + "." + CachedMovieEntry._ID + " = ? ";
+
+    /**
      * Used to match URIs to queries and their result type.
      */
-    private static final UriMatcher sUriMatcher = buildUriMatcher();
+    private static UriMatcher sUriMatcher = buildUriMatcher();
 
-    // Initialize the UriMatcher
+    /**
+     * Used to query cached movie data.
+     */
+    private static SQLiteQueryBuilder sCachedMovieQueryBuilder;
+
     static {
-        sUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
-                , MovieContract.PATH_CACHED_MOVIE
-                , MovieProvider.CACHED_MOVIE);
-        sUriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
-                , MovieContract.PATH_CACHED_MOVIE + "/#"
-                , MovieProvider.CACHED_MOVIE_ID);
+        sCachedMovieQueryBuilder = new SQLiteQueryBuilder();
+        sCachedMovieQueryBuilder.setTables(CachedMovieEntry.TABLE_NAME);
     }
 
     /**
      * Used to get access and initialize the database.
      */
     private MovieDbHelper mOpenHelper;
-
-    /**
-     * Used to query cached movie data.
-     */
-    private static final SQLiteQueryBuilder sCachedMovieQueryBuilder;
-
-    static{
-        sCachedMovieQueryBuilder = new SQLiteQueryBuilder();
-        sCachedMovieQueryBuilder.setTables(CachedMovieEntry.TABLE_NAME);
-    }
-
-    /**
-     * Selection for a cached movie queried by id.
-     */
-    private static final String SELECTION_CACHED_MOVIE_ID =
-            CachedMovieEntry.TABLE_NAME + "." + CachedMovieEntry._ID + " = ? ";
 
     /**
      * Returns a new instance of {@link UriMatcher} that maps URIs to the
@@ -186,7 +176,7 @@ public class MovieProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case CACHED_MOVIE:
                 long rowId = db.insert(CachedMovieEntry.TABLE_NAME, null, values);
-                if ( rowId != -1) {
+                if (rowId != -1) {
                     resultUri = CachedMovieEntry.buildMovieUri(rowId);
                 } else {
                     throw new android.database.SQLException("Insertion failed. " + uri);
@@ -208,8 +198,8 @@ public class MovieProvider extends ContentProvider {
                 int insertionCount = 0;
                 try {
                     for (ContentValues value : values) {
-                        long _id = db.insert(CachedMovieEntry.TABLE_NAME, null, value);
-                        if (_id != -1) {
+                        long id = db.insert(CachedMovieEntry.TABLE_NAME, null, value);
+                        if (id != -1) {
                             insertionCount++;
                         }
                     }

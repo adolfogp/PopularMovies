@@ -27,11 +27,6 @@ import java.util.TimeZone;
 public class MovieJsonModel {
 
     /**
-     * Identifies the messages written to the log by this class.
-     */
-    private static String LOG_TAG = MovieJsonModel.class.getSimpleName();
-
-    /**
      * The format used by date attributes, like {@link #getReleaseDate()}.
      */
     public static final String DATE_FORMAT = "yyyy-MM-dd";
@@ -40,6 +35,11 @@ public class MovieJsonModel {
      * The name of the UTC time zone.
      */
     public static final String UTC_TIME_ZONE = "UTC";
+
+    /**
+     * Identifies the messages written to the log by this class.
+     */
+    private static final String LOG_TAG = MovieJsonModel.class.getSimpleName();
 
     /**
      * Identifies if the movie is adult content.
@@ -277,28 +277,10 @@ public class MovieJsonModel {
     }
 
     @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("mAdult", this.mAdult)
-                .append("mBackdropPath", this.mBackdropPath)
-                .append("mGenreIds", this.mGenreIds)
-                .append("mId", this.mId)
-                .append("mOriginalLanguage", this.mOriginalLanguage)
-                .append("mOriginalTitle", this.mOriginalTitle)
-                .append("mOverview", this.mOverview)
-                .append("mPopularity", this.mPopularity)
-                .append("mPosterPath", this.mPosterPath)
-                .append("mReleaseDate", this.mReleaseDate)
-                .append("mTitle", this.mTitle)
-                .append("mVideo", this.mVideo)
-                .append("mVoteAverage", this.mVoteAverage)
-                .append("mVoteCount", this.mVoteCount)
-                .toString();
-    }
-
-    @Override
     public int hashCode() {
-        return new HashCodeBuilder(23, 131)
+        final int initial = 23;
+        final int multiplier = 131;
+        return new HashCodeBuilder(initial, multiplier)
                 .append(this.mAdult)
                 .append(this.mBackdropPath)
                 .append(this.mGenreIds)
@@ -321,7 +303,7 @@ public class MovieJsonModel {
         if (obj == this) {
             return true;
         }
-        if ((obj instanceof MovieJsonModel) == false) {
+        if (!(obj instanceof MovieJsonModel)) {
             return false;
         }
         MovieJsonModel that = ((MovieJsonModel) obj);
@@ -343,4 +325,23 @@ public class MovieJsonModel {
                 .isEquals();
     }
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("mAdult", this.mAdult)
+                .append("mBackdropPath", this.mBackdropPath)
+                .append("mGenreIds", this.mGenreIds)
+                .append("mId", this.mId)
+                .append("mOriginalLanguage", this.mOriginalLanguage)
+                .append("mOriginalTitle", this.mOriginalTitle)
+                .append("mOverview", this.mOverview)
+                .append("mPopularity", this.mPopularity)
+                .append("mPosterPath", this.mPosterPath)
+                .append("mReleaseDate", this.mReleaseDate)
+                .append("mTitle", this.mTitle)
+                .append("mVideo", this.mVideo)
+                .append("mVoteAverage", this.mVoteAverage)
+                .append("mVoteCount", this.mVoteCount)
+                .toString();
+    }
 }

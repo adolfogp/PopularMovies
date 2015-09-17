@@ -16,7 +16,6 @@
 
 package mx.com.adolfogarcia.popularmovies;
 
-import android.app.Application;
 import android.content.Context;
 
 import java.lang.ref.WeakReference;
@@ -46,6 +45,9 @@ public class PopularMoviesApplicationModule {
      */
     private final PopularMoviesApplication mApplication;
 
+    /**
+     * The RESTful API's configuration.
+     */
     private final RestfulServiceConfiguration mConfiguration;
 
     /**
@@ -64,7 +66,8 @@ public class PopularMoviesApplicationModule {
      *
      * @return the application's context.
      */
-    @Provides @Singleton Context provideApplicationContext() {
+    @Singleton
+    @Provides Context provideApplicationContext() {
         return mApplication;
     }
 
@@ -73,7 +76,8 @@ public class PopularMoviesApplicationModule {
      *
      * @return the application's system wide RESTful service configuration data.
      */
-    @Provides @Singleton RestfulServiceConfiguration provideConfiguration() {
+    @Singleton
+    @Provides RestfulServiceConfiguration provideConfiguration() {
         return mConfiguration;
     }
 
@@ -101,10 +105,16 @@ public class PopularMoviesApplicationModule {
     }
 
     /**
-     * Provides the sorting options used by
+     * Provides the available sort order options. Used by
      * {@link mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel}.
      *
-     * @return the application's system wide configuration data.
+     * @param context the {@link Context} used by the task created by the
+     *     {@link FetchMoviePageTaskFactory} to access the
+     *     {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}
+     * @param configuration the {@link RestfulServiceConfiguration} used by the
+     *     tasks created by the {@link FetchMoviePageTaskFactory} to access the
+     *     RESTful API.
+     * @return the available sort order options.
      */
     @SuppressWarnings("unchecked")
     @Provides LabeledItem<FetchMoviePageTaskFactory>[] provideSortOrderOptions(

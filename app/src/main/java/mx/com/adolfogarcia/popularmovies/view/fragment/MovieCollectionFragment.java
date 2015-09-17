@@ -24,7 +24,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -80,6 +79,13 @@ public class MovieCollectionFragment extends Fragment
     private static final String STATE_VIEW_MODEL = "state_view_model";
 
     /**
+     * The configuration information required to retrieve movie data and images
+     * using <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful
+     * API.
+     */
+    @Inject WeakReference<RestfulServiceConfiguration> mWeakConfiguration;
+
+    /**
      * Binds the view to the view model.
      * @see MovieCollectionViewModel
      */
@@ -90,14 +96,11 @@ public class MovieCollectionFragment extends Fragment
      */
     private MoviePosterAdapter mMoviePosterAdapter;
 
-    private MovieCollectionViewModel mViewModel;
-
     /**
-     * The configuration information required to retrieve movie data and images
-     * using <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful
-     * API.
+     * View model that provides data and behaviour to the
+     * {@link MovieCollectionFragment}.
      */
-    @Inject WeakReference<RestfulServiceConfiguration> mWeakConfiguration;
+    private MovieCollectionViewModel mViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

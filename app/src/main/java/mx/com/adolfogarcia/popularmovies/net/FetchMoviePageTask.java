@@ -23,20 +23,17 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
-import mx.com.adolfogarcia.popularmovies.model.transport.MoviePageJsonModel;
-
-import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 import mx.com.adolfogarcia.popularmovies.model.transport.MovieJsonModel;
+import mx.com.adolfogarcia.popularmovies.model.transport.MoviePageJsonModel;
 import retrofit.Call;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
+
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 /**
  * Task that retrieves a page of movies from

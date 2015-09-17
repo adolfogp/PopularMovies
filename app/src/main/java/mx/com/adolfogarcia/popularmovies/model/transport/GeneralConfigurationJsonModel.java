@@ -52,7 +52,9 @@ public class GeneralConfigurationJsonModel {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(11, 109)
+        final int initial = 11;
+        final int multiplier = 109;
+        return new HashCodeBuilder(initial, multiplier)
                 .append(this.mChangeKeys)
                 .append(this.mImageConfiguration)
                 .hashCode();
@@ -63,7 +65,7 @@ public class GeneralConfigurationJsonModel {
         if (this == obj) {
             return true;
         }
-        if ((obj instanceof GeneralConfigurationJsonModel) == false) {
+        if (!(obj instanceof GeneralConfigurationJsonModel)) {
             return false;
         }
         GeneralConfigurationJsonModel that = (GeneralConfigurationJsonModel) obj;

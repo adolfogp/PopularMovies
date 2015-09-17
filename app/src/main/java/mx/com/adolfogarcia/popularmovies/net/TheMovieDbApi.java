@@ -7,8 +7,9 @@ import retrofit.http.GET;
 import retrofit.http.Query;
 
 /**
- * Declaration of the RESTful API provided by <a href="https://www.themoviedb.org/">themoviedb.org</a>
- * for use with <a href="http://square.github.io/retrofit/">Retrofit</a>.
+ * Declaration of the RESTful API provided by
+ * <a href="https://www.themoviedb.org/">themoviedb.org</a> for use with
+ * <a href="http://square.github.io/retrofit/">Retrofit</a>.
  *
  * @author Jesús Adolfo García Pasquel
  */

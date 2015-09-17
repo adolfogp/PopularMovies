@@ -31,12 +31,12 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     /**
      * Version number of the dabase.
      */
-    private static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 1;
 
     /**
      * Name of the SQLite database file.
      */
-    static final String DATABASE_NAME = "movie.db";
+    public static final String DATABASE_NAME = "movie.db";
 
     /**
      * Statement used to create the table that holds the movie data.

@@ -18,8 +18,6 @@ package mx.com.adolfogarcia.popularmovies.net;
 
 import android.os.AsyncTask;
 
-import mx.com.adolfogarcia.popularmovies.data.MovieContract;
-
 /**
  * Implementations of this interface can create {@link android.os.AsyncTask}s
  * capable of retrieving  pages of movies from

@@ -93,7 +93,7 @@
         <module name="LocalVariableName"/>
 
         <module name="MemberName">
-            <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9]*$"/>
+            <property name="format" value="[m][\w$]*"/>
         </module>
 
         <module name="MethodLength"/>
@@ -161,7 +161,7 @@
         <module name="RedundantModifier"/>
 
         <module name="RightCurly">
-            <property name="option" value="alone"/>
+            <property name="option" value="same"/>
         </module>
 
         <module name="SimplifyBooleanExpression"/>
@@ -178,7 +178,10 @@
 
         <module name="UpperEll"/>
 
-        <module name="VisibilityModifier"/>
+        <module name="VisibilityModifier">
+            <property name="packageAllowed" value="true"/>
+            <property name="protectedAllowed" value="true"/>
+        </module>
 
         <module name="WhitespaceAfter"/>
 
@@ -191,14 +194,6 @@
         <module name="MissingSwitchDefault"/>
 
         <module name="MagicNumber"/>
-
-        <module name="Indentation">
-            <property name="basicOffset" value="4"/>
-            <property name="braceAdjustment" value="0"/>
-            <property name="caseIndent" value="4"/>
-        </module>
-
-        <module name="ArrayTrailingComma"/>
 
         <module name="EqualsAvoidNull"/>
 
