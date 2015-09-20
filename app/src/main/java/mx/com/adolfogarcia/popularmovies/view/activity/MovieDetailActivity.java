@@ -21,28 +21,33 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
 import org.parceler.Parcels;
 
-import de.greenrobot.event.EventBus;
 import mx.com.adolfogarcia.popularmovies.R;
-import mx.com.adolfogarcia.popularmovies.model.event.MovieSelectionEvent;
+import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
 import mx.com.adolfogarcia.popularmovies.view.fragment.MovieCollectionFragment;
 import mx.com.adolfogarcia.popularmovies.view.fragment.MovieDetailFragment;
 
 /**
- * Presents a collection of movies to select from and shows the details of the
- * selected movie.
+ * Shows the details of a {@link Movie} passed as an extra in the {@link Intent},
+ * using the key {@link #EXTRA_MOVIE}. The only attribute that the {@link Movie}
+ * must have assigned is {@link Movie#getId()}.
  *
  * @author Jesús Adolfo García Pasquel
  */
-public class MainActivity extends AppCompatActivity {
+public class MovieDetailActivity extends AppCompatActivity {
+
+    /**
+     * Key used to access the {@link Movie} to show, from the {@link Intent}'s
+     * extras.
+     */
+    public static final String EXTRA_MOVIE = "extra_movie";
 
     /**
      * Identifies the messages written to the log by this class.
      */
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = MovieDetailActivity.class.getSimpleName();
 
     /**
      * Identifies the {@code Fragment} used to present the details of a movie.
@@ -50,56 +55,25 @@ public class MainActivity extends AppCompatActivity {
     private static final String MOVIE_DETAIL_FRAGMENT_TAG =
             MovieDetailFragment.class.getCanonicalName();
 
-    /**
-     * Indicates if the activity contains two panes (master-detail) or just
-     * one.
-     */
-    private boolean mTwoPane;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        if (findViewById(R.id.movie_detail_container) != null) {
-            mTwoPane = true;
-            if (savedInstanceState == null) {
-                // TODO: Put a placeholder fragment in the detail area.
-            }
-        } else {
-            mTwoPane = false;
+        Movie movie = Parcels.unwrap(getIntent().getParcelableExtra(EXTRA_MOVIE));
+        if (movie == null) {
+            throw new IllegalArgumentException(
+                    "The movie specified in the Intent may not be null.");
         }
-    }
-
-    @Override
-    protected void onResume() {
-        EventBus.getDefault().register(this);
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        EventBus.getDefault().unregister(this);
-    }
-
-    /**
-     * Displays the detail view of the selected movie.
-     *
-     * @param event the movie selection event.
-     */
-    public void onEvent(MovieSelectionEvent event) {
-        if (mTwoPane) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
+        setContentView(R.layout.activity_movie_detail);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (fragmentManager.findFragmentByTag(MOVIE_DETAIL_FRAGMENT_TAG) == null) {
             MovieDetailFragment movieDetailFragment =
-                    MovieDetailFragment.newInstance(event.getSelectedMovie());
+                    MovieDetailFragment.newInstance(movie);
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.movie_detail_container, movieDetailFragment);
+            transaction.add(R.id.movie_detail_container
+                    , movieDetailFragment
+                    , MOVIE_DETAIL_FRAGMENT_TAG);
             transaction.commit();
-        } else {
-            Intent intent = new Intent(this, MovieDetailActivity.class);
-            intent.putExtra(MovieDetailActivity.EXTRA_MOVIE
-                    , Parcels.wrap(event.getSelectedMovie()));
-            startActivity(intent);
         }
     }
+
 }

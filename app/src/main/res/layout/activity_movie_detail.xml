@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright 2015 Jesús Adolfo García Pasquel
   ~
@@ -14,10 +15,7 @@
   ~ limitations under the License.
   -->
 
-<fragment android:id="@+id/fragment_movie_collection"
-          android:name="mx.com.adolfogarcia.popularmovies.view.fragment.MovieCollectionFragment"
-          xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          tools:layout="@layout/fragment_movie_collection"/>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:id="@+id/movie_detail_container"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent" />
