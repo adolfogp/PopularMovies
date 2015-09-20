@@ -26,6 +26,7 @@
     <!-- TODO: Use a RecyclerView instead. -->
     <!-- TODO: Change number of columns depending on width of screen and portrait/landscape -->
     <GridView android:id="@+id/poster_grid_view"
+              android:choiceMode="singleChoice"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:columnWidth="180dp"

@@ -30,7 +30,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridView;
 import android.widget.Spinner;
 
 import org.parceler.Parcels;
@@ -235,6 +237,15 @@ public class MovieCollectionFragment extends Fragment
         Cursor oldCursor = mMoviePosterAdapter.swapCursor(data);
         if (oldCursor != null) {
             oldCursor.close();
+        }
+        // Scroll to the last selected item if reloading after an event
+        // that causes the first item to be shown (e.g. configuration change).
+        // If reloading because of new movie page downloads, do not scroll back
+        // to selection.
+        if (mBinding.posterGridView.getFirstVisiblePosition() == 0
+                && mViewModel.getSelectedPosition() != AdapterView.INVALID_POSITION) {
+            mBinding.posterGridView.smoothScrollToPosition(
+                    mViewModel.getSelectedPosition());
         }
     }
 

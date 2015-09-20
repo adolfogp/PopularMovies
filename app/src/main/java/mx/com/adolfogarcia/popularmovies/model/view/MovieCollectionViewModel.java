@@ -94,6 +94,13 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
      */
     @Inject LabeledItem<FetchMoviePageTaskFactory>[] mSortOrderOptions;
 
+
+    /**
+     * The position of the currently selected movie, possibly
+     * {@link AdapterView#INVALID_POSITION}.
+     */
+    private int mSelectedPosition = AdapterView.INVALID_POSITION;
+
     /**
      * Current movie downloading task. A reference is kept to avoid
      * creating multiple download tasks for the same page.
@@ -106,6 +113,14 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
      */
     public MovieCollectionViewModel() {
         // Empty bean constructor.
+    }
+
+    public int getSelectedPosition() {
+        return mSelectedPosition;
+    }
+
+    public void setSelectedPosition(int selectedPosition) {
+        mSelectedPosition = selectedPosition;
     }
 
     /**
@@ -160,8 +175,9 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
     }
 
     /**
-     * Deletes all cached movie data and resets the last page of movies
-     * downloaded, back to zero.
+     * Deletes all cached movie data, resets the last page of movies
+     * downloaded back to zero and clears the selected item position
+     * (sets it to {@link AdapterView#INVALID_POSITION}).
      */
     public void deleteCachedMovieData() {
         requireNonNullConfiguration();
@@ -169,6 +185,7 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
         mWeakContext.get().getContentResolver()
                 .delete(CachedMovieEntry.CONTENT_URI, null, null);
         mWeakConfiguration.get().setLastMoviePageRetrieved(0);
+        mSelectedPosition = AdapterView.INVALID_POSITION;
     }
 
     /**
@@ -245,6 +262,7 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        mSelectedPosition = position;
         Movie selectedMovie = new Movie();
         selectedMovie.setId(id);
         EventBus.getDefault().post(new MovieSelectionEvent(selectedMovie));
