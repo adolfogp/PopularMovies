@@ -12,4 +12,10 @@ https://svn.apache.org/repos/asf/hive/trunk/checkstyle/
 poster_placeholder.png is based on the CC-BY-SA licensed SVG image available at
 http://sv-ti.com/2013/10/16/creating-an-ajax-loader-in-svg/
 
+The icon and logo are based on the public domain file available at
+https://upload.wikimedia.org/wikipedia/commons/9/9b/Clapboard.svg
+Modifications were done with Gimp and Inkscape, using the shadows provided by
+Material Design Shadows for Inkscape, available at
+http://shiningwingpony.deviantart.com/art/Material-Design-Shadows-for-Inkscape-SVG-490418162
+
 "This product uses the TMDb API but is not endorsed or certified by TMDb."

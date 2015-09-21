@@ -18,5 +18,7 @@
 <resources>
     <item name="white" type="color">#ffffff</item>
     <item name="detail_label" type="color">#616161</item>
-    <item name="title_background" type="color">#424242</item>
+    <item name="title_background" type="color">#597725</item>
+    <item name="popular_movies_green" type="color">#597725</item>
+    <item name="popular_movies_dark_green" type="color">#456411</item>
 </resources>

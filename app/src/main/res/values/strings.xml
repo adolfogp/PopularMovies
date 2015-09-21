@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Popular Movies</string>
+    <string name="title_activity_movie_detail">Details</string>
     <string name="label_release_date">Release date</string>
     <string name="format_movie_release_date">yyyy-MM-dd</string>
     <string name="label_vote_average">User rating</string>
