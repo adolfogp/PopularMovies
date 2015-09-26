@@ -32,6 +32,7 @@ import java.util.Set;
 
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.model.transport.ImageConfigurationJsonModel;
+import mx.com.adolfogarcia.popularmovies.net.TheMovieDbApi;
 
 /**
  * Handles access to storage of
@@ -181,11 +182,20 @@ public class RestfulServiceConfiguration {
 
     // TODO: Store for both highest rated and most popular (not single value)
     /**
-     * Key used to access the number of the page last retrieved from the RESTful
-     * API, as stored in the {@link SharedPreferences}.
+     * Key used to access the number of the page last retrieved for movies sorted
+     * by popularity from the RESTful API, as stored in the
+     * {@link SharedPreferences}.
      */
-    private static final String PREFERENCES_KEY_LAST_MOVIE_PAGE_RETRIEVED =
-            "last_movie_page_retrieved";
+    private static final String PREFERENCES_KEY_LAST_POPULAR_MOVIE_PAGE_RETRIEVED =
+            "last_popular_movie_page_retrieved";
+
+    /**
+     * Key used to access the number of the page last retrieved for movies sorted
+     * by user rating from the RESTful API, as stored in the
+     * {@link SharedPreferences}.
+     */
+    private static final String PREFERENCES_KEY_LAST_RATED_MOVIE_PAGE_RETRIEVED =
+            "last_popular_movie_page_retrieved";
 
     /**
      * Key used to access, the index number of the sort order options that
@@ -521,31 +531,80 @@ public class RestfulServiceConfiguration {
 
     /**
      * Returns the number of the page last retrieved from the RESTful
-     * API, as stored in the {@link SharedPreferences}, or zero if none have
-     * been retrieved.
+     * API for the specified sort order or zero if none have been retrieved.
      *
+     * @param apiSortOrder the sort order for which the last retrieved movie page
+     *     number should be returned. This must be one of {@link TheMovieDbApi}'s
+     *     constants: {@link TheMovieDbApi#SORT_BY_POPULARITY},
+     *     {@link TheMovieDbApi#SORT_BY_USER_RATING}.
      * @return the number of the page last retrieved from the RESTful
-     * API, as stored in the {@link SharedPreferences}, or zero if none have
-     * been retrieved.
+     * API for the specified sort order or zero if none have been retrieved.
      */
-    public int getLastMoviePageRetrieved() {
+    public int getLastMoviePageRetrieved(String apiSortOrder) {
         SharedPreferences settings =
                 PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
-        return settings.getInt(PREFERENCES_KEY_LAST_MOVIE_PAGE_RETRIEVED, 0);
+        return settings.getInt(getPreferencesKeyForSortOrder(apiSortOrder), 0);
     }
 
     /**
      * Sets the number of the page last retrieved from the RESTful
-     * API. That is, stores the value in the application's
-     * {@link SharedPreferences}.
+     * API for the specified sort order. That is, stores the value in
+     * the application's {@link SharedPreferences}.
      *
+     * @param apiSortOrder the sort order for which the last retrieved movie page
+     *     number should be set. This must be one of {@link TheMovieDbApi}'s
+     *     constants: {@link TheMovieDbApi#SORT_BY_POPULARITY},
+     *     {@link TheMovieDbApi#SORT_BY_USER_RATING}.
      * @param page the value to store.
      */
-    public void setLastMoviePageRetrieved(int page) {
+    public void setLastMoviePageRetrieved(String apiSortOrder, int page) {
+        SharedPreferences settings =
+                PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt(getPreferencesKeyForSortOrder(apiSortOrder), page);
+        editor.apply();
+    }
+
+    /**
+     * Returns the key associate to the last page downloaded for the specified
+     * sort order.
+     *
+     * @param apiSortOrder the sort order for which the last retrieved movie page
+     *     number key should be returned. This must be one of {@link TheMovieDbApi}'s
+     *     constants: {@link TheMovieDbApi#SORT_BY_POPULARITY},
+     *     {@link TheMovieDbApi#SORT_BY_USER_RATING}.
+     * @return the key associate to the last page downloaded for the specified
+     *     sort order.
+     */
+    private String getPreferencesKeyForSortOrder(String apiSortOrder) {
+        final String preferencesKeyLastMovie;
+        switch (apiSortOrder) {
+            case TheMovieDbApi.SORT_BY_POPULARITY:
+                preferencesKeyLastMovie =
+                        PREFERENCES_KEY_LAST_POPULAR_MOVIE_PAGE_RETRIEVED;
+                break;
+            case TheMovieDbApi.SORT_BY_USER_RATING:
+                preferencesKeyLastMovie =
+                        PREFERENCES_KEY_LAST_RATED_MOVIE_PAGE_RETRIEVED;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown sort order: "
+                        + apiSortOrder);
+        }
+        return preferencesKeyLastMovie;
+    }
+
+    /**
+     * Sets the number of page last retrieved to 0 for all sort orders. That is
+     * {@link TheMovieDbApi#SORT_BY_POPULARITY} and
+     * {@link TheMovieDbApi#SORT_BY_USER_RATING}.
+     */
+    public void clearLastMoviePageRetrieved() {
         SharedPreferences preferences =
                 PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(PREFERENCES_KEY_LAST_MOVIE_PAGE_RETRIEVED, page);
+        editor.putInt(PREFERENCES_KEY_LAST_POPULAR_MOVIE_PAGE_RETRIEVED, 0);
+        editor.putInt(PREFERENCES_KEY_LAST_RATED_MOVIE_PAGE_RETRIEVED, 0);
         editor.apply();
     }
 

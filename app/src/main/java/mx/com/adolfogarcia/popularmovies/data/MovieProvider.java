@@ -119,7 +119,7 @@ public class MovieProvider extends ContentProvider {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             case CACHED_MOVIE:
-                retCursor = getAllMovies(projection, sortOrder);
+                retCursor = getAllMovies(projection, selection, selectionArgs, sortOrder);
                 break;
             case CACHED_MOVIE_ID:
                 retCursor = getMovieById(uri, projection);
@@ -135,15 +135,20 @@ public class MovieProvider extends ContentProvider {
      * Queries the database for all registered movies.
      *
      * @param projection the columns to return.
+     * @param selection the <i>WHERE</i> clause.
+     * @param selectionArgs the values for the arguments used in {@code selection}.
      * @param sortOrder how the rows sould be ordered.
      * @return a {@link Cursor} for the result.
      */
-    private Cursor getAllMovies(String[] projection, String sortOrder) {
+    private Cursor getAllMovies(String[] projection
+            , String selection
+            , String[] selectionArgs
+            , String sortOrder) {
         return sCachedMovieQueryBuilder.query(
                 mOpenHelper.getReadableDatabase()
                 , projection
-                , null // selection
-                , null // selectionArgs
+                , selection
+                , selectionArgs
                 , null // groupBy
                 , null // having
                 , sortOrder);

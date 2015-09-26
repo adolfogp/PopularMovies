@@ -180,11 +180,14 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
      * (sets it to {@link AdapterView#INVALID_POSITION}).
      */
     public void deleteCachedMovieData() {
+        // TODO - Keep user favorite movies, only remove the flags for most_popular
+        //        most_popular or highest_rated, and set them back later, if
+        //        found among the pages for most popular or highest rated.
         requireNonNullConfiguration();
         requireNonNullContext();
         mWeakContext.get().getContentResolver()
                 .delete(CachedMovieEntry.CONTENT_URI, null, null);
-        mWeakConfiguration.get().setLastMoviePageRetrieved(0);
+        mWeakConfiguration.get().clearLastMoviePageRetrieved();
         mSelectedPosition = AdapterView.INVALID_POSITION;
     }
 
@@ -231,8 +234,9 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
             Log.d(LOG_TAG, "Ignoring sort order change.");
             return;
         }
+        mSelectedPosition = AdapterView.INVALID_POSITION;
+        mFetchMoviePageTask = null;
         configuration.setSelectedSortOrderIndex(idx);
-        deleteCachedMovieData();
         downloadNextMoviePage();
         EventBus.getDefault().post(new SortOrderSelectionEvent());
     }
@@ -246,18 +250,20 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
     public void downloadNextMoviePage() {
         requireNonNullConfiguration();
         RestfulServiceConfiguration configuration = mWeakConfiguration.get();
-        if (configuration.getTotalMoviePagesAvailable()
-                <= configuration.getLastMoviePageRetrieved()) {
-            Log.i(LOG_TAG, "No more movie pages to download.");
-            return;
-        }
         if (mFetchMoviePageTask != null
                 && mFetchMoviePageTask.getStatus() == Status.RUNNING) {
             Log.d(LOG_TAG, "Still downloading movie page. Ignoring request.");
             return;
         }
+        FetchMoviePageTaskFactory taskFactory = getSelectedSortOrderTaskFactory();
+        final int lastPageRetrieved =
+                configuration.getLastMoviePageRetrieved(taskFactory.getRestApiSortOrder());
+        if (configuration.getTotalMoviePagesAvailable() <= lastPageRetrieved) {
+            Log.i(LOG_TAG, "No more movie pages to download.");
+            return;
+        }
         mFetchMoviePageTask = getSelectedSortOrderTaskFactory().newFetchMovieTask();
-        mFetchMoviePageTask.execute(configuration.getLastMoviePageRetrieved() + 1);
+        mFetchMoviePageTask.execute(lastPageRetrieved + 1);
     }
 
     @Override
@@ -293,6 +299,32 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
     }
 
     /**
+     * Returns the selection clause (<i>WHERE</i> clause) to be used on
+     * {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}, that
+     * corresponds to the currently selected item from
+     * {@link #getSortOrderOptions()}.
+     *
+     * @return a selection clause to be used on
+     *     {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+     */
+    public String getSelectionClause() {
+        return getSelectedSortOrderTaskFactory().getMovieProviderSelectionClause();
+    }
+
+    /**
+     * Returns the arguments to be used on the selection clause to be used on
+     * {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}, that
+     * corresponds to the currently selected item from
+     * {@link #getSortOrderOptions()}.
+     *
+     * @return an order clause to be used on
+     *     {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+     */
+    public String[] getSelectionArguments() {
+        return getSelectedSortOrderTaskFactory().getMovieProviderSelectionArguments();
+    }
+
+    /**
      * Returns an order clause to be used on
      * {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}, that
      * corresponds to the currently selected item from
@@ -301,8 +333,8 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
      * @return an order clause to be used on
      *     {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
      */
-    public String getSelectedSortOrderClause() {
-        return getSelectedSortOrderTaskFactory().getMovieSortOrder();
+    public String getSortOrderClause() {
+        return getSelectedSortOrderTaskFactory().getMovieProviderSortOrder();
     }
 
     @Override

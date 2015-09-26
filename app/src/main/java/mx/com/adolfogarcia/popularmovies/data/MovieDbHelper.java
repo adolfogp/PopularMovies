@@ -55,8 +55,13 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             + CachedMovieEntry.COLUMN_MOST_POPULAR + " BOOLEAN NOT NULL DEFAULT 0, "
             + CachedMovieEntry.COLUMN_HIGHEST_RATED + " BOOLEAN NOT NULL DEFAULT 0, "
             + CachedMovieEntry.COLUMN_USER_FAVORITE + " BOOLEAN NOT NULL DEFAULT 0, "
-            + "UNIQUE (" + CachedMovieEntry.COLUMN_API_ID + ")"
+            + "UNIQUE (" + CachedMovieEntry.COLUMN_API_ID + ") ON CONFLICT REPLACE"
             + ");";
+    // TODO: Instead of ON CONFLICT REPLACE, take care of conflicts on insertion.
+    //       That is, use INSERT OR REPLACE when re-downloading data and
+    //       mind keeping the value of columns: COLUMN_MOST_POPULAR,
+    //       COLUMN_HIGHEST_RATED and COLUMN_USER_FAVORITE.
+    //       Add tests to verify this is the case.
 
     /**
      * Creates a new instance of {@link MovieDbHelper}.

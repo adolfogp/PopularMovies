@@ -16,7 +16,6 @@
 
 package mx.com.adolfogarcia.popularmovies.view.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -26,11 +25,10 @@ import org.parceler.Parcels;
 
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
-import mx.com.adolfogarcia.popularmovies.view.fragment.MovieCollectionFragment;
 import mx.com.adolfogarcia.popularmovies.view.fragment.MovieDetailFragment;
 
 /**
- * Shows the details of a {@link Movie} passed as an extra in the {@link Intent},
+ * Shows the details of a {@link Movie} passed as an extra in the {@code Intent},
  * using the key {@link #EXTRA_MOVIE}. The only attribute that the {@link Movie}
  * must have assigned is {@link Movie#getId()}.
  *
@@ -39,7 +37,7 @@ import mx.com.adolfogarcia.popularmovies.view.fragment.MovieDetailFragment;
 public class MovieDetailActivity extends AppCompatActivity {
 
     /**
-     * Key used to access the {@link Movie} to show, from the {@link Intent}'s
+     * Key used to access the {@link Movie} to show, from the {@code Intent}'s
      * extras.
      */
     public static final String EXTRA_MOVIE = "extra_movie";

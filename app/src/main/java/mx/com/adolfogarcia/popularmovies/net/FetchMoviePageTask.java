@@ -80,7 +80,7 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
      * with the specified order criteria and uses to {@link Context} to
      * access {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
      *
-     *  @param configuration the configuration used to access movie pages.
+     * @param configuration the configuration used to access movie pages.
      * @param orderCriteria the order criteria for the query to the RESTful API.
      * @param context the context used to access the provider on which the
      *                movie data will be stored.
@@ -93,6 +93,11 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
         }
         if (context == null) {
             throw new IllegalArgumentException("The Context may not be null");
+        }
+        if (orderCriteria != TheMovieDbApi.SORT_BY_POPULARITY
+                && orderCriteria != TheMovieDbApi.SORT_BY_USER_RATING) {
+            throw new IllegalArgumentException("Unknown order criteria: "
+                    + orderCriteria);
         }
         mWeakConfiguration = new WeakReference<>(configuration);
         mWeakContext = new WeakReference<>(context);
@@ -137,6 +142,18 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
     private void insertMoviesInProvider(MoviePageJsonModel response) {
         List<MovieJsonModel> movieList = response.getMovies();
         ContentValues[] cvArray = new ContentValues[movieList.size()];
+        final String orderColumnName;
+        switch (mOrderCriteria) {
+            case  TheMovieDbApi.SORT_BY_POPULARITY:
+                orderColumnName = CachedMovieEntry.COLUMN_MOST_POPULAR;
+                break;
+            case TheMovieDbApi.SORT_BY_USER_RATING:
+                orderColumnName = CachedMovieEntry.COLUMN_HIGHEST_RATED;
+                break;
+            default:
+                throw new IllegalStateException("Unknown order criteria: "
+                        + mOrderCriteria);
+        }
         for (int i = 0; i < cvArray.length; i++) {
             MovieJsonModel movie = movieList.get(i);
             ContentValues contentValues = new ContentValues();
@@ -156,13 +173,15 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
                     , movie.getVoteAverage());
             contentValues.put(CachedMovieEntry.COLUMN_POSTER_PATH
                     , movie.getPosterPath());
+            contentValues.put(orderColumnName, true);
             cvArray[i] = contentValues;
         }
         if (cvArray.length > 0 && mWeakContext != null && mWeakConfiguration != null) {
             mWeakContext.get().getContentResolver().bulkInsert(
                     CachedMovieEntry.CONTENT_URI, cvArray);
             mWeakConfiguration.get().setTotalMoviePagesAvailable(response.getTotalPages());
-            mWeakConfiguration.get().setLastMoviePageRetrieved(response.getPageNumber());
+            mWeakConfiguration.get().setLastMoviePageRetrieved(mOrderCriteria
+                    , response.getPageNumber());
         }
     }
 

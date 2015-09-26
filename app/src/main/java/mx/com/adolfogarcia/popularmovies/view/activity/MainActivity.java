@@ -21,14 +21,12 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
 import org.parceler.Parcels;
 
 import de.greenrobot.event.EventBus;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.model.event.MovieSelectionEvent;
-import mx.com.adolfogarcia.popularmovies.view.fragment.MovieCollectionFragment;
 import mx.com.adolfogarcia.popularmovies.view.fragment.MovieDetailFragment;
 
 /**

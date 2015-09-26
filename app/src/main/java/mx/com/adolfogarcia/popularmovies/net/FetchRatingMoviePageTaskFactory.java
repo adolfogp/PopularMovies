@@ -19,10 +19,12 @@ package mx.com.adolfogarcia.popularmovies.net;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import java.lang.ref.WeakReference;
 
-import mx.com.adolfogarcia.popularmovies.data.MovieContract;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 
 /**
  * Implementation of {@link FetchMoviePageTaskFactory} for movies sorted by
@@ -38,8 +40,8 @@ public class FetchRatingMoviePageTaskFactory implements FetchMoviePageTaskFactor
      * to order the results from highest to lowest rated.
      */
     private static final String ORDER_BY_VOTE_AVERAGE_DESCENDING =
-            MovieContract.CachedMovieEntry.COLUMN_VOTE_AVERAGE + " DESC"
-                    + ", " + MovieContract.CachedMovieEntry._ID + " ASC";
+            CachedMovieEntry.COLUMN_VOTE_AVERAGE + " DESC"
+            + ", " + CachedMovieEntry._ID + " ASC";
 
     /**
      * The configuration of the RESTful API.
@@ -69,7 +71,22 @@ public class FetchRatingMoviePageTaskFactory implements FetchMoviePageTaskFactor
     }
 
     @Override
-    public String getMovieSortOrder() {
+    public String getRestApiSortOrder() {
+        return TheMovieDbApi.SORT_BY_USER_RATING;
+    }
+
+    @Override
+    public String getMovieProviderSelectionClause() {
+        return CachedMovieEntry.COLUMN_HIGHEST_RATED + " = ?";
+    }
+
+    @Override
+    public String[] getMovieProviderSelectionArguments() {
+        return new String[] {Integer.toString(BooleanUtils.toInteger(true))};
+    }
+
+    @Override
+    public String getMovieProviderSortOrder() {
         return ORDER_BY_VOTE_AVERAGE_DESCENDING;
     }
 

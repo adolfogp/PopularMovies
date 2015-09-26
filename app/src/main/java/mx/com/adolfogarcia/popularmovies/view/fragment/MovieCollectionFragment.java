@@ -24,6 +24,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,7 +33,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.Spinner;
 
 import org.parceler.Parcels;
@@ -215,6 +215,7 @@ public class MovieCollectionFragment extends Fragment
      * @param event the change of sort order event.
      */
     public void onEvent(SortOrderSelectionEvent event) {
+        Log.wtf(LOG_TAG, "Restarting loader");
         getLoaderManager().restartLoader(MOVIE_COLLECTION_LOADER_ID, null, this);
     }
 
@@ -223,9 +224,9 @@ public class MovieCollectionFragment extends Fragment
         return new CursorLoader(this.getActivity()
                 , CachedMovieEntry.CONTENT_URI
                 , MoviePosterAdapter.PROJECTION_MOVIE_POSTERS
-                , null
-                , null
-                , mViewModel.getSelectedSortOrderClause());
+                , mViewModel.getSelectionClause()
+                , mViewModel.getSelectionArguments()
+                , mViewModel.getSortOrderClause());
     }
 
     @Override

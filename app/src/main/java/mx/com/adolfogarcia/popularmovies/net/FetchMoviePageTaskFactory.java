@@ -43,6 +43,17 @@ public interface FetchMoviePageTaskFactory {
     AsyncTask<Integer, ?, ?> newFetchMovieTask();
 
     /**
+     * Returns the parameter used to specify the sort order to the RESTful API,
+     * that is equivalent to the order clause used on
+     * {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+     *
+     * @return the parameter used to specify the sort order to the RESTful API,
+     *     for example {@link TheMovieDbApi#SORT_BY_POPULARITY}.
+     * @see #getMovieProviderSortOrder()
+     */
+    String getRestApiSortOrder();
+
+    /**
      * Returns an order clause to be used on
      * {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}, that is
      * equivalent to the criteria by which the movies retrieved by
@@ -50,7 +61,29 @@ public interface FetchMoviePageTaskFactory {
      *
      * @return an equivalente order clause, that may be used on
      *     {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+     * @see #getRestApiSortOrder()
      */
-    String getMovieSortOrder();
+    String getMovieProviderSortOrder();
+
+    /**
+     * Returns a selection clause (<i>WHERE</i> clase) to be used on
+     * {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}, that is
+     * equivalent to the criteria by which the movies retrieved by
+     * {@link #newFetchMovieTask()} are ordered.
+     *
+     * @return a selection clause, that may be used on
+     *     {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+     * @see #getMovieProviderSortOrder()
+     */
+    String getMovieProviderSelectionClause();
+
+    /**
+     * Returns selection arguments to be used with
+     * {@link #getMovieProviderSelectionClause()}.
+     *
+     * @return selection arguments to be used with
+     *    {@link #getMovieProviderSelectionClause()}.
+     */
+    String[] getMovieProviderSelectionArguments();
 
 }
