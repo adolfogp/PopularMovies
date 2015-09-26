@@ -179,6 +179,7 @@ public class RestfulServiceConfiguration {
      */
     private static final String PROPERTIES_KEY_API_ACCESS = "api_key";
 
+    // TODO: Store for both highest rated and most popular (not single value)
     /**
      * Key used to access the number of the page last retrieved from the RESTful
      * API, as stored in the {@link SharedPreferences}.

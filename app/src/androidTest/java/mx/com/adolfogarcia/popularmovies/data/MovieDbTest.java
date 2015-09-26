@@ -79,6 +79,9 @@ public class MovieDbTest extends AndroidTestCase {
         columnNameSet.add(CachedMovieEntry.COLUMN_POPULARITY);
         columnNameSet.add(CachedMovieEntry.COLUMN_POSTER_PATH);
         columnNameSet.add(CachedMovieEntry.COLUMN_VOTE_AVERAGE);
+        columnNameSet.add(CachedMovieEntry.COLUMN_MOST_POPULAR);
+        columnNameSet.add(CachedMovieEntry.COLUMN_HIGHEST_RATED);
+        columnNameSet.add(CachedMovieEntry.COLUMN_USER_FAVORITE);
 
         int columnNameIndex = c.getColumnIndex("name");
         do {

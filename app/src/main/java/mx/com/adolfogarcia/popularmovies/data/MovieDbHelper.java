@@ -52,7 +52,10 @@ public class MovieDbHelper extends SQLiteOpenHelper {
             + CachedMovieEntry.COLUMN_POSTER_PATH + " TEXT, "
             + CachedMovieEntry.COLUMN_POPULARITY + " REAL NOT NULL, "
             + CachedMovieEntry.COLUMN_VOTE_AVERAGE + " REAL NOT NULL, "
-            + "UNIQUE (" + CachedMovieEntry._ID + ") ON CONFLICT REPLACE"
+            + CachedMovieEntry.COLUMN_MOST_POPULAR + " BOOLEAN NOT NULL DEFAULT 0, "
+            + CachedMovieEntry.COLUMN_HIGHEST_RATED + " BOOLEAN NOT NULL DEFAULT 0, "
+            + CachedMovieEntry.COLUMN_USER_FAVORITE + " BOOLEAN NOT NULL DEFAULT 0, "
+            + "UNIQUE (" + CachedMovieEntry.COLUMN_API_ID + ")"
             + ");";
 
     /**

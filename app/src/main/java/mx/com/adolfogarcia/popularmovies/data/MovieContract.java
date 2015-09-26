@@ -126,6 +126,23 @@ public final class MovieContract {
         public static final String COLUMN_VOTE_AVERAGE = "vote_average";
 
         /**
+         * Indicates that the move appears in the pages for most popular movies
+         * downloaded so far.
+         */
+        public static final String COLUMN_MOST_POPULAR = "most_popular";
+
+        /**
+         * Indicates that the move appears in the pages for highest rated movies
+         * downloaded so far.
+         */
+        public static final String COLUMN_HIGHEST_RATED = "highest_rated";
+
+        /**
+         * Indicates that the movie was marked as favorite by the user.
+         */
+        public static final String COLUMN_USER_FAVORITE = "user_favorite";
+
+        /**
          * Returns the URI for a particular movie given its id.
          *
          * @param id the movie's identifier.
