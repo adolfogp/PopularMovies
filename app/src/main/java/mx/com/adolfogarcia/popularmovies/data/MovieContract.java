@@ -46,6 +46,16 @@ public final class MovieContract {
     public static final String PATH_CACHED_MOVIE = "cached_movie";
 
     /**
+     * Path for cached movie related video data.
+     */
+    public static final String PATH_CACHED_MOVIE_VIDEO = "cached_video";
+
+    /**
+     * Path for cached movie review data.
+     */
+    public static final String PATH_CACHED_MOVIE_REVIEW = "cached_review";
+
+    /**
      * This class only provides constants and utility methods.
      */
     private MovieContract() {
@@ -67,7 +77,7 @@ public final class MovieContract {
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_CACHED_MOVIE).build();
 
         /**
-         * Type for {@code content:} URIs with a directories of chached movies.
+         * Type for {@code content:} URIs with directories of chached movies.
          */
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
                 + "/" + CONTENT_AUTHORITY + "/" + PATH_CACHED_MOVIE;
@@ -151,6 +161,144 @@ public final class MovieContract {
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
+    }
+
+    /**
+     * Defines the contents of the table holding cached movie video data
+     * (trailers, featurettes, etc.).
+     *
+     * @author Jesús Adolfo García Pasquel
+     * @see <a href="http://docs.themoviedb.apiary.io/">The Movie Database API</a>.
+     */
+    public static final class CachedMovieVideoEntry implements BaseColumns {
+
+        /**
+         * Base URI for cached movie related video data.
+         */
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_CACHED_MOVIE_VIDEO).build();
+
+        /**
+         * Type for {@code content:} URIs with directories of chached movie
+         * related video data.
+         */
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_CACHED_MOVIE_VIDEO;
+
+        /**
+         * Type for {@code content:} URIs with a single cached movie related video.
+         */
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_CACHED_MOVIE_VIDEO;
+
+        /**
+         * Name of the table containing cached movie related video data.
+         */
+        public static final String TABLE_NAME = "cached_movie_video";
+
+        /**
+         * The movie's id in
+         * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
+         */
+        public static final String COLUMN_MOVIE_API_ID = "movie_api_id";
+
+        /**
+         * The video's id in
+         * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
+         */
+        public static final String COLUMN_API_ID = "api_id";
+
+        /**
+         * The video's language in ISO 639.
+         */
+        public static final String COLUMN_LANGUAGE = "language";
+
+        /**
+         * The key used to retrieve the video from the website it is posted at.
+         */
+        public static final String COLUMN_KEY = "key";
+
+        /**
+         * The video's name.
+         */
+        public static final String COLUMN_NAME = "name";
+
+        /**
+         * The website from which the video can be retrieved.
+         */
+        public static final String COLUMN_SITE = "site";
+
+        /**
+         * The video's resolution (e.g. {@code 1080}).
+         */
+        public static final String COLUMN_SIZE = "size";
+
+        /**
+         * How the video is related to the movie (e.g. {@code Trailer}).
+         */
+        public static final String COLUMN_TYPE = "type";
+
+    }
+
+    /**
+     * Defines the contents of the table holding cached movie reviews.
+     *
+     * @author Jesús Adolfo García Pasquel
+     * @see <a href="http://docs.themoviedb.apiary.io/">The Movie Database API</a>.
+     */
+    public static final class CachedMovieReviewEntry implements BaseColumns {
+
+        /**
+         * Base URI for cached movie review data.
+         */
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_CACHED_MOVIE_REVIEW).build();
+
+        /**
+         * Type for {@code content:} URIs with directories of chached movie
+         * review data.
+         */
+        public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_CACHED_MOVIE_REVIEW;
+
+        /**
+         * Type for {@code content:} URIs with a single cached movie review.
+         */
+        public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_CACHED_MOVIE_REVIEW;
+
+        /**
+         * Name of the table containing cached movie review data.
+         */
+        public static final String TABLE_NAME = "cached_movie_review";
+
+        /**
+         * The movie's id in
+         * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
+         */
+        public static final String COLUMN_MOVIE_API_ID = "movie_api_id";
+
+        /**
+         * The video's id in
+         * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
+         */
+        public static final String COLUMN_API_ID = "api_id";
+
+        /**
+         * The name of the review's author.
+         */
+        public static final String COLUMN_AUTHOR = "author";
+
+        /**
+         * The review's text.
+         */
+        public static final String COLUMN_CONTENT = "content";
+
+        /**
+         * The URL for the full review.
+         */
+        public static final String COLUMN_URL = "url";
 
     }
 

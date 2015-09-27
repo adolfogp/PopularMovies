@@ -25,6 +25,8 @@ import junit.framework.Assert;
 import java.util.HashSet;
 import java.util.Set;
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieVideoEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieReviewEntry;
 
 /**
  * Test cases that verify the movie database is properly created with a
@@ -48,6 +50,8 @@ public class MovieDbTest extends AndroidTestCase {
         // Set of tables in the schema
         final Set<String> tableNameSet = new HashSet<>();
         tableNameSet.add(CachedMovieEntry.TABLE_NAME);
+        tableNameSet.add(CachedMovieVideoEntry.TABLE_NAME);
+        tableNameSet.add(CachedMovieReviewEntry.TABLE_NAME);
 
         SQLiteDatabase db = new MovieDbHelper(this.mContext).getWritableDatabase();
         Assert.assertTrue("Database should be open.", db.isOpen());
@@ -65,6 +69,7 @@ public class MovieDbTest extends AndroidTestCase {
         c.close();
 
         // Verify the tables contain the required columns
+        // Cached Movies' table
         c = db.rawQuery("PRAGMA table_info(" + CachedMovieEntry.TABLE_NAME + ")", null);
         assertTrue("The table must contain columns.", c.moveToFirst());
 
@@ -86,13 +91,68 @@ public class MovieDbTest extends AndroidTestCase {
         int columnNameIndex = c.getColumnIndex("name");
         do {
             String columnName = c.getString(columnNameIndex);
-            columnNameSet.remove(columnName);
+            Assert.assertTrue("No unexpected colums in " + CachedMovieEntry.TABLE_NAME
+                    , columnNameSet.remove(columnName));
         } while(c.moveToNext());
 
         Assert.assertTrue("The table " + CachedMovieEntry.TABLE_NAME
                         + " must contain the required columns"
                 , columnNameSet.isEmpty());
         c.close();
+
+        // Cached Movie Videos' table
+        c = db.rawQuery("PRAGMA table_info(" + CachedMovieVideoEntry.TABLE_NAME + ")", null);
+        assertTrue("The table must contain columns.", c.moveToFirst());
+
+        // Build a HashSet of all of the column names we want to look for
+        columnNameSet = new HashSet<>();
+        columnNameSet.add(CachedMovieVideoEntry._ID);
+        columnNameSet.add(CachedMovieVideoEntry.COLUMN_MOVIE_API_ID);
+        columnNameSet.add(CachedMovieVideoEntry.COLUMN_API_ID);
+        columnNameSet.add(CachedMovieVideoEntry.COLUMN_LANGUAGE);
+        columnNameSet.add(CachedMovieVideoEntry.COLUMN_KEY);
+        columnNameSet.add(CachedMovieVideoEntry.COLUMN_NAME);
+        columnNameSet.add(CachedMovieVideoEntry.COLUMN_SITE);
+        columnNameSet.add(CachedMovieVideoEntry.COLUMN_SIZE);
+        columnNameSet.add(CachedMovieVideoEntry.COLUMN_TYPE);
+
+        columnNameIndex = c.getColumnIndex("name");
+        do {
+            String columnName = c.getString(columnNameIndex);
+            Assert.assertTrue("No unexpected colums in " + CachedMovieVideoEntry.TABLE_NAME
+                    , columnNameSet.remove(columnName));
+        } while(c.moveToNext());
+
+        Assert.assertTrue("The table " + CachedMovieVideoEntry.TABLE_NAME
+                + " must contain the required columns"
+                , columnNameSet.isEmpty());
+        c.close();
+
+        // Chaced Movie Reviews' table
+        c = db.rawQuery("PRAGMA table_info(" + CachedMovieReviewEntry.TABLE_NAME + ")", null);
+        assertTrue("The table must contain columns.", c.moveToFirst());
+
+        // Build a HashSet of all of the column names we want to look for
+        columnNameSet = new HashSet<>();
+        columnNameSet.add(CachedMovieReviewEntry._ID);
+        columnNameSet.add(CachedMovieReviewEntry.COLUMN_MOVIE_API_ID);
+        columnNameSet.add(CachedMovieReviewEntry.COLUMN_API_ID);
+        columnNameSet.add(CachedMovieReviewEntry.COLUMN_AUTHOR);
+        columnNameSet.add(CachedMovieReviewEntry.COLUMN_CONTENT);
+        columnNameSet.add(CachedMovieReviewEntry.COLUMN_URL);
+
+        columnNameIndex = c.getColumnIndex("name");
+        do {
+            String columnName = c.getString(columnNameIndex);
+            Assert.assertTrue("No unexpected colums in " + CachedMovieReviewEntry.TABLE_NAME
+                    , columnNameSet.remove(columnName));
+        } while(c.moveToNext());
+
+        Assert.assertTrue("The table " + CachedMovieReviewEntry.TABLE_NAME
+                + " must contain the required columns"
+                , columnNameSet.isEmpty());
+        c.close();
+
         db.close();
     }
 
@@ -119,6 +179,22 @@ public class MovieDbTest extends AndroidTestCase {
                 , cursor.moveToNext());
         cursor.close();
         db.close();
+    }
+
+    /**
+     * Verifies insertion and query operations work correctly on the movie
+     * video table.
+     */
+    public void testMovieVideoTable() {
+        Assert.fail("Test movie video table");
+    }
+
+    /**
+     * Verifies insertion and query operations work correctly on the movie
+     * review table.
+     */
+    public void testMovieReviewTable() {
+        Assert.fail("Test movie review table");
     }
 
 }

@@ -195,7 +195,7 @@ public class RestfulServiceConfiguration {
      * {@link SharedPreferences}.
      */
     private static final String PREFERENCES_KEY_LAST_RATED_MOVIE_PAGE_RETRIEVED =
-            "last_popular_movie_page_retrieved";
+            "last_rated_movie_page_retrieved";
 
     /**
      * Key used to access, the index number of the sort order options that

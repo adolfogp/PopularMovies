@@ -20,6 +20,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieVideoEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieReviewEntry;
 
 /**
  * Manages the creation and maintenance of the local movie database.
@@ -63,6 +65,41 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     //       COLUMN_HIGHEST_RATED and COLUMN_USER_FAVORITE.
     //       Add tests to verify this is the case.
 
+
+    /**
+     * Statement used to create the table that holds the movie related
+     * video data.
+     */
+    private static final String SQL_CREATE_MOVIE_VIDEO_TABLE =
+            "CREATE TABLE " + CachedMovieVideoEntry.TABLE_NAME + " ("
+            + CachedMovieVideoEntry._ID + " INTEGER PRIMARY KEY, "
+            + CachedMovieVideoEntry.COLUMN_MOVIE_API_ID + " INTEGER NOT NULL, "
+            + CachedMovieVideoEntry.COLUMN_API_ID + " TEXT NOT NULL, "
+            + CachedMovieVideoEntry.COLUMN_LANGUAGE + " TEXT, "
+            + CachedMovieVideoEntry.COLUMN_KEY + " TEXT, "
+            + CachedMovieVideoEntry.COLUMN_NAME + " TEXT, "
+            + CachedMovieVideoEntry.COLUMN_SITE + " TEXT, "
+            + CachedMovieVideoEntry.COLUMN_SIZE + " INTEGER, "
+            + CachedMovieVideoEntry.COLUMN_TYPE + " TEXT, "
+            + "UNIQUE (" + CachedMovieVideoEntry.COLUMN_MOVIE_API_ID + ", "
+                    + CachedMovieVideoEntry.COLUMN_API_ID + ") ON CONFLICT REPLACE"
+            + ");";
+
+    /**
+     * Statement used to create the table that holds the movie reviews.
+     */
+    private static final String SQL_CREATE_MOVIE_REVIEW_TABLE =
+            "CREATE TABLE " + CachedMovieReviewEntry.TABLE_NAME + " ("
+            + CachedMovieReviewEntry._ID + " INTEGER PRIMARY KEY, "
+            + CachedMovieReviewEntry.COLUMN_MOVIE_API_ID + " INTEGER NOT NULL, "
+            + CachedMovieReviewEntry.COLUMN_API_ID + " TEXT NOT NULL, "
+            + CachedMovieReviewEntry.COLUMN_AUTHOR + " TEXT, "
+            + CachedMovieReviewEntry.COLUMN_CONTENT + " TEXT, "
+            + CachedMovieReviewEntry.COLUMN_URL + " TEXT, "
+            + "UNIQUE (" + CachedMovieReviewEntry.COLUMN_MOVIE_API_ID + ", "
+                    + CachedMovieReviewEntry.COLUMN_API_ID + ") ON CONFLICT REPLACE"
+            + ");";
+
     /**
      * Creates a new instance of {@link MovieDbHelper}.
      *
@@ -75,11 +112,15 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_MOVIE_TABLE);
+        db.execSQL(SQL_CREATE_MOVIE_VIDEO_TABLE);
+        db.execSQL(SQL_CREATE_MOVIE_REVIEW_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + CachedMovieEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CachedMovieVideoEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CachedMovieReviewEntry.TABLE_NAME);
         onCreate(db);
     }
 

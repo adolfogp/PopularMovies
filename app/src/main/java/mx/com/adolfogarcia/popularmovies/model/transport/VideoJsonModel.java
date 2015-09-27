@@ -48,7 +48,7 @@ public class VideoJsonModel {
     private String mLanguage;
 
     /**
-     * The mKey used to retrieve the video from the website it is posted at.
+     * The key used to retrieve the video from the website it is posted at.
      * @see #mSite
      */
     @SerializedName("key")
@@ -56,14 +56,14 @@ public class VideoJsonModel {
     private String mKey;
 
     /**
-     * The video's mName.
+     * The video's name.
      */
     @SerializedName("name")
     @Expose
     private String mName;
 
     /**
-     * The website where the video can be retrieved from.
+     * The website from which the video can be retrieved.
      * @see #mKey
      */
     @SerializedName("site")
