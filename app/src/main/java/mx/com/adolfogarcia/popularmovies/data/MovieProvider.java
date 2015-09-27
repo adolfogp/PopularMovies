@@ -372,7 +372,7 @@ public class MovieProvider extends ContentProvider {
         return sCachedReviewQueryBuilder.query(
                 mOpenHelper.getReadableDatabase()
                 , projection
-                , SELECTION_CACHED_MOVIE_ID // selection
+                , SELECTION_CACHED_REVIEW_ID // selection
                 , new String[] {id}  // selectionArgs
                 , null // groupBy
                 , null // having

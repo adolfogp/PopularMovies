@@ -33,6 +33,8 @@ import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieRe
 
 import junit.framework.Assert;
 
+import java.util.UUID;
+
 /**
  * Test cases for {@link MovieProvider}.  The code is based on
  * {@code TestProvider} from the sample application <i>Sunshine</i>.
@@ -278,8 +280,7 @@ public class MovieProviderTest extends AndroidTestCase {
                 , null
                 , null);
         cursor.moveToFirst();
-        TestUtilities.assertRowEquals(TestUtilities.createMadMaxMovieValues()
-                , cursor);
+        TestUtilities.assertRowEquals(testValues, cursor);
     }
 
     /**
@@ -307,10 +308,102 @@ public class MovieProviderTest extends AndroidTestCase {
     }
 
     /**
-     * Verifies that {@link MovieProvider#insert(Uri, ContentValues)} works
-     * properly.
+     * Verifies that
+     * {@link MovieProvider#query(Uri, String[], String, String[], String)}
+     * works properly. Case for a query of all movie videos.
      */
-    public void testInsert() {
+    public void testQuery_allVideos() {
+        // insert test records directly into the database
+        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues testValues = TestUtilities.createMadMaxMovieVideoValues();
+        long rowId = TestUtilities.insertMadMaxMovieVideoValues(mContext);
+        db.close();
+
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieVideoEntry.CONTENT_URI
+                , null
+                , null
+                , null
+                , null);
+        cursor.moveToFirst();
+        TestUtilities.assertRowEquals(testValues, cursor);
+    }
+
+    /**
+     * Verifies that
+     * {@link MovieProvider#query(Uri, String[], String, String[], String)}
+     * works properly. Case for a single movie video.
+     */
+    public void testQuery_singleVideo() {
+        // insert test records directly into the database
+        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues testValues = TestUtilities.createMadMaxMovieVideoValues();
+        long rowId = TestUtilities.insertMadMaxMovieVideoValues(mContext);
+        db.close();
+
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieVideoEntry.buildMovieVideoUri(rowId)
+                , null
+                , null
+                , null
+                , null);
+        cursor.moveToFirst();
+        TestUtilities.assertRowEquals(testValues, cursor);
+    }
+
+    /**
+     * Verifies that
+     * {@link MovieProvider#query(Uri, String[], String, String[], String)}
+     * works properly. Case for a query of all movie reviews.
+     */
+    public void testQuery_allReviews() {
+        // insert test records directly into the database
+        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues testValues = TestUtilities.createMadMaxMovieReviewValues();
+        long rowId = TestUtilities.insertMadMaxMovieReviewValues(mContext);
+        db.close();
+
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieReviewEntry.CONTENT_URI
+                , null
+                , null
+                , null
+                , null);
+        cursor.moveToFirst();
+        TestUtilities.assertRowEquals(testValues, cursor);
+    }
+
+    /**
+     * Verifies that
+     * {@link MovieProvider#query(Uri, String[], String, String[], String)}
+     * works properly. Case for a single movie review.
+     */
+    public void testQuery_singleReview() {
+        // insert test records directly into the database
+        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues testValues = TestUtilities.createMadMaxMovieReviewValues();
+        long rowId = TestUtilities.insertMadMaxMovieReviewValues(mContext);
+        db.close();
+
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieReviewEntry.buildMovieReviewUri(rowId)
+                , null
+                , null
+                , null
+                , null);
+        cursor.moveToFirst();
+        TestUtilities.assertRowEquals(testValues, cursor);
+    }
+
+    /**
+     * Verifies that {@link MovieProvider#insert(Uri, ContentValues)} works
+     * properly. Case for a movie.
+     */
+    public void testInsert_movie() {
         ContentValues values = TestUtilities.createMadMaxMovieValues();
         Uri locationUri = mContext.getContentResolver().insert(
                 CachedMovieEntry.CONTENT_URI, values);
@@ -332,11 +425,61 @@ public class MovieProviderTest extends AndroidTestCase {
     }
 
     /**
+     * Verifies that {@link MovieProvider#insert(Uri, ContentValues)} works
+     * properly. Case for a video of a movie.
+     */
+    public void testInsert_video() {
+        ContentValues values = TestUtilities.createMadMaxMovieVideoValues();
+        Uri locationUri = mContext.getContentResolver().insert(
+                CachedMovieVideoEntry.CONTENT_URI, values);
+        long rowId = ContentUris.parseId(locationUri);
+        Assert.assertTrue("Provider inserted the movie", rowId != -1);
+
+        // Verify the entry was stored properly
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieVideoEntry.CONTENT_URI
+                , null
+                , CachedMovieVideoEntry._ID + " = " + rowId
+                , null
+                , null);
+        cursor.moveToFirst();
+        TestUtilities.assertRowEquals(
+                TestUtilities.createMadMaxMovieVideoValues()
+                , cursor);
+        cursor.close();
+    }
+
+    /**
+     * Verifies that {@link MovieProvider#insert(Uri, ContentValues)} works
+     * properly. Case for a review of a movie.
+     */
+    public void testInsert_review() {
+        ContentValues values = TestUtilities.createMadMaxMovieReviewValues();
+        Uri locationUri = mContext.getContentResolver().insert(
+                CachedMovieReviewEntry.CONTENT_URI, values);
+        long rowId = ContentUris.parseId(locationUri);
+        Assert.assertTrue("Provider inserted the movie", rowId != -1);
+
+        // Verify the entry was stored properly
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieReviewEntry.CONTENT_URI
+                , null
+                , CachedMovieReviewEntry._ID + " = " + rowId
+                , null
+                , null);
+        cursor.moveToFirst();
+        TestUtilities.assertRowEquals(
+                TestUtilities.createMadMaxMovieReviewValues()
+                , cursor);
+        cursor.close();
+    }
+
+    /**
      * Verifies that
      * {@link MovieProvider#update(Uri, ContentValues, String, String[])}
-     * works properly.
+     * works properly. Case for a cached movie.
      */
-    public void testUpdate() {
+    public void testUpdate_movie() {
         ContentValues values = TestUtilities.createMadMaxMovieValues();
         Uri locationUri = mContext.getContentResolver().insert(
                 CachedMovieEntry.CONTENT_URI, values);
@@ -367,18 +510,106 @@ public class MovieProviderTest extends AndroidTestCase {
     }
 
     /**
-     * Verifies that {@link MovieProvider#delete(Uri, String, String[])} works
-     * properly.
+     * Verifies that
+     * {@link MovieProvider#update(Uri, ContentValues, String, String[])}
+     * works properly. Case for a cached movie video.
      */
-    public void testDelete() {
-        testInsert();
+    public void testUpdate_video() {
+        ContentValues values = TestUtilities.createMadMaxMovieVideoValues();
+        Uri locationUri = mContext.getContentResolver().insert(
+                CachedMovieVideoEntry.CONTENT_URI, values);
+        long rowId = ContentUris.parseId(locationUri);
+        Assert.assertTrue("Provider inserted the movie video", rowId != -1);
+
+        ContentValues updatedValues = new ContentValues(values);
+        updatedValues.put(CachedMovieVideoEntry._ID, rowId);
+        updatedValues.put(CachedMovieVideoEntry.COLUMN_NAME, "A happy video!");
+
+        int count = mContext.getContentResolver().update(
+                CachedMovieVideoEntry.CONTENT_URI
+                , updatedValues
+                , CachedMovieEntry._ID + "= ?"
+                , new String[]{Long.toString(rowId)});
+        Assert.assertEquals("One entry must be updated", 1, count);
+
+        // Verify the changes were applied
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieVideoEntry.CONTENT_URI
+                , null
+                , CachedMovieVideoEntry._ID + " = " + rowId
+                , null
+                , null);
+        cursor.moveToFirst();
+        TestUtilities.assertRowEquals(updatedValues, cursor);
+        cursor.close();
+    }
+
+    /**
+     * Verifies that
+     * {@link MovieProvider#update(Uri, ContentValues, String, String[])}
+     * works properly. Case for a cached movie review.
+     */
+    public void testUpdate_review() {
+        ContentValues values = TestUtilities.createMadMaxMovieReviewValues();
+        Uri locationUri = mContext.getContentResolver().insert(
+                CachedMovieReviewEntry.CONTENT_URI, values);
+        long rowId = ContentUris.parseId(locationUri);
+        Assert.assertTrue("Provider inserted the movie review", rowId != -1);
+
+        ContentValues updatedValues = new ContentValues(values);
+        updatedValues.put(CachedMovieReviewEntry._ID, rowId);
+        updatedValues.put(CachedMovieReviewEntry.COLUMN_AUTHOR, "Some Guy");
+
+        int count = mContext.getContentResolver().update(
+                CachedMovieReviewEntry.CONTENT_URI
+                , updatedValues
+                , CachedMovieEntry._ID + "= ?"
+                , new String[]{Long.toString(rowId)});
+        Assert.assertEquals("One entry must be updated", 1, count);
+
+        // Verify the changes were applied
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieReviewEntry.CONTENT_URI
+                , null
+                , CachedMovieReviewEntry._ID + " = " + rowId
+                , null
+                , null);
+        cursor.moveToFirst();
+        TestUtilities.assertRowEquals(updatedValues, cursor);
+        cursor.close();
+    }
+
+    /**
+     * Verifies that {@link MovieProvider#delete(Uri, String, String[])} works
+     * properly. Case for cached movies.
+     */
+    public void testDelete_movie() {
+        testInsert_movie();
         deleteAllMovies();
     }
 
     /**
-     * Returns a set of movie entries that may be insert into the database.
+     * Verifies that {@link MovieProvider#delete(Uri, String, String[])} works
+     * properly. Case for cached movie videos.
+     */
+    public void testDelete_video() {
+        testInsert_video();
+        deleteAllMovieVideos();
+    }
+
+    /**
+     * Verifies that {@link MovieProvider#delete(Uri, String, String[])} works
+     * properly. Case for cached movie reviews.
+     */
+    public void testDelete_review() {
+        testInsert_review();
+        deleteAllMovieReviews();
+    }
+
+    /**
+     * Returns a set of movie entries that may be inserted into the database.
      *
-     * @return a set of movie entries that may be insert into the database.
+     * @return a set of movie entries that may be inserted into the database.
      */
     static ContentValues[] createBulkInsertMovieValues() {
         ContentValues[] returnContentValues =
@@ -397,16 +628,11 @@ public class MovieProviderTest extends AndroidTestCase {
         return returnContentValues;
     }
 
-    // Student: Uncomment this test after you have completed writing the BulkInsert functionality
-    // in your provider.  Note that this test will work with the built-in (default) provider
-    // implementation, which just inserts records one-at-a-time, so really do implement the
-    // BulkInsert ContentProvider function.
-
     /**
      * Verifies that {@link MovieProvider#bulkInsert(Uri, ContentValues[])}
-     * works properly.
+     * works properly. Case for cached movies.
      */
-    public void testBulkInsert() {
+    public void testBulkInsert_movie() {
         ContentValues[] bulkInsertContentValues = createBulkInsertMovieValues();
         int insertCount =
                 mContext.getContentResolver().bulkInsert(CachedMovieEntry.CONTENT_URI
@@ -420,6 +646,115 @@ public class MovieProviderTest extends AndroidTestCase {
                 , null
                 , null
                 , CachedMovieEntry._ID + " ASC");
+        Assert.assertEquals("The expected number of entries must be retrieved"
+                , BULK_INSERT_NUMBER_OF_RECORDS
+                , cursor.getCount());
+
+        // Verify the entries were correctly inserted.
+        cursor.moveToFirst();
+        for ( int i = 0; i < BULK_INSERT_NUMBER_OF_RECORDS; i++) {
+            TestUtilities.assertRowEquals(bulkInsertContentValues[i], cursor);
+            cursor.moveToNext();
+        }
+        cursor.close();
+    }
+
+    /**
+     * Returns a set of movie video entries that may be inserted into the database.
+     *
+     * @return a set of movie video entries that may be inserted into the database.
+     */
+    static ContentValues[] createBulkInsertMovieVideoValues() {
+        ContentValues[] returnContentValues =
+                new ContentValues[BULK_INSERT_NUMBER_OF_RECORDS];
+        for (int i = 1; i <= BULK_INSERT_NUMBER_OF_RECORDS; i++) {
+            ContentValues videoValues = new ContentValues();
+            videoValues.put(CachedMovieVideoEntry._ID, i);
+            videoValues.put(CachedMovieVideoEntry.COLUMN_MOVIE_API_ID, 76341);
+            videoValues.put(CachedMovieVideoEntry.COLUMN_API_ID, UUID.randomUUID().toString());
+            videoValues.put(CachedMovieVideoEntry.COLUMN_LANGUAGE, "en");
+            videoValues.put(CachedMovieVideoEntry.COLUMN_KEY, UUID.randomUUID().toString());
+            videoValues.put(CachedMovieVideoEntry.COLUMN_NAME, "Trailer " + i);
+            videoValues.put(CachedMovieVideoEntry.COLUMN_SITE, "YouTube");
+            videoValues.put(CachedMovieVideoEntry.COLUMN_SIZE, 1080);
+            videoValues.put(CachedMovieVideoEntry.COLUMN_TYPE, "Trailer");
+            returnContentValues[i - 1] = videoValues;
+        }
+        return returnContentValues;
+    }
+
+    /**
+     * Verifies that {@link MovieProvider#bulkInsert(Uri, ContentValues[])}
+     * works properly. Case for cached movie videos.
+     */
+    public void testBulkInsert_video() {
+        ContentValues[] bulkInsertContentValues = createBulkInsertMovieVideoValues();
+        int insertCount =
+                mContext.getContentResolver().bulkInsert(
+                        CachedMovieVideoEntry.CONTENT_URI
+                        , bulkInsertContentValues);
+        Assert.assertEquals("The expected number of entries must be inserted"
+                , BULK_INSERT_NUMBER_OF_RECORDS
+                , insertCount);
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieVideoEntry.CONTENT_URI
+                , null
+                , null
+                , null
+                , CachedMovieVideoEntry._ID + " ASC");
+        Assert.assertEquals("The expected number of entries must be retrieved"
+                , BULK_INSERT_NUMBER_OF_RECORDS
+                , cursor.getCount());
+
+        // Verify the entries were correctly inserted.
+        cursor.moveToFirst();
+        for ( int i = 0; i < BULK_INSERT_NUMBER_OF_RECORDS; i++) {
+            TestUtilities.assertRowEquals(bulkInsertContentValues[i], cursor);
+            cursor.moveToNext();
+        }
+        cursor.close();
+    }
+
+    /**
+     * Returns a set of movie review entries that may be inserted into the database.
+     *
+     * @return a set of movie review entries that may be inserted into the database.
+     */
+    static ContentValues[] createBulkInsertMovieReviewValues() {
+        ContentValues[] returnContentValues =
+                new ContentValues[BULK_INSERT_NUMBER_OF_RECORDS];
+        for (int i = 1; i <= BULK_INSERT_NUMBER_OF_RECORDS; i++) {
+            ContentValues reviewValues = new ContentValues();
+            reviewValues.put(CachedMovieReviewEntry._ID, i);
+            reviewValues.put(CachedMovieReviewEntry.COLUMN_MOVIE_API_ID, 76341);
+            reviewValues.put(CachedMovieReviewEntry.COLUMN_API_ID, UUID.randomUUID().toString());
+            reviewValues.put(CachedMovieReviewEntry.COLUMN_AUTHOR, "SomeGuy" + i);
+            reviewValues.put(CachedMovieReviewEntry.COLUMN_CONTENT, "I would rate it " + i);
+            reviewValues.put(CachedMovieReviewEntry.COLUMN_URL, "http://site/" + i);
+            returnContentValues[i - 1] = reviewValues;
+        }
+        return returnContentValues;
+    }
+
+    /**
+     * Verifies that {@link MovieProvider#bulkInsert(Uri, ContentValues[])}
+     * works properly. Case for cached movie reviews.
+     */
+    public void testBulkInsert_review() {
+        ContentValues[] bulkInsertContentValues = createBulkInsertMovieReviewValues();
+        int insertCount =
+                mContext.getContentResolver().bulkInsert(
+                        CachedMovieReviewEntry.CONTENT_URI
+                        , bulkInsertContentValues);
+        Assert.assertEquals("The expected number of entries must be inserted"
+                , BULK_INSERT_NUMBER_OF_RECORDS
+                , insertCount);
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieReviewEntry.CONTENT_URI
+                , null
+                , null
+                , null
+                , CachedMovieReviewEntry._ID + " ASC");
         Assert.assertEquals("The expected number of entries must be retrieved"
                 , BULK_INSERT_NUMBER_OF_RECORDS
                 , cursor.getCount());

@@ -12,6 +12,7 @@ List of features that may be added in future versions.
     - Optimize the app experience for tablet.
 
 * Other features:
+    - Download data using a Sync Adapter.
     - Add [transitions](https://developer.android.com/training/material/animations.html#Transitions).
     - Keep cached movie data only for one day / synchronize data if older than one day.
     - Notify users when they are offline.
