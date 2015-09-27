@@ -43,17 +43,17 @@ public final class MovieContract {
     /**
      * Path for cached movie data.
      */
-    public static final String PATH_CACHED_MOVIE = "cached_movie";
+    public static final String PATH_MOVIE = "movie";
 
     /**
      * Path for cached movie related video data.
      */
-    public static final String PATH_CACHED_MOVIE_VIDEO = "cached_video";
+    public static final String PATH_MOVIE_VIDEO = "video";
 
     /**
      * Path for cached movie review data.
      */
-    public static final String PATH_CACHED_MOVIE_REVIEW = "cached_review";
+    public static final String PATH_MOVIE_REVIEW = "review";
 
     /**
      * This class only provides constants and utility methods.
@@ -74,19 +74,19 @@ public final class MovieContract {
          * Base URI for cached movie data.
          */
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_CACHED_MOVIE).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE).build();
 
         /**
          * Type for {@code content:} URIs with directories of chached movies.
          */
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_CACHED_MOVIE;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
 
         /**
          * Type for {@code content:} URIs with a single cached movie.
          */
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_CACHED_MOVIE;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE;
 
         /**
          * Name of the table containing cached movie data.
@@ -162,6 +162,43 @@ public final class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
+        /**
+         * Returns the URI for all the videos related to a particular movie,
+         * given the movie's id.
+         *
+         * @param id the movie's identifier.
+         * @return the URI for all the videos related to a particular movie,
+         */
+        public static Uri buildMovieVideosUri(long id) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Long.toString(id))
+                    .appendPath(PATH_MOVIE_VIDEO).build();
+        }
+
+        /**
+         * Returns the URI for all the reviews related to a particular movie,
+         * given the movie's id.
+         *
+         * @param id the movie's identifier.
+         * @return the URI for all the videos related to a particular movie,
+         */
+        public static Uri buildMovieReviewsUri(long id) {
+            return CONTENT_URI.buildUpon()
+                    .appendPath(Long.toString(id))
+                    .appendPath(PATH_MOVIE_REVIEW).build();
+        }
+
+        /**
+         * Extracts the movie's id from a movie videos URI or movie reviews URI.
+         *
+         * @param uri the URI from which the movie's id will be extracted.
+         * @return the movie's id.
+         * @see #buildMovieVideosUri(long)
+         * @see #buildMovieReviewsUri(long)
+         */
+        public static long getMovieIdFromUri(Uri uri) {
+            return Integer.parseInt(uri.getPathSegments().get(1));
+        }
     }
 
     /**
@@ -177,20 +214,20 @@ public final class MovieContract {
          * Base URI for cached movie related video data.
          */
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_CACHED_MOVIE_VIDEO).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE_VIDEO).build();
 
         /**
          * Type for {@code content:} URIs with directories of chached movie
          * related video data.
          */
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_CACHED_MOVIE_VIDEO;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE_VIDEO;
 
         /**
          * Type for {@code content:} URIs with a single cached movie related video.
          */
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_CACHED_MOVIE_VIDEO;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE_VIDEO;
 
         /**
          * Name of the table containing cached movie related video data.
@@ -263,20 +300,20 @@ public final class MovieContract {
          * Base URI for cached movie review data.
          */
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_CACHED_MOVIE_REVIEW).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_MOVIE_REVIEW).build();
 
         /**
          * Type for {@code content:} URIs with directories of chached movie
          * review data.
          */
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_CACHED_MOVIE_REVIEW;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE_REVIEW;
 
         /**
          * Type for {@code content:} URIs with a single cached movie review.
          */
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
-                + "/" + CONTENT_AUTHORITY + "/" + PATH_CACHED_MOVIE_REVIEW;
+                + "/" + CONTENT_AUTHORITY + "/" + PATH_MOVIE_REVIEW;
 
         /**
          * Name of the table containing cached movie review data.

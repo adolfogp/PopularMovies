@@ -256,8 +256,32 @@ public class MovieProviderTest extends AndroidTestCase {
         String type = mContext.getContentResolver().getType(
                 CachedMovieReviewEntry.buildMovieReviewUri(1));
         Assert.assertEquals(
-                "The content type for the URI of a single movie must be of type entry"
+                "The content type for the URI of a single review must be of type entry"
                 , CachedMovieReviewEntry.CONTENT_ITEM_TYPE, type);
+    }
+
+    /**
+     * Verifies that {@link MovieProvider#getType(Uri)} works properly.
+     * Case for the URI that identifies the videos related to a particular movie.
+     */
+    public void testGetType_movieVideos() {
+        String type = mContext.getContentResolver().getType(
+                CachedMovieEntry.buildMovieVideosUri(1));
+        Assert.assertEquals(
+                "The content type for the URI of a movie's videos must be of type directory"
+                , CachedMovieVideoEntry.CONTENT_TYPE, type);
+    }
+
+    /**
+     * Verifies that {@link MovieProvider#getType(Uri)} works properly.
+     * Case for the URI that identifies the reviews related to a particular movie.
+     */
+    public void testGetType_movieReviews() {
+        String type = mContext.getContentResolver().getType(
+                CachedMovieEntry.buildMovieReviewsUri(1));
+        Assert.assertEquals(
+                "The content type for the URI of a movie's reviews must be of type directory"
+                , CachedMovieReviewEntry.CONTENT_TYPE, type);
     }
 
     /**
@@ -400,8 +424,57 @@ public class MovieProviderTest extends AndroidTestCase {
     }
 
     /**
-     * Verifies that {@link MovieProvider#insert(Uri, ContentValues)} works
-     * properly. Case for a movie.
+     * Verifies that
+     * {@link MovieProvider#query(Uri, String[], String, String[], String)}
+     * works properly. Case for the videos related to a movie.
+     */
+    public void testQuery_movieVideos() {
+        // insert test records directly into the database
+        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long rowId = TestUtilities.insertMadMaxMovieValues(mContext);
+        TestUtilities.insertMadMaxMovieVideoValues(mContext);
+        db.close();
+
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieEntry.buildMovieVideosUri(rowId)
+                , null
+                , null
+                , null
+                , null);
+        cursor.moveToFirst();
+        TestUtilities.assertRowEquals(TestUtilities.createMadMaxMovieVideoValues()
+                , cursor);
+    }
+
+    /**
+     * Verifies that
+     * {@link MovieProvider#query(Uri, String[], String, String[], String)}
+     * works properly. Case for the reviews related to a movie.
+     */
+    public void testQuery_movieReviews() {
+        // insert test records directly into the database
+        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        long rowId = TestUtilities.insertMadMaxMovieValues(mContext);
+        TestUtilities.insertMadMaxMovieReviewValues(mContext);
+        db.close();
+
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieEntry.buildMovieReviewsUri(rowId)
+                , null
+                , null
+                , null
+                , null);
+        cursor.moveToFirst();
+        TestUtilities.assertRowEquals(TestUtilities.createMadMaxMovieReviewValues()
+                , cursor);
+    }
+
+    /**
+     * Verifies that
+     * {@link MovieProvider#query(Uri, String[], String, String[], String)}
+     * works properly. Case for the reviews related to a movie.
      */
     public void testInsert_movie() {
         ContentValues values = TestUtilities.createMadMaxMovieValues();

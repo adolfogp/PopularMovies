@@ -24,6 +24,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.net.wifi.WifiEnterpriseConfig;
 import android.support.annotation.NonNull;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
@@ -54,17 +55,18 @@ public class MovieProvider extends ContentProvider {
      */
     static final int CACHED_VIDEO = 300;
 
+
+    /**
+     * Identifies a query for the videos of a specific cached movie, by the
+     * movie's identifier in
+     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
+     */
+    static final int CACHED_MOVIE_VIDEO = 310;
+
     /**
      * Identifies a query for a specific cached movie video by id.
      */
     static final int CACHED_VIDEO_ID = 400;
-
-    // TODO: Add
-    /**
-     * Identifies a query for the videos of a specific cached movie, by the movie's identifier in
-     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
-     */
-//    static final int CACHED_MOVIE_VIDEO = xxx;
 
     /**
      * Identifies a query for all the reviews of all movies.
@@ -72,16 +74,16 @@ public class MovieProvider extends ContentProvider {
     static final int CACHED_REVIEW = 500;
 
     /**
+     * Identifies a query for the reviews of a specific cached movie, by the movie's identifier in
+     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
+     */
+    static final int CACHED_MOVIE_REVIEW = 510;
+
+    /**
      * Identifies a query for a specific cached movie review by id.
      */
     static final int CACHED_REVIEW_ID = 600;
 
-    // TODO: Add
-    /**
-     * Identifies a query for the reviews of a specific cached movie, by the movie's identifier in
-     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
-     */
-//    static final int CACHED_MOVIE_REVIEW = xxx;
 
     /**
      * Selection for a cached movie queried by id.
@@ -101,21 +103,21 @@ public class MovieProvider extends ContentProvider {
     private static final String SELECTION_CACHED_REVIEW_ID =
             CachedMovieReviewEntry.TABLE_NAME + "." + CachedMovieReviewEntry._ID + " = ? ";
 
-    // TODO: Add
     /**
-     * Selection for the videos of a specific cached movie, queried by the movie's identifier in
+     * Selection for the videos of a specific cached movie, queried by the
+     * movie's identifier in
      * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
      */
-//    private static final String SELECTION_CACHED_MOVIE_VIDEOS =
-//            CachedMovieVideoEntry.TABLE_NAME + "." + CachedMovieVideoEntry.COLUMN_MOVIE_API_ID + " = ? ";
+    private static final String SELECTION_CACHED_MOVIE_VIDEOS =
+            CachedMovieEntry.TABLE_NAME + "." + CachedMovieEntry._ID + " = ? ";
 
-    // TODO: Add
     /**
-     * Selection for the reviews of a specific cached movie, queried by the movie's identifier in
+     * Selection for the reviews of a specific cached movie, queried by the
+     * movie's identifier in
      * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
      */
-//    private static final String SELECTION_CACHED_MOVIE_REVIEWS =
-//            CachedMovieReviewEntry.TABLE_NAME + "." + CachedMovieReviewEntry.COLUMN_MOVIE_API_ID + " = ? ";
+    private static final String SELECTION_CACHED_MOVIE_REVIEWS =
+            CachedMovieEntry.TABLE_NAME + "." + CachedMovieEntry._ID + " = ? ";
 
     /**
      * Used to match URIs to queries and their result type.
@@ -125,31 +127,65 @@ public class MovieProvider extends ContentProvider {
     /**
      * Used to query cached movie data.
      */
-    private static SQLiteQueryBuilder sCachedMovieQueryBuilder;
+    private static SQLiteQueryBuilder sMovieQueryBuilder;
 
     static {
-        sCachedMovieQueryBuilder = new SQLiteQueryBuilder();
-        sCachedMovieQueryBuilder.setTables(CachedMovieEntry.TABLE_NAME);
+        sMovieQueryBuilder = new SQLiteQueryBuilder();
+        sMovieQueryBuilder.setTables(CachedMovieEntry.TABLE_NAME);
     }
 
     /**
      * Used to query cached movie video data.
      */
-    private static SQLiteQueryBuilder sCachedVideoQueryBuilder;
+    private static SQLiteQueryBuilder sVideoQueryBuilder;
 
     static {
-        sCachedVideoQueryBuilder = new SQLiteQueryBuilder();
-        sCachedVideoQueryBuilder.setTables(CachedMovieVideoEntry.TABLE_NAME);
+        sVideoQueryBuilder = new SQLiteQueryBuilder();
+        sVideoQueryBuilder.setTables(CachedMovieVideoEntry.TABLE_NAME);
     }
 
     /**
-     * Used to query cached movie video data.
+     * Used to query cached movie review data.
      */
-    private static SQLiteQueryBuilder sCachedReviewQueryBuilder;
+    private static SQLiteQueryBuilder sReviewQueryBuilder;
 
     static {
-        sCachedReviewQueryBuilder = new SQLiteQueryBuilder();
-        sCachedReviewQueryBuilder.setTables(CachedMovieReviewEntry.TABLE_NAME);
+        sReviewQueryBuilder = new SQLiteQueryBuilder();
+        sReviewQueryBuilder.setTables(CachedMovieReviewEntry.TABLE_NAME);
+    }
+
+    /**
+     * Usedto query videos for a particular cached movie.
+     */
+    private static SQLiteQueryBuilder sMovieVideoQueryBuilder;
+
+    static{
+        sMovieVideoQueryBuilder = new SQLiteQueryBuilder();
+        sMovieVideoQueryBuilder.setTables(
+                CachedMovieEntry.TABLE_NAME
+                + " INNER JOIN "
+                + CachedMovieVideoEntry.TABLE_NAME
+                + " ON " + CachedMovieEntry.TABLE_NAME
+                + "." + CachedMovieEntry.COLUMN_API_ID
+                + " = " + CachedMovieVideoEntry.TABLE_NAME
+                + "." + CachedMovieVideoEntry.COLUMN_MOVIE_API_ID);
+    }
+
+    /**
+     * Usedto query videos for a particular cached movie.
+     */
+    private static SQLiteQueryBuilder sMovieReviewQueryBuilder;
+
+    static{
+        sMovieReviewQueryBuilder = new SQLiteQueryBuilder();
+        sMovieReviewQueryBuilder.setTables(
+                CachedMovieEntry.TABLE_NAME
+                + " INNER JOIN "
+                + CachedMovieReviewEntry.TABLE_NAME
+                + " ON " + CachedMovieEntry.TABLE_NAME
+                + "." + CachedMovieEntry.COLUMN_API_ID
+                + " = " + CachedMovieReviewEntry.TABLE_NAME
+                + "." + CachedMovieReviewEntry.COLUMN_MOVIE_API_ID);
     }
 
     /**
@@ -172,23 +208,29 @@ public class MovieProvider extends ContentProvider {
     static UriMatcher buildUriMatcher() {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
         uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
-                , MovieContract.PATH_CACHED_MOVIE
+                , MovieContract.PATH_MOVIE
                 , MovieProvider.CACHED_MOVIE);
         uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
-                , MovieContract.PATH_CACHED_MOVIE + "/#"
+                , MovieContract.PATH_MOVIE + "/#"
                 , MovieProvider.CACHED_MOVIE_ID);
         uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
-                , MovieContract.PATH_CACHED_MOVIE_VIDEO
+                , MovieContract.PATH_MOVIE_VIDEO
                 , MovieProvider.CACHED_VIDEO);
         uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
-                , MovieContract.PATH_CACHED_MOVIE_VIDEO + "/#"
+                , MovieContract.PATH_MOVIE_VIDEO + "/#"
                 , MovieProvider.CACHED_VIDEO_ID);
         uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
-                , MovieContract.PATH_CACHED_MOVIE_REVIEW
+                , MovieContract.PATH_MOVIE_REVIEW
                 , MovieProvider.CACHED_REVIEW);
         uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
-                , MovieContract.PATH_CACHED_MOVIE_REVIEW + "/#"
+                , MovieContract.PATH_MOVIE_REVIEW + "/#"
                 , MovieProvider.CACHED_REVIEW_ID);
+        uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
+                , MovieContract.PATH_MOVIE + "/#/" + MovieContract.PATH_MOVIE_VIDEO
+                , MovieProvider.CACHED_MOVIE_VIDEO);
+        uriMatcher.addURI(MovieContract.CONTENT_AUTHORITY
+                , MovieContract.PATH_MOVIE + "/#/" + MovieContract.PATH_MOVIE_REVIEW
+                , MovieProvider.CACHED_MOVIE_REVIEW);
         return uriMatcher;
     }
 
@@ -213,6 +255,10 @@ public class MovieProvider extends ContentProvider {
                 return CachedMovieReviewEntry.CONTENT_TYPE;
             case CACHED_REVIEW_ID:
                 return CachedMovieReviewEntry.CONTENT_ITEM_TYPE;
+            case CACHED_MOVIE_VIDEO:
+                return CachedMovieVideoEntry.CONTENT_TYPE;
+            case CACHED_MOVIE_REVIEW:
+                return CachedMovieReviewEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown: " + uri);
         }
@@ -244,6 +290,12 @@ public class MovieProvider extends ContentProvider {
             case CACHED_REVIEW_ID:
                 retCursor = getReviewById(uri, projection);
                 break;
+            case CACHED_MOVIE_VIDEO:
+                retCursor = getMovieVideos(uri, projection);
+                break;
+            case CACHED_MOVIE_REVIEW:
+                retCursor = getMovieReviews(uri, projection);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown: " + uri);
         }
@@ -264,7 +316,7 @@ public class MovieProvider extends ContentProvider {
             , String selection
             , String[] selectionArgs
             , String sortOrder) {
-        return sCachedMovieQueryBuilder.query(
+        return sMovieQueryBuilder.query(
                 mOpenHelper.getReadableDatabase()
                 , projection
                 , selection
@@ -283,7 +335,7 @@ public class MovieProvider extends ContentProvider {
      */
     private Cursor getMovieById(Uri uri, String[] projection) {
         String id = Long.toString(ContentUris.parseId(uri));
-        return sCachedMovieQueryBuilder.query(
+        return sMovieQueryBuilder.query(
                 mOpenHelper.getReadableDatabase()
                 , projection
                 , SELECTION_CACHED_MOVIE_ID // selection
@@ -307,7 +359,7 @@ public class MovieProvider extends ContentProvider {
             , String selection
             , String[] selectionArgs
             , String sortOrder) {
-        return sCachedVideoQueryBuilder.query(
+        return sVideoQueryBuilder.query(
                 mOpenHelper.getReadableDatabase()
                 , projection
                 , selection
@@ -326,7 +378,7 @@ public class MovieProvider extends ContentProvider {
      */
     private Cursor getVideoById(Uri uri, String[] projection) {
         String id = Long.toString(ContentUris.parseId(uri));
-        return sCachedVideoQueryBuilder.query(
+        return sVideoQueryBuilder.query(
                 mOpenHelper.getReadableDatabase()
                 , projection
                 , SELECTION_CACHED_VIDEO_ID // selection
@@ -350,7 +402,7 @@ public class MovieProvider extends ContentProvider {
             , String selection
             , String[] selectionArgs
             , String sortOrder) {
-        return sCachedReviewQueryBuilder.query(
+        return sReviewQueryBuilder.query(
                 mOpenHelper.getReadableDatabase()
                 , projection
                 , selection
@@ -369,7 +421,7 @@ public class MovieProvider extends ContentProvider {
      */
     private Cursor getReviewById(Uri uri, String[] projection) {
         String id = Long.toString(ContentUris.parseId(uri));
-        return sCachedReviewQueryBuilder.query(
+        return sReviewQueryBuilder.query(
                 mOpenHelper.getReadableDatabase()
                 , projection
                 , SELECTION_CACHED_REVIEW_ID // selection
@@ -380,6 +432,47 @@ public class MovieProvider extends ContentProvider {
         );
     }
 
+    /**
+     * Queries the database for all the videos related to a movie with the
+     * movie's id contained in the URI.
+     *
+     * @param uri the URI used to query, containing the id of the movie.
+     * @param projection the columns to return.
+     * @return a {@link Cursor} for the result.
+     */
+    private Cursor getMovieVideos(Uri uri, String[] projection) {
+        String id = Long.toString(CachedMovieEntry.getMovieIdFromUri(uri));
+        return sMovieVideoQueryBuilder.query(
+                mOpenHelper.getReadableDatabase()
+                , projection
+                , SELECTION_CACHED_MOVIE_VIDEOS
+                , new String[] {id}
+                , null // groupBy
+                , null // having
+                , null  // sortOrder
+        );
+    }
+
+    /**
+     * Queries the database for all the reviews related to a movie with the
+     * movie's id contained in the URI.
+     *
+     * @param uri the URI used to query, containing the id of the movie.
+     * @param projection the columns to return.
+     * @return a {@link Cursor} for the result.
+     */
+    private Cursor getMovieReviews(Uri uri, String[] projection) {
+        String id = Long.toString(CachedMovieEntry.getMovieIdFromUri(uri));
+        return sMovieReviewQueryBuilder.query(
+                mOpenHelper.getReadableDatabase()
+                , projection
+                , SELECTION_CACHED_MOVIE_REVIEWS
+                , new String[] {id}
+                , null // groupBy
+                , null // having
+                , null  // sortOrder
+        );
+    }
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
