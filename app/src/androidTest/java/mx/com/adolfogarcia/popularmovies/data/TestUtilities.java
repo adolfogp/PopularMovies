@@ -23,10 +23,14 @@ import android.database.sqlite.SQLiteDatabase;
 
 import junit.framework.Assert;
 
+import org.apache.commons.lang3.BooleanUtils;
+
 import java.util.Map;
 import java.util.Set;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieVideoEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieReviewEntry;
 
 /**
  * Utility methods to help test the movie database. The code is based on
@@ -51,6 +55,9 @@ public final class TestUtilities {
         testValues.put(CachedMovieEntry.COLUMN_POPULARITY, 55.32);
         testValues.put(CachedMovieEntry.COLUMN_POSTER_PATH, "/kqjL17yufvn9OVLyXYpvtyrFfak.jpg");
         testValues.put(CachedMovieEntry.COLUMN_VOTE_AVERAGE, 7.7);
+        testValues.put(CachedMovieEntry.COLUMN_MOST_POPULAR, BooleanUtils.toInteger(true));
+        testValues.put(CachedMovieEntry.COLUMN_HIGHEST_RATED, BooleanUtils.toInteger(false));
+        testValues.put(CachedMovieEntry.COLUMN_USER_FAVORITE, BooleanUtils.toInteger(false));
         return testValues;
     }
 
@@ -91,6 +98,76 @@ public final class TestUtilities {
                     , expectedValue
                     , valueCursor.getString(columnIdx));
         }
+    }
+
+    /**
+     * Returns the values of a row that may be inserted into the movie database.
+     *
+     * @return the values of a row that may be inserted into the movie database.
+     */
+    static ContentValues createMadMaxMovieVideoValues() {
+        ContentValues testValues = new ContentValues();
+        testValues.put(CachedMovieVideoEntry.COLUMN_MOVIE_API_ID, 76341);
+        testValues.put(CachedMovieVideoEntry.COLUMN_API_ID, "551afc679251417fd70002b1");
+        testValues.put(CachedMovieVideoEntry.COLUMN_LANGUAGE, "en");
+        testValues.put(CachedMovieVideoEntry.COLUMN_KEY, "jnsgdqppAYA");
+        testValues.put(CachedMovieVideoEntry.COLUMN_NAME, "Trailer 2");
+        testValues.put(CachedMovieVideoEntry.COLUMN_NAME, "Trailer 2");
+        testValues.put(CachedMovieVideoEntry.COLUMN_SITE, "YouTube");
+        testValues.put(CachedMovieVideoEntry.COLUMN_SIZE, 720);
+        testValues.put(CachedMovieVideoEntry.COLUMN_TYPE, "Trailer");
+        return testValues;
+    }
+
+    /**
+     * Inserts the values returned by {@link #createMadMaxMovieVideoValues()} into
+     * the movie database.
+     *
+     * @param context the {@link Context} used to access the database.
+     * @return the row id of the insertion.
+     */
+    static long insertMadMaxMovieVideoValues(Context context) {
+        MovieDbHelper dbHelper = new MovieDbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues testValues = TestUtilities.createMadMaxMovieVideoValues();
+
+        long rowId;
+        rowId = db.insert(CachedMovieVideoEntry.TABLE_NAME, null, testValues);
+        Assert.assertTrue("Row was successfully inserted", rowId != -1);
+        return rowId;
+    }
+
+    /**
+     * Returns the values of a row that may be inserted into the movie database.
+     *
+     * @return the values of a row that may be inserted into the movie database.
+     */
+    static ContentValues createMadMaxMovieReviewValues() {
+        ContentValues testValues = new ContentValues();
+        testValues.put(CachedMovieReviewEntry.COLUMN_MOVIE_API_ID, 76341);
+        testValues.put(CachedMovieReviewEntry.COLUMN_API_ID, "55edd26792514106d600e380");
+        testValues.put(CachedMovieReviewEntry.COLUMN_AUTHOR, "extoix");
+        testValues.put(CachedMovieReviewEntry.COLUMN_CONTENT, "Awesome movie!");
+        testValues.put(CachedMovieReviewEntry.COLUMN_URL, "http://j.mp/1hQIOdj");
+        return testValues;
+    }
+
+    /**
+     * Inserts the values returned by {@link #createMadMaxMovieVideoValues()} into
+     * the movie database.
+     *
+     * @param context the {@link Context} used to access the database.
+     * @return the row id of the insertion.
+     */
+    static long insertMadMaxMovieReviewValues(Context context) {
+        MovieDbHelper dbHelper = new MovieDbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues testValues = TestUtilities.createMadMaxMovieReviewValues();
+
+        long rowId;
+        rowId = db.insert(CachedMovieReviewEntry.TABLE_NAME, null, testValues);
+        Assert.assertTrue("Row was successfully inserted", rowId != -1);
+        return rowId;
     }
 
 }

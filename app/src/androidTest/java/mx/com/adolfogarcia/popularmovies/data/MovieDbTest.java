@@ -186,7 +186,25 @@ public class MovieDbTest extends AndroidTestCase {
      * video table.
      */
     public void testMovieVideoTable() {
-        Assert.fail("Test movie video table");
+        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        TestUtilities.insertMadMaxMovieVideoValues(mContext);
+        // Verify the data was inserted
+        Cursor cursor = db.query(
+                CachedMovieVideoEntry.TABLE_NAME
+                , null // all columns
+                , null // all rows
+                , null // no values for conditions
+                , null // no group by
+                , null // no having
+                , null // no ordering
+        );
+        Assert.assertTrue("The table must have at least one row", cursor.moveToFirst());
+        TestUtilities.assertRowEquals(TestUtilities.createMadMaxMovieVideoValues(), cursor);
+        Assert.assertFalse("There must be only one record in the database"
+                , cursor.moveToNext());
+        cursor.close();
+        db.close();
     }
 
     /**
@@ -194,7 +212,25 @@ public class MovieDbTest extends AndroidTestCase {
      * review table.
      */
     public void testMovieReviewTable() {
-        Assert.fail("Test movie review table");
+        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        TestUtilities.insertMadMaxMovieReviewValues(mContext);
+        // Verify the data was inserted
+        Cursor cursor = db.query(
+                CachedMovieReviewEntry.TABLE_NAME
+                , null // all columns
+                , null // all rows
+                , null // no values for conditions
+                , null // no group by
+                , null // no having
+                , null // no ordering
+        );
+        Assert.assertTrue("The table must have at least one row", cursor.moveToFirst());
+        TestUtilities.assertRowEquals(TestUtilities.createMadMaxMovieReviewValues(), cursor);
+        Assert.assertFalse("There must be only one record in the database"
+                , cursor.moveToNext());
+        cursor.close();
+        db.close();
     }
 
 }
