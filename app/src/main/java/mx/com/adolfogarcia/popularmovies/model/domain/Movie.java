@@ -39,7 +39,7 @@ public class Movie {
 
     /**
      * The movie's identifier in
-     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API..
+     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
      */
     private long mApiId;
 

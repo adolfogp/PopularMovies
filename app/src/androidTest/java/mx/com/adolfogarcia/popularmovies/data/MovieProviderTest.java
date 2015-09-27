@@ -28,6 +28,8 @@ import android.net.Uri;
 import android.test.AndroidTestCase;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieVideoEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieReviewEntry;
 
 import junit.framework.Assert;
 
@@ -48,7 +50,51 @@ public class MovieProviderTest extends AndroidTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        deleteAllMovieVideos();
+        deleteAllMovieReviews();
         deleteAllMovies();
+    }
+
+    /**
+     * Deletes all movie video entries in the {@link MovieProvider}, and verifies
+     * none remain.
+     */
+    public void deleteAllMovieVideos() {
+        mContext.getContentResolver().delete(
+                CachedMovieVideoEntry.CONTENT_URI
+                , null
+                , null);
+
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieVideoEntry.CONTENT_URI
+                , null
+                , null
+                , null
+                , null);
+        Assert.assertEquals("No movie video entries must remain"
+                , 0, cursor.getCount());
+        cursor.close();
+    }
+
+    /**
+     * Deletes all movie review entries in the {@link MovieProvider}, and verifies
+     * none remain.
+     */
+    public void deleteAllMovieReviews() {
+        mContext.getContentResolver().delete(
+                CachedMovieReviewEntry.CONTENT_URI
+                , null
+                , null);
+
+        Cursor cursor = mContext.getContentResolver().query(
+                CachedMovieReviewEntry.CONTENT_URI
+                , null
+                , null
+                , null
+                , null);
+        Assert.assertEquals("No movie review entries must remain"
+                , 0, cursor.getCount());
+        cursor.close();
     }
 
     /**
@@ -96,6 +142,33 @@ public class MovieProviderTest extends AndroidTestCase {
     }
 
     /**
+     * Verifies that {@link MovieProvider#buildUriMatcher()} creates an
+     * {@link android.content.UriMatcher} that maps correctly the URIs to
+     * the expected constants. Case for the URI that identifies all the
+     * videos related to all movie.
+     */
+    public void testBuildUriMatcher_allVideos() {
+        UriMatcher testMatcher = MovieProvider.buildUriMatcher();
+        Assert.assertEquals(
+                "All videos of a movie URI must match expected constant."
+                , testMatcher.match(CachedMovieVideoEntry.CONTENT_URI)
+                , MovieProvider.CACHED_VIDEO);
+    }
+
+    /**
+     * Verifies that {@link MovieProvider#buildUriMatcher()} creates an
+     * {@link android.content.UriMatcher} that maps correctly the URIs to
+     * the expected constants. Case for the URI that identifies all the
+     * reviews of all movies.
+     */
+    public void testBuildUriMatcher_allReviews() {
+        UriMatcher testMatcher = MovieProvider.buildUriMatcher();
+        Assert.assertEquals("All movies URI must match expected constant."
+                , testMatcher.match(CachedMovieReviewEntry.CONTENT_URI)
+                , MovieProvider.CACHED_REVIEW);
+    }
+
+    /**
      * Verifies that {@link MovieProvider} is properly registered.
      */
     public void testProviderRegistry() {
@@ -118,7 +191,8 @@ public class MovieProviderTest extends AndroidTestCase {
      * Case for the URI that identifies all movies.
      */
     public void testGetType_allMovies() {
-        String type = mContext.getContentResolver().getType(CachedMovieEntry.CONTENT_URI);
+        String type = mContext.getContentResolver().getType(
+                CachedMovieEntry.CONTENT_URI);
         Assert.assertEquals(
                 "The content type for the 'all movies' URI must be of type directory"
                 , CachedMovieEntry.CONTENT_TYPE, type);
@@ -129,10 +203,59 @@ public class MovieProviderTest extends AndroidTestCase {
      * Case for the URI that identifies a single movie.
      */
     public void testGetType_singleMovies() {
-        String type = mContext.getContentResolver().getType(CachedMovieEntry.buildMovieUri(1));
+        String type = mContext.getContentResolver().getType(
+                CachedMovieEntry.buildMovieUri(1));
         Assert.assertEquals(
                 "The content type for the URI of a single movie must be of type entry"
                 , CachedMovieEntry.CONTENT_ITEM_TYPE, type);
+    }
+
+    /**
+     * Verifies that {@link MovieProvider#getType(Uri)} works properly.
+     * Case for the URI that identifies all movie videos.
+     */
+    public void testGetType_allVideos() {
+        String type = mContext.getContentResolver().getType(
+                CachedMovieVideoEntry.CONTENT_URI);
+        Assert.assertEquals(
+                "The content type for the 'all videos' URI must be of type directory"
+                , CachedMovieVideoEntry.CONTENT_TYPE, type);
+    }
+
+    /**
+     * Verifies that {@link MovieProvider#getType(Uri)} works properly.
+     * Case for the URI that identifies a single movie video.
+     */
+    public void testGetType_singleVideo() {
+        String type = mContext.getContentResolver().getType(
+                CachedMovieVideoEntry.buildMovieVideoUri(1));
+        Assert.assertEquals(
+                "The content type for the URI of a single video must be of type entry"
+                , CachedMovieVideoEntry.CONTENT_ITEM_TYPE, type);
+    }
+
+    /**
+     * Verifies that {@link MovieProvider#getType(Uri)} works properly.
+     * Case for the URI that identifies all movie reviews.
+     */
+    public void testGetType_allReviews() {
+        String type = mContext.getContentResolver().getType(
+                CachedMovieReviewEntry.CONTENT_URI);
+        Assert.assertEquals(
+                "The content type for the 'all reviews' URI must be of type directory"
+                , CachedMovieReviewEntry.CONTENT_TYPE, type);
+    }
+
+    /**
+     * Verifies that {@link MovieProvider#getType(Uri)} works properly.
+     * Case for the URI that identifies a single movie review.
+     */
+    public void testGetType_singleReview() {
+        String type = mContext.getContentResolver().getType(
+                CachedMovieReviewEntry.buildMovieReviewUri(1));
+        Assert.assertEquals(
+                "The content type for the URI of a single movie must be of type entry"
+                , CachedMovieReviewEntry.CONTENT_ITEM_TYPE, type);
     }
 
     /**

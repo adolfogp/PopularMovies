@@ -239,6 +239,16 @@ public final class MovieContract {
          */
         public static final String COLUMN_TYPE = "type";
 
+        /**
+         * Returns the URI for a particular movie video given its id.
+         *
+         * @param id the video's identifier.
+         * @return the URI for the movie with the specified id.
+         */
+        public static Uri buildMovieVideoUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
     }
 
     /**
@@ -299,6 +309,16 @@ public final class MovieContract {
          * The URL for the full review.
          */
         public static final String COLUMN_URL = "url";
+
+        /**
+         * Returns the URI for a particular movie review given its id.
+         *
+         * @param id the review's identifier.
+         * @return the URI for the movie with the specified id.
+         */
+        public static Uri buildMovieReviewUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
 
     }
 
