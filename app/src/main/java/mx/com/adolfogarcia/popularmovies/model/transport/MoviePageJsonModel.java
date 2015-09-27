@@ -28,7 +28,7 @@ public class MoviePageJsonModel {
     private Integer mPageNumber;
 
     /**
-     * The mMovies included in the page of movie data.
+     * The movies included in the page of movie data.
      */
     @SerializedName("results")
     @Expose
