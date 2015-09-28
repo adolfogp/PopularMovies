@@ -25,15 +25,20 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+import mx.com.adolfogarcia.popularmovies.data.MovieContract;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.model.transport.MovieJsonModel;
 import mx.com.adolfogarcia.popularmovies.model.transport.MoviePageJsonModel;
+import mx.com.adolfogarcia.popularmovies.model.transport.MovieVideosJsonModel;
+import mx.com.adolfogarcia.popularmovies.model.transport.VideoJsonModel;
 import retrofit.Call;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
 import retrofit.Retrofit;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieVideoEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieReviewEntry;
 
 /**
  * Task that retrieves a page of movies from
@@ -112,16 +117,19 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         TheMovieDbApi service = retrofit.create(TheMovieDbApi.class);
-        Call<MoviePageJsonModel> configCall = service.getMoviePage(
+        Call<MoviePageJsonModel> movieCall = service.getMoviePage(
                 mWeakConfiguration.get().getMovieApiKey()
                 , mOrderCriteria
                 , params[0]
         );
         try {
-            Response<MoviePageJsonModel> response = configCall.execute();
+            Response<MoviePageJsonModel> response = movieCall.execute();
             if (response.isSuccess()) {
                 Log.i(LOG_TAG, "Successfully downloaded movie page " + params[0]);
                 insertMoviesInProvider(response.body());
+                for (MovieJsonModel movie : response.body().getMovies()) {
+                    downloadVideosFor(movie);
+                }
             } else {
                 Log.w(LOG_TAG, "Failed to download movie page " + params[0]);
             }
@@ -182,6 +190,60 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
             mWeakConfiguration.get().setTotalMoviePagesAvailable(response.getTotalPages());
             mWeakConfiguration.get().setLastMoviePageRetrieved(mOrderCriteria
                     , response.getPageNumber());
+        }
+    }
+
+    private void downloadVideosFor(MovieJsonModel movie) {
+        Log.d(LOG_TAG, "Starting download of videos for: " + movie);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TheMovieDbApi.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TheMovieDbApi service = retrofit.create(TheMovieDbApi.class);
+        Call<MovieVideosJsonModel> movieVideosCall = service.getMovieVideos(
+                movie.getId()
+                , mWeakConfiguration.get().getMovieApiKey());
+        try {
+            Response<MovieVideosJsonModel> response = movieVideosCall.execute();
+            if (response.isSuccess()) {
+                Log.d(LOG_TAG, "Successfully downloaded videos for movie " + movie.getId());
+                insertVideosInProvider(response.body());
+            } else {
+                Log.w(LOG_TAG, "Failed to download the videos for movie");
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error getting videos for movie", e);
+        }
+    }
+
+    /**
+     * Inserts the videos available for a particular movie, retrieved from
+     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API
+     * into
+     * {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+     *
+     * @param movieVideos the videos available for a particular movie.
+     */
+    private void insertVideosInProvider(MovieVideosJsonModel movieVideos) {
+        List<VideoJsonModel> videoList = movieVideos.getVideos();
+        long movieId = movieVideos.getMovieId();
+        ContentValues[] cvArray = new ContentValues[videoList.size()];
+        for (int i = 0; i < cvArray.length; i++) {
+            VideoJsonModel video = videoList.get(i);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(CachedMovieVideoEntry.COLUMN_MOVIE_API_ID, movieId);
+            contentValues.put(CachedMovieVideoEntry.COLUMN_API_ID, video.getId());
+            contentValues.put(CachedMovieVideoEntry.COLUMN_LANGUAGE, video.getLanguage());
+            contentValues.put(CachedMovieVideoEntry.COLUMN_NAME, video.getName());
+            contentValues.put(CachedMovieVideoEntry.COLUMN_TYPE, video.getType());
+            contentValues.put(CachedMovieVideoEntry.COLUMN_SIZE, video.getSize());
+            contentValues.put(CachedMovieVideoEntry.COLUMN_SITE, video.getSite());
+            contentValues.put(CachedMovieVideoEntry.COLUMN_KEY, video.getKey());
+            cvArray[i] = contentValues;
+        }
+        if (cvArray.length > 0 && mWeakContext != null && mWeakConfiguration != null) {
+            mWeakContext.get().getContentResolver().bulkInsert(
+                    CachedMovieVideoEntry.CONTENT_URI, cvArray);
         }
     }
 

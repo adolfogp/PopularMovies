@@ -175,6 +175,7 @@ public class MovieCollectionFragment extends Fragment
         mBinding.posterGridView.setOnItemClickListener(mViewModel);
         mBinding.posterGridView.setOnScrollListener(mViewModel);
         if (mViewModel.isApiConfigOld()) {
+            Log.i(LOG_TAG, "Old local data. Redownloading.");
             mViewModel.updateApiConfig();
             mViewModel.deleteCachedMovieData();
             mViewModel.downloadNextMoviePage();
@@ -215,7 +216,7 @@ public class MovieCollectionFragment extends Fragment
      * @param event the change of sort order event.
      */
     public void onEvent(SortOrderSelectionEvent event) {
-        Log.wtf(LOG_TAG, "Restarting loader");
+        Log.i(LOG_TAG, "Restarting loader");
         getLoaderManager().restartLoader(MOVIE_COLLECTION_LOADER_ID, null, this);
     }
 
@@ -233,6 +234,7 @@ public class MovieCollectionFragment extends Fragment
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         // If no movie pages have been downloaded, download the first page.
         if (data.getCount() == 0) {
+            Log.i(LOG_TAG, "Downloading movies because of no local data.");
             mViewModel.downloadNextMoviePage();
         }
         Cursor oldCursor = mMoviePosterAdapter.swapCursor(data);

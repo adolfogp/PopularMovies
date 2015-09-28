@@ -40,7 +40,7 @@ public class MovieReviewPageJsonModel {
      */
     @SerializedName("id")
     @Expose
-    private Integer mMovieId;
+    private Long mMovieId;
 
     /**
      * The page's index.
@@ -70,11 +70,11 @@ public class MovieReviewPageJsonModel {
     @Expose
     private Integer mTotalResults;
 
-    public Integer getMovieId() {
+    public Long getMovieId() {
         return mMovieId;
     }
 
-    public void setMovieId(Integer id) {
+    public void setMovieId(Long id) {
         this.mMovieId = id;
     }
 

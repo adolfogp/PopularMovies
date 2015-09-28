@@ -41,7 +41,7 @@ public class MovieVideosJsonModel {
      */
     @SerializedName("id")
     @Expose
-    private Integer mMovieId;
+    private Long mMovieId;
 
     /**
      * The videos available for a movie (trailers, featurettes, etc.).
@@ -50,11 +50,11 @@ public class MovieVideosJsonModel {
     @Expose
     private List<VideoJsonModel> mVideos = new ArrayList<>();
 
-    public Integer getMovieId() {
+    public Long getMovieId() {
         return mMovieId;
     }
 
-    public void setMovieId(Integer id) {
+    public void setMovieId(Long id) {
         this.mMovieId = id;
     }
 

@@ -2,8 +2,10 @@ package mx.com.adolfogarcia.popularmovies.net;
 
 import mx.com.adolfogarcia.popularmovies.model.transport.MoviePageJsonModel;
 import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
+import mx.com.adolfogarcia.popularmovies.model.transport.MovieVideosJsonModel;
 import retrofit.Call;
 import retrofit.http.GET;
+import retrofit.http.Path;
 import retrofit.http.Query;
 
 /**
@@ -42,8 +44,8 @@ public interface TheMovieDbApi {
     Call<GeneralConfigurationJsonModel> getConfiguration(@Query("api_key") String apiKey);
 
     /**
-     * Get a page worth of results from the list of movied provided by the
-     * servides, sorted according to the criteria given.
+     * Get a page worth of results from the list of movies provided by the
+     * services, sorted according to the criteria given.
      *
      * @param apiKey the key required to access the services.
      * @param orderCriteria the keyword that determines how the movies should be
@@ -57,5 +59,17 @@ public interface TheMovieDbApi {
     Call<MoviePageJsonModel> getMoviePage(@Query("api_key") String apiKey
             , @Query("sort_by") String orderCriteria
             , @Query("page") int page);
+
+    /**
+     * Get the list of videos available for a given movie.
+     *
+     * @param movieId the id of the movie for which the list of available
+     *                videos should be returned.
+     * @param apiKey the key required to access the services.
+     * @return a {@link Call} that can retrieve the videos related to the movie.
+     */
+    @GET("/3/movie/{id}/videos")
+    Call<MovieVideosJsonModel> getMovieVideos(@Path("id") long movieId
+            , @Query("api_key") String apiKey);
 
 }

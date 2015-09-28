@@ -237,7 +237,6 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
         mSelectedPosition = AdapterView.INVALID_POSITION;
         mFetchMoviePageTask = null;
         configuration.setSelectedSortOrderIndex(idx);
-        downloadNextMoviePage();
         EventBus.getDefault().post(new SortOrderSelectionEvent());
     }
 
@@ -284,6 +283,7 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
                 totalItemCount - visibleItemCount - firstVisibleItem
                         < DOWNLOAD_THRESHOLD * visibleItemCount;
         if (totalItemCount > 0 && reachedNewDataDownloadThreshold) {
+            Log.i(LOG_TAG, "Reached threshold. Downloading new data.");
             downloadNextMoviePage();
         }
     }
