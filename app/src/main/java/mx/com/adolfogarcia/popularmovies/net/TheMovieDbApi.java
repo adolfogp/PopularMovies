@@ -1,7 +1,8 @@
 package mx.com.adolfogarcia.popularmovies.net;
 
-import mx.com.adolfogarcia.popularmovies.model.transport.MoviePageJsonModel;
 import mx.com.adolfogarcia.popularmovies.model.transport.GeneralConfigurationJsonModel;
+import mx.com.adolfogarcia.popularmovies.model.transport.MoviePageJsonModel;
+import mx.com.adolfogarcia.popularmovies.model.transport.MovieReviewPageJsonModel;
 import mx.com.adolfogarcia.popularmovies.model.transport.MovieVideosJsonModel;
 import retrofit.Call;
 import retrofit.http.GET;
@@ -71,5 +72,19 @@ public interface TheMovieDbApi {
     @GET("/3/movie/{id}/videos")
     Call<MovieVideosJsonModel> getMovieVideos(@Path("id") long movieId
             , @Query("api_key") String apiKey);
+
+    /**
+     * Get the requested page of reviews for the specified movie.
+     *
+     * @param movieId the id of the movie for which the page of reviews should
+     *                be returned.
+     * @param apiKey the key required to access the services.
+     * @param page  the number of the page to retrieve (first page index: 1).
+     * @return a {@link Call} that can retrieve the specified page of reviews.
+     */
+    @GET("/3/movie/{id}/reviews")
+    Call<MovieReviewPageJsonModel> getMovieReviews(@Path("id") long movieId
+            , @Query("api_key") String apiKey
+            , @Query("page") int page);
 
 }

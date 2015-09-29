@@ -25,10 +25,11 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-import mx.com.adolfogarcia.popularmovies.data.MovieContract;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.model.transport.MovieJsonModel;
 import mx.com.adolfogarcia.popularmovies.model.transport.MoviePageJsonModel;
+import mx.com.adolfogarcia.popularmovies.model.transport.MovieReviewJsonModel;
+import mx.com.adolfogarcia.popularmovies.model.transport.MovieReviewPageJsonModel;
 import mx.com.adolfogarcia.popularmovies.model.transport.MovieVideosJsonModel;
 import mx.com.adolfogarcia.popularmovies.model.transport.VideoJsonModel;
 import retrofit.Call;
@@ -37,8 +38,8 @@ import retrofit.Response;
 import retrofit.Retrofit;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
-import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieVideoEntry;
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieReviewEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieVideoEntry;
 
 /**
  * Task that retrieves a page of movies from
@@ -129,6 +130,7 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
                 insertMoviesInProvider(response.body());
                 for (MovieJsonModel movie : response.body().getMovies()) {
                     downloadVideosFor(movie);
+                    downloadReviewsFor(movie);
                 }
             } else {
                 Log.w(LOG_TAG, "Failed to download movie page " + params[0]);
@@ -184,12 +186,17 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
             contentValues.put(orderColumnName, true);
             cvArray[i] = contentValues;
         }
-        if (cvArray.length > 0 && mWeakContext != null && mWeakConfiguration != null) {
+        if (cvArray.length > 0
+                && mWeakContext.get() != null && mWeakConfiguration.get() != null) {
             mWeakContext.get().getContentResolver().bulkInsert(
                     CachedMovieEntry.CONTENT_URI, cvArray);
             mWeakConfiguration.get().setTotalMoviePagesAvailable(response.getTotalPages());
             mWeakConfiguration.get().setLastMoviePageRetrieved(mOrderCriteria
                     , response.getPageNumber());
+        } else if (cvArray.length == 0) {
+            Log.d(LOG_TAG, "No movies to insert.");
+        } else {
+            Log.e(LOG_TAG, "Unable to insert movies. No context or configuration available.");
         }
     }
 
@@ -209,7 +216,7 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
                 Log.d(LOG_TAG, "Successfully downloaded videos for movie " + movie.getId());
                 insertVideosInProvider(response.body());
             } else {
-                Log.w(LOG_TAG, "Failed to download the videos for movie");
+                Log.w(LOG_TAG, "Failed to download videos for movie");
             }
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error getting videos for movie", e);
@@ -241,9 +248,70 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
             contentValues.put(CachedMovieVideoEntry.COLUMN_KEY, video.getKey());
             cvArray[i] = contentValues;
         }
-        if (cvArray.length > 0 && mWeakContext != null && mWeakConfiguration != null) {
+        if (cvArray.length > 0
+                && mWeakContext.get() != null && mWeakConfiguration.get() != null) {
             mWeakContext.get().getContentResolver().bulkInsert(
                     CachedMovieVideoEntry.CONTENT_URI, cvArray);
+        } else if (cvArray.length == 0) {
+            Log.d(LOG_TAG, "No videos to insert.");
+        } else {
+            Log.e(LOG_TAG, "Unable to insert videos. No context or configuration available.");
+        }
+    }
+
+    private void downloadReviewsFor(MovieJsonModel movie) {
+        Log.d(LOG_TAG, "Starting download of reviews for: " + movie);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(TheMovieDbApi.BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        TheMovieDbApi service = retrofit.create(TheMovieDbApi.class);
+        Call<MovieReviewPageJsonModel> movieVideosCall =
+                service.getMovieReviews(
+                        movie.getId(), mWeakConfiguration.get().getMovieApiKey(), 1);
+        try {
+            Response<MovieReviewPageJsonModel> response = movieVideosCall.execute();
+            if (response.isSuccess()) {
+                Log.d(LOG_TAG, "Successfully downloaded reviews for movie " + movie.getId());
+                insertReviewsInProvider(response.body());
+            } else {
+                Log.w(LOG_TAG, "Failed to download reviews for movie");
+            }
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error getting reviews for movie", e);
+        }
+    }
+
+    /**
+     * Inserts a page of reviews for a particular movie, retrieved from
+     * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API
+     * into
+     * {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+     *
+     * @param pageOfReviews the reviews to insert.
+     */
+    private void insertReviewsInProvider(MovieReviewPageJsonModel pageOfReviews) {
+        List<MovieReviewJsonModel> reviewList = pageOfReviews.getReviews();
+        long movieId = pageOfReviews.getMovieId();
+        ContentValues[] cvArray = new ContentValues[reviewList.size()];
+        for (int i = 0; i < cvArray.length; i++) {
+            MovieReviewJsonModel video = reviewList.get(i);
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(CachedMovieReviewEntry.COLUMN_MOVIE_API_ID, movieId);
+            contentValues.put(CachedMovieReviewEntry.COLUMN_API_ID, video.getId());
+            contentValues.put(CachedMovieReviewEntry.COLUMN_AUTHOR, video.getAuthor());
+            contentValues.put(CachedMovieReviewEntry.COLUMN_CONTENT, video.getContent());
+            contentValues.put(CachedMovieReviewEntry.COLUMN_URL, video.getUrl());
+            cvArray[i] = contentValues;
+        }
+        if (cvArray.length > 0
+                && mWeakContext.get() != null && mWeakConfiguration.get() != null) {
+            mWeakContext.get().getContentResolver().bulkInsert(
+                    CachedMovieReviewEntry.CONTENT_URI, cvArray);
+        } else if (cvArray.length == 0) {
+            Log.d(LOG_TAG, "No reviews to insert.");
+        } else {
+            Log.e(LOG_TAG, "Unable to insert reviews. No context or configuration available.");
         }
     }
 
