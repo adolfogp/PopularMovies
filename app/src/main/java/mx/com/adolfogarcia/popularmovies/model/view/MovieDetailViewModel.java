@@ -409,13 +409,6 @@ public class MovieDetailViewModel extends BaseObservable {
     public static final class MovieDetailsQuery {
 
         /**
-         * The class only provides constants and utility methods.
-         */
-        private MovieDetailsQuery() {
-            // Empty constructor
-        }
-
-        /**
          * Projection that includes the movie details to be presented. Used to
          * query {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
          */
@@ -476,6 +469,13 @@ public class MovieDetailViewModel extends BaseObservable {
          * {@link #PROJECTION}.
          */
         public static final int COL_VOTE_AVERAGE = 7;
+
+        /**
+         * The class only provides constants and utility methods.
+         */
+        private MovieDetailsQuery() {
+            // Empty constructor
+        }
     }
 
 
@@ -526,6 +526,13 @@ public class MovieDetailViewModel extends BaseObservable {
          * {@link #PROJECTION}.
          */
         public static final int COL_KEY = 4;
+
+        /**
+         * The class only provides constants and utility methods.
+         */
+        private MovieTrailersQuery() {
+            // Empty constructor
+        }
 
     }
 

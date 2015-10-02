@@ -215,8 +215,9 @@ public class MovieDetailFragment extends Fragment {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             return new CursorLoader(MovieDetailFragment.this.getActivity()
+                    // TODO: Load only trailers and from YouTube - use query parameters
                     , CachedMovieEntry.buildMovieVideosUri(mViewModel.getMovie().getId())
-                    , MovieTrailersQuery.PROJECTION // TODO: Load only trailers and from YouTube - use query parameters
+                    , MovieTrailersQuery.PROJECTION
                     , null
                     , null
                     , null); // TODO: Set order criteria
