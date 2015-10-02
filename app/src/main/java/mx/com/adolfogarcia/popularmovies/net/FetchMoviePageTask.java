@@ -200,6 +200,15 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
         }
     }
 
+    /**
+     * Retrieves the collection of videos available for the specified movie,
+     * from <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful
+     * API and stores them in the local database.
+     *
+     * @param movie the movie for which the collection of videos will be
+     *              retrieved and stored locally.
+     * @see #insertVideosInProvider(MovieVideosJsonModel)
+     */
     private void downloadVideosFor(MovieJsonModel movie) {
         Log.d(LOG_TAG, "Starting download of videos for: " + movie);
         Retrofit retrofit = new Retrofit.Builder()
@@ -259,6 +268,15 @@ public class FetchMoviePageTask extends AsyncTask<Integer, Void, Void> {
         }
     }
 
+    /**
+     * Retrieves the collection of reviews available for the specified movie,
+     * from <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful
+     * API and stores them in the local database.
+     *
+     * @param movie the movie for which the collection of reviews will be
+     *              retrieved and stored locally.
+     * @see #insertVideosInProvider(MovieVideosJsonModel)
+     */
     private void downloadReviewsFor(MovieJsonModel movie) {
         Log.d(LOG_TAG, "Starting download of reviews for: " + movie);
         Retrofit retrofit = new Retrofit.Builder()

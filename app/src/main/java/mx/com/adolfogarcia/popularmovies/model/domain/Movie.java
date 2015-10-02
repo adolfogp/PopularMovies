@@ -22,6 +22,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.parceler.Parcel;
+
+import java.util.List;
+
 import static org.parceler.Parcel.Serialization;
 
 /**
@@ -72,6 +75,16 @@ public class Movie {
      * The movie's user rating.
      */
     private double mVoteAverage;
+
+    /**
+     * Collection of trailers available for the feature film.
+     */
+    private List<Trailer> mTrailers;
+
+    /**
+     * Collection of reviews available for the feature film.
+     */
+    private List<Review> mReviews;
 
     /**
      * Creates a new instance of {@link Movie} with the default values for
@@ -145,6 +158,22 @@ public class Movie {
         mVoteAverage = voteAverage;
     }
 
+    public List<Trailer> getTrailers() {
+        return mTrailers;
+    }
+
+    public void setTrailers(List<Trailer> trailers) {
+        mTrailers = trailers;
+    }
+
+    public List<Review> getReviews() {
+        return mReviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        mReviews = reviews;
+    }
+
     @Override
     public int hashCode() {
         final int initial = 19;
@@ -157,6 +186,8 @@ public class Movie {
                 .append(this.mPosterUri)
                 .append(this.mBackdropUri)
                 .append(this.mVoteAverage)
+                .append(this.mTrailers)
+                .append(this.mReviews)
                 .toHashCode();
     }
 
@@ -177,6 +208,8 @@ public class Movie {
                 .append(this.mPosterUri, that.mPosterUri)
                 .append(this.mBackdropUri, that.mBackdropUri)
                 .append(this.mVoteAverage, that.mVoteAverage)
+                .append(this.mTrailers, that.mTrailers)
+                .append(this.mReviews, that.mReviews)
                 .isEquals();
     }
 
@@ -190,6 +223,8 @@ public class Movie {
                 .append("mPosterUri", this.mPosterUri)
                 .append("mBackdropUri", this.mBackdropUri)
                 .append("mVoteAverage", this.mVoteAverage)
+                .append("mTrailers", this.mTrailers)
+                .append("mReviews", this.mReviews)
                 .toString();
     }
 

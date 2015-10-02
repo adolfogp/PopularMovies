@@ -24,12 +24,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.net.wifi.WifiEnterpriseConfig;
 import android.support.annotation.NonNull;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
-import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieVideoEntry;
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieReviewEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieVideoEntry;
 
 /**
  * Provides access to the data used by the application. This includes cached
@@ -159,7 +158,7 @@ public class MovieProvider extends ContentProvider {
      */
     private static SQLiteQueryBuilder sMovieVideoQueryBuilder;
 
-    static{
+    static {
         sMovieVideoQueryBuilder = new SQLiteQueryBuilder();
         sMovieVideoQueryBuilder.setTables(
                 CachedMovieEntry.TABLE_NAME
@@ -176,7 +175,7 @@ public class MovieProvider extends ContentProvider {
      */
     private static SQLiteQueryBuilder sMovieReviewQueryBuilder;
 
-    static{
+    static {
         sMovieReviewQueryBuilder = new SQLiteQueryBuilder();
         sMovieReviewQueryBuilder.setTables(
                 CachedMovieEntry.TABLE_NAME
@@ -524,6 +523,14 @@ public class MovieProvider extends ContentProvider {
         }
     }
 
+    /**
+     * Bulk inserts values for the specified table.
+     *
+     * @param uri the insertion request's URI.
+     * @param values the values to insert into the table.
+     * @param table the name of the table to insert the values into.
+     * @return the number of values that were inserted.
+     */
     private int bulkInsert(@NonNull Uri uri
             , @NonNull ContentValues[] values
             , @NonNull String table) {
