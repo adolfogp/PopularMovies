@@ -43,10 +43,12 @@ import mx.com.adolfogarcia.popularmovies.BR;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
+import mx.com.adolfogarcia.popularmovies.model.domain.Review;
 import mx.com.adolfogarcia.popularmovies.model.domain.Trailer;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieVideoEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieReviewEntry;
 import static org.parceler.Parcel.Serialization;
 
 /**
@@ -294,7 +296,7 @@ public class MovieDetailViewModel extends BaseObservable {
     /**
      * Retrieves the data from the cursor passed as argument and sets it onto the
      * {@link MovieDetailViewModel}'s current {@link Movie}. The projection used
-     * must be {@link MovieDetailsQuery#PROJECTION}. This method
+     * must be {@link MovieDetailQuery#PROJECTION}. This method
      * also notifies the data binding of the change, so the visual elements can
      * be updated.
      *
@@ -315,7 +317,7 @@ public class MovieDetailViewModel extends BaseObservable {
             Log.w(LOG_TAG, "The cursor contains no data. Ignoring movie details.");
             return;
         }
-        if (mMovie.getId() != cursor.getLong(MovieDetailsQuery.COL_ID)) {
+        if (mMovie.getId() != cursor.getLong(MovieDetailQuery.COL_ID)) {
             throw new IllegalArgumentException(
                     "The data passed does not belong to the movie");
         }
@@ -323,19 +325,19 @@ public class MovieDetailViewModel extends BaseObservable {
         requireNonNullConfiguration();
         RestfulServiceConfiguration configuration = mWeakConfiguration.get();
         Context context = mWeakContext.get();
-        mMovie.setApiId(cursor.getLong(MovieDetailsQuery.COL_API_ID));
-        mMovie.setOriginalTitle(cursor.getString(MovieDetailsQuery.COL_ORIGINAL_TITLE));
-        mMovie.setReleaseDate(cursor.getLong(MovieDetailsQuery.COL_RELEASE_DATE));
-        mMovie.setOverview(cursor.getString(MovieDetailsQuery.COL_OVERVIEW));
+        mMovie.setApiId(cursor.getLong(MovieDetailQuery.COL_API_ID));
+        mMovie.setOriginalTitle(cursor.getString(MovieDetailQuery.COL_ORIGINAL_TITLE));
+        mMovie.setReleaseDate(cursor.getLong(MovieDetailQuery.COL_RELEASE_DATE));
+        mMovie.setOverview(cursor.getString(MovieDetailQuery.COL_OVERVIEW));
         int posterPixelWidth = context.getResources().getDimensionPixelSize(
                 R.dimen.movie_poster_thumbnail_width);
         mMovie.setPosterUri(Uri.parse(configuration.getBestFittingPosterUrl(
-                cursor.getString(MovieDetailsQuery.COL_POSTER_PATH), posterPixelWidth)));
+                cursor.getString(MovieDetailQuery.COL_POSTER_PATH), posterPixelWidth)));
         int backdropPixelWidth = context.getResources().getDimensionPixelSize(
                 R.dimen.movie_backdrop_width);
         mMovie.setBackdropUri(Uri.parse(configuration.getBestFittingPosterUrl(
-                cursor.getString(MovieDetailsQuery.COL_BACKDROP_PATH), backdropPixelWidth)));
-        mMovie.setVoteAverage(cursor.getDouble(MovieDetailsQuery.COL_VOTE_AVERAGE));
+                cursor.getString(MovieDetailQuery.COL_BACKDROP_PATH), backdropPixelWidth)));
+        mMovie.setVoteAverage(cursor.getDouble(MovieDetailQuery.COL_VOTE_AVERAGE));
 
         notifyPropertyChanged(BR._all);
     }
@@ -343,7 +345,7 @@ public class MovieDetailViewModel extends BaseObservable {
     /**
      * Retrieves the data from the cursor passed as argument and sets it onto the
      * {@link MovieDetailViewModel}'s current {@link Movie}. The projection used
-     * must be {@link MovieTrailersQuery#PROJECTION}. This method
+     * must be {@link MovieTrailerQuery#PROJECTION}. This method
      * also notifies the data binding of the change, so the visual elements can
      * be updated.
      *
@@ -359,7 +361,7 @@ public class MovieDetailViewModel extends BaseObservable {
             throw new IllegalStateException("No movie currently set in MovieDetailViewModel.");
         }
         if (cursor == null || !cursor.moveToFirst()) {
-            Log.w(LOG_TAG, "The cursor contains no trailers.");
+            Log.d(LOG_TAG, "The cursor contains no trailers.");
             mMovie.setTrailers(Collections.emptyList());
             // TODO: Update list of trailers on screen
 //            notifyPropertyChanged(BR._all);
@@ -377,7 +379,7 @@ public class MovieDetailViewModel extends BaseObservable {
     /**
      * Returns a new instance of {@link Trailer} with the data of the touple
      * currently pointed at by the {@link Cursor} passed as argument. The
-     * data of the cursor is expected to appear as in {@link MovieTrailersQuery}.
+     * data of the cursor is expected to appear as in {@link MovieTrailerQuery}.
      *
      * @param cursor the {@link Cursor} from which the data of the
      *     {@link Trailer} will be retrieved.
@@ -389,12 +391,12 @@ public class MovieDetailViewModel extends BaseObservable {
             return null;
         }
         Trailer trailer = new Trailer();
-        trailer.setId(cursor.getLong(MovieTrailersQuery.COL_ID));
-        trailer.setApiId(cursor.getString(MovieTrailersQuery.COL_API_ID));
-        trailer.setName(cursor.getString(MovieTrailersQuery.COL_NAME));
+        trailer.setId(cursor.getLong(MovieTrailerQuery.COL_ID));
+        trailer.setApiId(cursor.getString(MovieTrailerQuery.COL_API_ID));
+        trailer.setName(cursor.getString(MovieTrailerQuery.COL_NAME));
         Uri videoUri = Uri.parse(YOUTUBE_BASE_URI).buildUpon()
                 .appendQueryParameter(YOUTUBE_VIDEO_QUERY_PARAM
-                        , cursor.getString(MovieTrailersQuery.COL_KEY))
+                        , cursor.getString(MovieTrailerQuery.COL_KEY))
                 .build();
         trailer.setVideoUri(videoUri);
         Log.d(LOG_TAG, "new trailer:" + trailer); // TODO: Delete
@@ -402,11 +404,70 @@ public class MovieDetailViewModel extends BaseObservable {
     }
 
     /**
+     * Retrieves the data from the cursor passed as argument and sets it onto the
+     * {@link MovieDetailViewModel}'s current {@link Movie}. The projection used
+     * must be {@link MovieTrailerQuery#PROJECTION}. This method
+     * also notifies the data binding of the change, so the visual elements can
+     * be updated.
+     *
+     * @param cursor the {@link Cursor} containing the data  to load.
+     * @throws IllegalStateException if there is no {@link Movie} currently set
+     *     in the {@link MovieDetailViewModel}.
+     * @throws IllegalArgumentException if the data passed does not belong to
+     *     the {@link Movie} currently set (i.e. does not have the same id in
+     *     the RESTful API).
+     */
+    public void setMovieReviewData(Cursor cursor) {
+        if (mMovie == null) {
+            throw new IllegalStateException("No movie currently set in MovieDetailViewModel.");
+        }
+        if (cursor == null || !cursor.moveToFirst()) {
+            Log.d(LOG_TAG, "The cursor contains no reviews.");
+            mMovie.setReviews(Collections.emptyList());
+            // TODO: Update list of reviews on screen
+//            notifyPropertyChanged(BR._all);
+            return;
+        }
+        List<Review> reviews = new ArrayList<>();
+        do {
+            reviews.add(newReview(cursor));
+        } while (cursor.moveToNext());
+        mMovie.setReviews(reviews);
+        // TODO: Update list of reviews on screen
+//        notifyPropertyChanged(BR._all);
+    }
+
+    /**
+     * Returns a new instance of {@link Review} with the data of the touple
+     * currently pointed at by the {@link Cursor} passed as argument. The
+     * data of the cursor is expected to appear as in {@link MovieTrailerQuery}.
+     *
+     * @param cursor the {@link Cursor} from which the data of the
+     *     {@link Trailer} will be retrieved.
+     * @return  a new instance of {@link Trailer} with the data of the touple
+     *     currently pointed at by the {@link Cursor} passed as argument.
+     */
+    private Review newReview(Cursor cursor) {
+        if (cursor == null) {
+            return null;
+        }
+        Review review = new Review();
+        review.setId(cursor.getLong(MovieReviewQuery.COL_ID));
+        review.setApiId(cursor.getString(MovieReviewQuery.COL_API_ID));
+        review.setAuthor(cursor.getString(MovieReviewQuery.COL_AUTHOR));
+        review.setContent(cursor.getString(MovieReviewQuery.COL_CONTENT));
+        review.setSourceUri(Uri.parse(cursor.getString(MovieReviewQuery.COL_URL)));
+        Log.d(LOG_TAG, "new review:" + review); // TODO: Delete
+        return review;
+    }
+
+
+    /**
      * Provides information about projection and column indices expected by
      * {@link MovieCollectionViewModel} when setting movie details from a
      * {@link Cursor}.
      */
-    public static final class MovieDetailsQuery {
+    public static final class MovieDetailQuery {
 
         /**
          * Projection that includes the movie details to be presented. Used to
@@ -473,7 +534,7 @@ public class MovieDetailViewModel extends BaseObservable {
         /**
          * The class only provides constants and utility methods.
          */
-        private MovieDetailsQuery() {
+        private MovieDetailQuery() {
             // Empty constructor
         }
     }
@@ -484,16 +545,15 @@ public class MovieDetailViewModel extends BaseObservable {
      * {@link MovieCollectionViewModel} when setting movie trailers from a
      * {@link Cursor}.
      */
-    public static final class MovieTrailersQuery {
+    public static final class MovieTrailerQuery {
 
         /**
-         * Projection that includes the movie trailer videos to be presented. Used
-         * to query {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+         * Projection that includes the details of the movie trailer videos to be presented.
+         * Used to query {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
          */
         public static final String[] PROJECTION = {
                 CachedMovieVideoEntry.TABLE_NAME + "." + CachedMovieVideoEntry._ID,
                 CachedMovieVideoEntry.TABLE_NAME + "." + CachedMovieVideoEntry.COLUMN_API_ID,
-                CachedMovieVideoEntry.COLUMN_MOVIE_API_ID,
                 CachedMovieVideoEntry.COLUMN_NAME,
                 CachedMovieVideoEntry.COLUMN_KEY
         };
@@ -510,27 +570,78 @@ public class MovieDetailViewModel extends BaseObservable {
         public static final int COL_API_ID = 1;
 
         /**
-         * Index of {@link CachedMovieVideoEntry#COLUMN_MOVIE_API_ID} in
-         * {@link #PROJECTION}.
-         */
-        public static final int COL_MOVIE_API_ID = 2;
-
-        /**
          * Index of {@link CachedMovieVideoEntry#COLUMN_NAME} in
          * {@link #PROJECTION}.
          */
-        public static final int COL_NAME = 3;
+        public static final int COL_NAME = 2;
 
         /**
          * Index of {@link CachedMovieVideoEntry#COLUMN_KEY} in
          * {@link #PROJECTION}.
          */
-        public static final int COL_KEY = 4;
+        public static final int COL_KEY = 3;
 
         /**
          * The class only provides constants and utility methods.
          */
-        private MovieTrailersQuery() {
+        private MovieTrailerQuery() {
+            // Empty constructor
+        }
+
+    }
+
+    /**
+     * Provides information about projection and column indices expected by
+     * {@link MovieCollectionViewModel} when setting movie reviews from a
+     * {@link Cursor}.
+     */
+    public static final class MovieReviewQuery {
+
+        /**
+         * Projection that includes the details of the movie review to be presented.
+         * Used to query {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+         */
+        public static final String[] PROJECTION = {
+                CachedMovieReviewEntry.TABLE_NAME + "." + CachedMovieReviewEntry._ID,
+                CachedMovieReviewEntry.TABLE_NAME + "." + CachedMovieReviewEntry.COLUMN_API_ID,
+                CachedMovieReviewEntry.COLUMN_AUTHOR,
+                CachedMovieReviewEntry.COLUMN_CONTENT,
+                CachedMovieReviewEntry.COLUMN_URL
+        };
+
+        /**
+         * Index of {@link CachedMovieReviewEntry#_ID} in {@link #PROJECTION}.
+         */
+        public static final int COL_ID = 0;
+
+        /**
+         * Index of {@link CachedMovieReviewEntry#COLUMN_API_ID} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_API_ID = 1;
+
+        /**
+         * Index of {@link CachedMovieReviewEntry#COLUMN_AUTHOR} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_AUTHOR = 2;
+
+        /**
+         * Index of {@link CachedMovieReviewEntry#COLUMN_CONTENT} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_CONTENT = 3;
+
+        /**
+         * Index of {@link CachedMovieReviewEntry#COLUMN_URL} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_URL = 4;
+
+        /**
+         * The class only provides constants and utility methods.
+         */
+        private MovieReviewQuery() {
             // Empty constructor
         }
 

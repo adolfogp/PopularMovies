@@ -36,8 +36,9 @@ import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
 import mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
-import static mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel.MovieDetailsQuery;
-import static mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel.MovieTrailersQuery;
+import static mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel.MovieDetailQuery;
+import static mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel.MovieTrailerQuery;
+import static mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel.MovieReviewQuery;
 
 /**
  * Displays detailed information for a given {@link Movie}. New instances of
@@ -159,6 +160,8 @@ public class MovieDetailFragment extends Fragment {
                 , new MovieLoaderCallbacks());
         getLoaderManager().initLoader(MOVIE_TRAILER_LOADER_ID, null
                 , new TrailerLoaderCallbacks());
+        getLoaderManager().initLoader(MOVIE_REVIEW_LOADER_ID, null
+                , new ReviewLoaderCallbacks());
     }
 
     @Override
@@ -187,7 +190,7 @@ public class MovieDetailFragment extends Fragment {
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             return new CursorLoader(MovieDetailFragment.this.getActivity()
                     , CachedMovieEntry.buildMovieUri(mViewModel.getMovie().getId())
-                    , MovieDetailsQuery.PROJECTION
+                    , MovieDetailQuery.PROJECTION
                     , null
                     , null
                     , null);
@@ -217,7 +220,7 @@ public class MovieDetailFragment extends Fragment {
             return new CursorLoader(MovieDetailFragment.this.getActivity()
                     // TODO: Load only trailers and from YouTube - use query parameters
                     , CachedMovieEntry.buildMovieVideosUri(mViewModel.getMovie().getId())
-                    , MovieTrailersQuery.PROJECTION
+                    , MovieTrailerQuery.PROJECTION
                     , null
                     , null
                     , null); // TODO: Set order criteria
@@ -231,6 +234,35 @@ public class MovieDetailFragment extends Fragment {
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
             mViewModel.setMovieTrailerData(null);
+        }
+    }
+
+    /**
+     * Handles the callbacks for the {@link Loader} that retrieves the movie's
+     * reviews from the {@code ContentProvider}. When loading is finished,
+     * sets them on the {@link MovieDetailFragment#mViewModel} of the associated
+     * {@link MovieDetailFragment}.
+     */
+    private class ReviewLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(MovieDetailFragment.this.getActivity()
+                    , CachedMovieEntry.buildMovieReviewsUri(mViewModel.getMovie().getId())
+                    , MovieReviewQuery.PROJECTION
+                    , null
+                    , null
+                    , null); // TODO: Set order criteria
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            mViewModel.setMovieReviewData(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            mViewModel.setMovieReviewData(null);
         }
     }
 
