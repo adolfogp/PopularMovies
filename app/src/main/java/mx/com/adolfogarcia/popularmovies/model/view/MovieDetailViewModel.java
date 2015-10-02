@@ -32,6 +32,9 @@ import org.parceler.Parcel;
 import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.TimeZone;
 
 import javax.inject.Inject;
@@ -40,8 +43,10 @@ import mx.com.adolfogarcia.popularmovies.BR;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
+import mx.com.adolfogarcia.popularmovies.model.domain.Trailer;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
+import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieVideoEntry;
 import static org.parceler.Parcel.Serialization;
 
 /**
@@ -61,66 +66,16 @@ public class MovieDetailViewModel extends BaseObservable {
     public static final String UTC_TIME_ZONE = "UTC";
 
     /**
-     * Projection that includes the movie details to be presented. Used to
-     * query {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+     * The base URL where the movie trailers are found on
+     * <a href="https://www.youtube.com">YouTube</a>.
      */
-    public static final String[] PROJECTION_MOVIE_DETAILS = {
-            CachedMovieEntry._ID,
-            CachedMovieEntry.COLUMN_API_ID,
-            CachedMovieEntry.COLUMN_ORIGINAL_TITLE,
-            CachedMovieEntry.COLUMN_RELEASE_DATE,
-            CachedMovieEntry.COLUMN_OVERVIEW,
-            CachedMovieEntry.COLUMN_POSTER_PATH,
-            CachedMovieEntry.COLUMN_BACKDROP_PATH,
-            CachedMovieEntry.COLUMN_VOTE_AVERAGE
-    };
+    public static final String YOUTUBE_BASE_URI = "https://www.youtube.com/watch";
 
     /**
-     * Index of {@link CachedMovieEntry#_ID} in {@link #PROJECTION_MOVIE_DETAILS}.
+     * Parameter used to define the key of the video to watch on
+     * {@link #YOUTUBE_BASE_URI}.
      */
-    public static final int COL_ID = 0;
-
-    /**
-     * Index of {@link CachedMovieEntry#COLUMN_API_ID} in
-     * {@link #PROJECTION_MOVIE_DETAILS}.
-     */
-    public static final int COL_API_ID = 1;
-
-    /**
-     * Index of {@link CachedMovieEntry#COLUMN_ORIGINAL_TITLE} in
-     * {@link #PROJECTION_MOVIE_DETAILS}.
-     */
-    public static final int COL_ORIGINAL_TITLE = 2;
-
-    /**
-     * Index of {@link CachedMovieEntry#COLUMN_RELEASE_DATE} in
-     * {@link #PROJECTION_MOVIE_DETAILS}.
-     */
-    public static final int COL_RELEASE_DATE = 3;
-
-    /**
-     * Index of {@link CachedMovieEntry#COLUMN_OVERVIEW} in
-     * {@link #PROJECTION_MOVIE_DETAILS}.
-     */
-    public static final int COL_OVERVIEW = 4;
-
-    /**
-     * Index of {@link CachedMovieEntry#COLUMN_POSTER_PATH} in
-     * {@link #PROJECTION_MOVIE_DETAILS}.
-     */
-    public static final int COL_POSTER_PATH = 5;
-
-    /**
-     * Index of {@link CachedMovieEntry#COLUMN_BACKDROP_PATH} in
-     * {@link #PROJECTION_MOVIE_DETAILS}.
-     */
-    public static final int COL_BACKDROP_PATH = 6;
-
-    /**
-     * Index of {@link CachedMovieEntry#COLUMN_VOTE_AVERAGE} in
-     * {@link #PROJECTION_MOVIE_DETAILS}.
-     */
-    public static final int COL_VOTE_AVERAGE = 7;
+    public static final String YOUTUBE_VIDEO_QUERY_PARAM = "v";
 
     /**
      * Identifies the messages written to the log by this class.
@@ -339,8 +294,9 @@ public class MovieDetailViewModel extends BaseObservable {
     /**
      * Retrieves the data from the cursor passed as argument and sets it onto the
      * {@link MovieDetailViewModel}'s current {@link Movie}. The projection used
-     * must be {@link #PROJECTION_MOVIE_DETAILS}. This method also notifies the
-     * data binding of the change, so the visual elements chan be updated.
+     * must be {@link MovieDetailsQuery#PROJECTION}. This method
+     * also notifies the data binding of the change, so the visual elements can
+     * be updated.
      *
      * @param cursor the {@link Cursor} containing the data  to load.
      * @throws IllegalStateException if there is no {@link Movie} currently set
@@ -356,33 +312,221 @@ public class MovieDetailViewModel extends BaseObservable {
             return;
         }
         if (!cursor.moveToFirst()) {
-            Log.w(LOG_TAG, "The cursor contains no data. Ignoring.");
+            Log.w(LOG_TAG, "The cursor contains no data. Ignoring movie details.");
             return;
         }
-        if (mMovie.getId() != cursor.getLong(COL_ID)) {
+        if (mMovie.getId() != cursor.getLong(MovieDetailsQuery.COL_ID)) {
             throw new IllegalArgumentException(
-                    "The data passed does not belong to movie " + mMovie.getId());
+                    "The data passed does not belong to the movie");
         }
         requireNonNullContext();
         requireNonNullConfiguration();
         RestfulServiceConfiguration configuration = mWeakConfiguration.get();
         Context context = mWeakContext.get();
-        mMovie.setApiId(cursor.getLong(COL_API_ID));
-        mMovie.setOriginalTitle(cursor.getString(COL_ORIGINAL_TITLE));
-        mMovie.setReleaseDate(cursor.getLong(COL_RELEASE_DATE));
-        mMovie.setOverview(cursor.getString(COL_OVERVIEW));
+        mMovie.setApiId(cursor.getLong(MovieDetailsQuery.COL_API_ID));
+        mMovie.setOriginalTitle(cursor.getString(MovieDetailsQuery.COL_ORIGINAL_TITLE));
+        mMovie.setReleaseDate(cursor.getLong(MovieDetailsQuery.COL_RELEASE_DATE));
+        mMovie.setOverview(cursor.getString(MovieDetailsQuery.COL_OVERVIEW));
         int posterPixelWidth = context.getResources().getDimensionPixelSize(
                 R.dimen.movie_poster_thumbnail_width);
         mMovie.setPosterUri(Uri.parse(configuration.getBestFittingPosterUrl(
-                cursor.getString(COL_POSTER_PATH), posterPixelWidth)));
+                cursor.getString(MovieDetailsQuery.COL_POSTER_PATH), posterPixelWidth)));
         int backdropPixelWidth = context.getResources().getDimensionPixelSize(
                 R.dimen.movie_backdrop_width);
         mMovie.setBackdropUri(Uri.parse(configuration.getBestFittingPosterUrl(
-                cursor.getString(COL_BACKDROP_PATH), backdropPixelWidth)));
-        mMovie.setVoteAverage(cursor.getDouble(COL_VOTE_AVERAGE));
+                cursor.getString(MovieDetailsQuery.COL_BACKDROP_PATH), backdropPixelWidth)));
+        mMovie.setVoteAverage(cursor.getDouble(MovieDetailsQuery.COL_VOTE_AVERAGE));
 
         notifyPropertyChanged(BR._all);
     }
 
+    /**
+     * Retrieves the data from the cursor passed as argument and sets it onto the
+     * {@link MovieDetailViewModel}'s current {@link Movie}. The projection used
+     * must be {@link MovieTrailersQuery#PROJECTION}. This method
+     * also notifies the data binding of the change, so the visual elements can
+     * be updated.
+     *
+     * @param cursor the {@link Cursor} containing the data  to load.
+     * @throws IllegalStateException if there is no {@link Movie} currently set
+     *     in the {@link MovieDetailViewModel}.
+     * @throws IllegalArgumentException if the data passed does not belong to
+     *     the {@link Movie} currently set (i.e. does not have the same id in
+     *     the RESTful API).
+     */
+    public void setMovieTrailerData(Cursor cursor) {
+        if (mMovie == null) {
+            throw new IllegalStateException("No movie currently set in MovieDetailViewModel.");
+        }
+        if (cursor == null || !cursor.moveToFirst()) {
+            Log.w(LOG_TAG, "The cursor contains no trailers.");
+            mMovie.setTrailers(Collections.emptyList());
+            // TODO: Update list of trailers on screen
+//            notifyPropertyChanged(BR._all);
+            return;
+        }
+        List<Trailer> trailers = new ArrayList<>();
+        do {
+            trailers.add(newTrailer(cursor));
+        } while (cursor.moveToNext());
+        mMovie.setTrailers(trailers);
+         // TODO: Update list of trailers on screen
+//        notifyPropertyChanged(BR._all);
+    }
+
+    /**
+     * Returns a new instance of {@link Trailer} with the data of the touple
+     * currently pointed at by the {@link Cursor} passed as argument. The
+     * data of the cursor is expected to appear as in {@link MovieTrailersQuery}.
+     *
+     * @param cursor the {@link Cursor} from which the data of the
+     *     {@link Trailer} will be retrieved.
+     * @return  a new instance of {@link Trailer} with the data of the touple
+     *     currently pointed at by the {@link Cursor} passed as argument.
+     */
+    private Trailer newTrailer(Cursor cursor) {
+        if (cursor == null) {
+            return null;
+        }
+        Trailer trailer = new Trailer();
+        trailer.setId(cursor.getLong(MovieTrailersQuery.COL_ID));
+        trailer.setApiId(cursor.getString(MovieTrailersQuery.COL_API_ID));
+        trailer.setName(cursor.getString(MovieTrailersQuery.COL_NAME));
+        Uri videoUri = Uri.parse(YOUTUBE_BASE_URI).buildUpon()
+                .appendQueryParameter(YOUTUBE_VIDEO_QUERY_PARAM
+                        , cursor.getString(MovieTrailersQuery.COL_KEY))
+                .build();
+        trailer.setVideoUri(videoUri);
+        Log.d(LOG_TAG, "new trailer:" + trailer); // TODO: Delete
+        return trailer;
+    }
+
+    /**
+     * Provides information about projection and column indices expected by
+     * {@link MovieCollectionViewModel} when setting movie details from a
+     * {@link Cursor}.
+     */
+    public static final class MovieDetailsQuery {
+
+        /**
+         * The class only provides constants and utility methods.
+         */
+        private MovieDetailsQuery() {
+            // Empty constructor
+        }
+
+        /**
+         * Projection that includes the movie details to be presented. Used to
+         * query {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+         */
+        public static final String[] PROJECTION = {
+                CachedMovieEntry._ID,
+                CachedMovieEntry.COLUMN_API_ID,
+                CachedMovieEntry.COLUMN_ORIGINAL_TITLE,
+                CachedMovieEntry.COLUMN_RELEASE_DATE,
+                CachedMovieEntry.COLUMN_OVERVIEW,
+                CachedMovieEntry.COLUMN_POSTER_PATH,
+                CachedMovieEntry.COLUMN_BACKDROP_PATH,
+                CachedMovieEntry.COLUMN_VOTE_AVERAGE
+        };
+
+        /**
+         * Index of {@link CachedMovieEntry#_ID} in {@link #PROJECTION}.
+         */
+        public static final int COL_ID = 0;
+
+        /**
+         * Index of {@link CachedMovieEntry#COLUMN_API_ID} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_API_ID = 1;
+
+        /**
+         * Index of {@link CachedMovieEntry#COLUMN_ORIGINAL_TITLE} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_ORIGINAL_TITLE = 2;
+
+        /**
+         * Index of {@link CachedMovieEntry#COLUMN_RELEASE_DATE} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_RELEASE_DATE = 3;
+
+        /**
+         * Index of {@link CachedMovieEntry#COLUMN_OVERVIEW} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_OVERVIEW = 4;
+
+        /**
+         * Index of {@link CachedMovieEntry#COLUMN_POSTER_PATH} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_POSTER_PATH = 5;
+
+        /**
+         * Index of {@link CachedMovieEntry#COLUMN_BACKDROP_PATH} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_BACKDROP_PATH = 6;
+
+        /**
+         * Index of {@link CachedMovieEntry#COLUMN_VOTE_AVERAGE} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_VOTE_AVERAGE = 7;
+    }
+
+
+    /**
+     * Provides information about projection and column indices expected by
+     * {@link MovieCollectionViewModel} when setting movie trailers from a
+     * {@link Cursor}.
+     */
+    public static final class MovieTrailersQuery {
+
+        /**
+         * Projection that includes the movie trailer videos to be presented. Used
+         * to query {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+         */
+        public static final String[] PROJECTION = {
+                CachedMovieVideoEntry.TABLE_NAME + "." + CachedMovieVideoEntry._ID,
+                CachedMovieVideoEntry.TABLE_NAME + "." + CachedMovieVideoEntry.COLUMN_API_ID,
+                CachedMovieVideoEntry.COLUMN_MOVIE_API_ID,
+                CachedMovieVideoEntry.COLUMN_NAME,
+                CachedMovieVideoEntry.COLUMN_KEY
+        };
+
+        /**
+         * Index of {@link CachedMovieVideoEntry#_ID} in {@link #PROJECTION}.
+         */
+        public static final int COL_ID = 0;
+
+        /**
+         * Index of {@link CachedMovieVideoEntry#COLUMN_API_ID} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_API_ID = 1;
+
+        /**
+         * Index of {@link CachedMovieVideoEntry#COLUMN_MOVIE_API_ID} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_MOVIE_API_ID = 2;
+
+        /**
+         * Index of {@link CachedMovieVideoEntry#COLUMN_NAME} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_NAME = 3;
+
+        /**
+         * Index of {@link CachedMovieVideoEntry#COLUMN_KEY} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_KEY = 4;
+
+    }
 
 }

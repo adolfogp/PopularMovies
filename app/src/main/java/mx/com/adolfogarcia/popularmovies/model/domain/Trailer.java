@@ -41,7 +41,7 @@ public class Trailer {
      * The trailer's identifier in
      * <a href="https://www.themoviedb.org/">themoviedb.org</a>'s RESTful API.
      */
-    private long mApiId;
+    private String mApiId;
 
     /**
      * The trailer's name or title.
@@ -61,11 +61,11 @@ public class Trailer {
         mId = id;
     }
 
-    public long getApiId() {
+    public String getApiId() {
         return mApiId;
     }
 
-    public void setApiId(long apiId) {
+    public void setApiId(String apiId) {
         mApiId = apiId;
     }
 

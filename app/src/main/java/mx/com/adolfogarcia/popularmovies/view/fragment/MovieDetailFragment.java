@@ -36,6 +36,8 @@ import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
 import mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
+import static mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel.MovieDetailsQuery;
+import static mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel.MovieTrailersQuery;
 
 /**
  * Displays detailed information for a given {@link Movie}. New instances of
@@ -44,14 +46,25 @@ import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEn
  *
  * @author Jesús Adolfo García Pasquel
  */
-public class MovieDetailFragment extends Fragment
-        implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieDetailFragment extends Fragment {
 
     /**
      * Identifies the {@link Loader} that retrieves the movie details cached in
      * the local database.
      */
     private static final int MOVIE_DETAIL_LOADER_ID = 532232;
+
+    /**
+     * Identifies the {@link Loader} that retrieves the trailer videos cached in
+     * the local database for the movie specified to the {@code Fragment}.
+     */
+    private static final int MOVIE_TRAILER_LOADER_ID = 244185;
+
+    /**
+     * Identifies the {@link Loader} that retrieves the reviews cached in
+     * the local database for the movie specified to the {@code Fragment}.
+     */
+    private static final int MOVIE_REVIEW_LOADER_ID = 950426;
 
     /**
      * Key used to access the {@link Movie} specified as argument at creation
@@ -142,7 +155,10 @@ public class MovieDetailFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(MOVIE_DETAIL_LOADER_ID, null, this);
+        getLoaderManager().initLoader(MOVIE_DETAIL_LOADER_ID, null
+                , new MovieLoaderCallbacks());
+        getLoaderManager().initLoader(MOVIE_TRAILER_LOADER_ID, null
+                , new TrailerLoaderCallbacks());
     }
 
     @Override
@@ -159,24 +175,62 @@ public class MovieDetailFragment extends Fragment
         return mBinding.getRoot();
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return new CursorLoader(this.getActivity()
-                , CachedMovieEntry.buildMovieUri(mViewModel.getMovie().getId())
-                , MovieDetailViewModel.PROJECTION_MOVIE_DETAILS
-                , null
-                , null
-                , null);
+    /**
+     * Handles the callbacks for the {@link Loader} that retrieves the movie's
+     * details from the {@code ContentProvider}. When loading is finished,
+     * sets them on the {@link MovieDetailFragment#mViewModel} of the associated
+     * {@link MovieDetailFragment}.
+     */
+    private class MovieLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(MovieDetailFragment.this.getActivity()
+                    , CachedMovieEntry.buildMovieUri(mViewModel.getMovie().getId())
+                    , MovieDetailsQuery.PROJECTION
+                    , null
+                    , null
+                    , null);
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            mViewModel.setMovieData(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            mViewModel.setMovieData(null);
+        }
     }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mViewModel.setMovieData(data);
-    }
+    /**
+     * Handles the callbacks for the {@link Loader} that retrieves the movie's
+     * trailer videos from the {@code ContentProvider}. When loading is finished,
+     * sets them on the {@link MovieDetailFragment#mViewModel} of the associated
+     * {@link MovieDetailFragment}.
+     */
+    private class TrailerLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mViewModel.setMovieData(null);
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return new CursorLoader(MovieDetailFragment.this.getActivity()
+                    , CachedMovieEntry.buildMovieVideosUri(mViewModel.getMovie().getId())
+                    , MovieTrailersQuery.PROJECTION // TODO: Load only trailers and from YouTube - use query parameters
+                    , null
+                    , null
+                    , null); // TODO: Set order criteria
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            mViewModel.setMovieTrailerData(data);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+            mViewModel.setMovieTrailerData(null);
+        }
     }
 
 }
