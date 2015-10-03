@@ -33,7 +33,7 @@
         <item name="actionBarStyle">@style/ActionBar.Solid.PopularMovies.NoTitle</item>
     </style>
 
-    <style name="SortOrder.Option" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="SortOrder.Option" parent="AppTheme">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textAppearance">?android:attr/textAppearanceListItemSmall</item>
@@ -111,7 +111,15 @@
         <item name="android:layout_marginBottom">@dimen/activity_vertical_margin</item>
     </style>
 
-    <style name="MovieDetail.Trailers.Label" parent="MovieDetail.Overview.Label" />
+    <style name="MovieDetail.Trailers.Label" parent="MovieDetail.Label" >
+        <item name="android:textSize">@dimen/subhead</item>
+        <item name="android:layout_columnSpan">2</item>
+        <item name="android:textColor">@color/detail_label</item>
+        <item name="android:paddingTop"> @dimen/trailer_label_bottom_padding</item>
+        <item name="android:paddingBottom">@dimen/trailer_label_bottom_padding</item>
+        <item name="android:layout_marginRight"> @dimen/activity_horizontal_margin</item>
+        <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>
+    </style>
 
     <style name="MovieDetail.Trailers.Container" parent="AppTheme">
         <item name="android:layout_width">fill_parent</item>
@@ -123,6 +131,11 @@
         <item name="android:layout_marginRight"> @dimen/activity_horizontal_margin</item>
         <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>
         <item name="android:layout_marginBottom">@dimen/activity_vertical_margin</item>
+    </style>
+
+    <style name="MovieDetail.Trailer.Item" parent="AppTheme">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:minHeight">?android:attr/listPreferredItemHeight</item>
     </style>
 
     <style name="MovieDetail.Reviews.Label" parent="MovieDetail.Label">
@@ -137,7 +150,7 @@
 
     <style name="MovieDetail.Reviews.Container" parent="MovieDetail.Trailers.Container" />
 
-    <style name="MovieReview.Author" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="MovieReview.Author" parent="AppTheme">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">@color/review_author</item>
@@ -146,7 +159,7 @@
         <item name="android:paddingBottom">@dimen/review_author_bottom_padding</item>
     </style>
 
-    <style name="MovieReview.Content" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="MovieReview.Content" parent="AppTheme">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/body</item>

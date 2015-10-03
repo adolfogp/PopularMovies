@@ -46,6 +46,7 @@ import mx.com.adolfogarcia.popularmovies.BR;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
 import mx.com.adolfogarcia.popularmovies.databinding.MovieReviewListItemBinding;
+import mx.com.adolfogarcia.popularmovies.databinding.MovieTrailerListItemBinding;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
 import mx.com.adolfogarcia.popularmovies.model.domain.Review;
 import mx.com.adolfogarcia.popularmovies.model.domain.Trailer;
@@ -337,8 +338,20 @@ public class MovieDetailViewModel extends BaseObservable {
     @BindingAdapter({"bind:trailers"})
     public static void loadTrailerViews(LinearLayout container, List<Trailer> trailers) {
         container.removeAllViews();
+        if (trailers == null || trailers.isEmpty()) {
+            return;
+        }
+        LayoutInflater inflater = (LayoutInflater) container.getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         for (Trailer trailer : trailers) {
-            Log.wtf(LOG_TAG, "Loading trailer into container: " + trailer); // TODO: Delete
+            MovieTrailerListItemBinding binding = DataBindingUtil.inflate(inflater
+                    , R.layout.list_item_movie_trailer
+                    , container
+                    , false);
+            MovieTrailerListItemViewModel itemViewModel = new MovieTrailerListItemViewModel();
+            itemViewModel.setTrailer(trailer);
+            binding.setViewModel(itemViewModel);
+            container.addView(binding.getRoot());
         }
     }
 

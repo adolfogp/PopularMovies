@@ -17,6 +17,8 @@
     <dimen name="body">14sp</dimen>
 
     <!-- Padding to use on the different sections of the movie details -->
+    <dimen name="trailer_label_top_padding">@dimen/activity_vertical_margin</dimen>
+    <dimen name="trailer_label_bottom_padding">8dp</dimen>
     <dimen name="review_label_top_padding">@dimen/activity_vertical_margin</dimen>
     <dimen name="review_label_bottom_padding">8dp</dimen>
 

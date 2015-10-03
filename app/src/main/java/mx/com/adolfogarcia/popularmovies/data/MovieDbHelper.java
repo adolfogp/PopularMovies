@@ -33,7 +33,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     /**
      * Version number of the dabase.
      */
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
 
     /**
      * Name of the SQLite database file.
