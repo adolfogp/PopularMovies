@@ -21,9 +21,12 @@ import android.database.Cursor;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.squareup.picasso.Picasso;
 
@@ -42,6 +45,7 @@ import javax.inject.Inject;
 import mx.com.adolfogarcia.popularmovies.BR;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
+import mx.com.adolfogarcia.popularmovies.databinding.MovieReviewListItemBinding;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
 import mx.com.adolfogarcia.popularmovies.model.domain.Review;
 import mx.com.adolfogarcia.popularmovies.model.domain.Trailer;
@@ -250,6 +254,36 @@ public class MovieDetailViewModel extends BaseObservable {
     }
 
     /**
+     * Returns the {@link Trailer}s available for the movie.
+     *
+     * @return the {@link Trailer}s available for the movie.
+     */
+    @Bindable
+    public List<Trailer> getTrailers() {
+        if (mMovie == null) {
+            return Collections.emptyList();
+        }
+        return mMovie.getTrailers() != null
+                ? mMovie.getTrailers()
+                : Collections.emptyList();
+    }
+
+    /**
+     * Returns the {@link Review}s available for the movie.
+     *
+     * @return the {@link Review}s available for the movie.
+     */
+    @Bindable
+    public List<Review> getReviews() {
+        if (mMovie == null) {
+            return Collections.emptyList();
+        }
+        return mMovie.getReviews() != null
+                ? mMovie.getReviews()
+                : Collections.emptyList();
+    }
+
+    /**
      * Loads the movie's poster image from the specified URI into the
      * {@link ImageView}. This method is used by the Data Binding Library.
      *
@@ -291,6 +325,48 @@ public class MovieDetailViewModel extends BaseObservable {
                 .placeholder(R.anim.backdrop_loading)
                 .error(R.drawable.logo_the_movie_db_360dp)
                 .into(view);
+    }
+
+    /**
+     * Removes all views from the {@link LinearLayout} and adds new ones for
+     * the specified {@link Trailer}s.
+     *
+     * @param container {@link LinearLayout} that will contain the trailers.
+     * @param trailers the {@link Trailer}s to be placed in the container.
+     */
+    @BindingAdapter({"bind:trailers"})
+    public static void loadTrailerViews(LinearLayout container, List<Trailer> trailers) {
+        container.removeAllViews();
+        for (Trailer trailer : trailers) {
+            Log.wtf(LOG_TAG, "Loading trailer into container: " + trailer); // TODO: Delete
+        }
+    }
+
+    /**
+     * Removes all views from the {@link LinearLayout} and adds new ones for
+     * the specified {@link Review}s.
+     *
+     * @param container {@link LinearLayout} that will contain the reviews.
+     * @param reviews the {@link Review}s to be placed in the container.
+     */
+    @BindingAdapter({"bind:reviews"})
+    public static void loadReviewViews(LinearLayout container, List<Review> reviews) {
+        container.removeAllViews();
+        if (reviews == null || reviews.isEmpty()) {
+            return;
+        }
+        LayoutInflater inflater = (LayoutInflater) container.getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        for (Review review : reviews) {
+            MovieReviewListItemBinding binding = DataBindingUtil.inflate(inflater
+                    , R.layout.list_item_movie_review
+                    , container
+                    , false);
+            MovieReviewListItemViewModel itemViewModel = new MovieReviewListItemViewModel();
+            itemViewModel.setReview(review);
+            binding.setViewModel(itemViewModel);
+            container.addView(binding.getRoot());
+        }
     }
 
     /**
@@ -363,8 +439,7 @@ public class MovieDetailViewModel extends BaseObservable {
         if (cursor == null || !cursor.moveToFirst()) {
             Log.d(LOG_TAG, "The cursor contains no trailers.");
             mMovie.setTrailers(Collections.emptyList());
-            // TODO: Update list of trailers on screen
-//            notifyPropertyChanged(BR._all);
+            notifyPropertyChanged(BR.trailers);
             return;
         }
         List<Trailer> trailers = new ArrayList<>();
@@ -372,8 +447,7 @@ public class MovieDetailViewModel extends BaseObservable {
             trailers.add(newTrailer(cursor));
         } while (cursor.moveToNext());
         mMovie.setTrailers(trailers);
-         // TODO: Update list of trailers on screen
-//        notifyPropertyChanged(BR._all);
+        notifyPropertyChanged(BR.trailers);
     }
 
     /**
@@ -399,7 +473,6 @@ public class MovieDetailViewModel extends BaseObservable {
                         , cursor.getString(MovieTrailerQuery.COL_KEY))
                 .build();
         trailer.setVideoUri(videoUri);
-        Log.d(LOG_TAG, "new trailer:" + trailer); // TODO: Delete
         return trailer;
     }
 
@@ -424,8 +497,7 @@ public class MovieDetailViewModel extends BaseObservable {
         if (cursor == null || !cursor.moveToFirst()) {
             Log.d(LOG_TAG, "The cursor contains no reviews.");
             mMovie.setReviews(Collections.emptyList());
-            // TODO: Update list of reviews on screen
-//            notifyPropertyChanged(BR._all);
+            notifyPropertyChanged(BR.reviews);
             return;
         }
         List<Review> reviews = new ArrayList<>();
@@ -433,8 +505,7 @@ public class MovieDetailViewModel extends BaseObservable {
             reviews.add(newReview(cursor));
         } while (cursor.moveToNext());
         mMovie.setReviews(reviews);
-        // TODO: Update list of reviews on screen
-//        notifyPropertyChanged(BR._all);
+        notifyPropertyChanged(BR.reviews);
     }
 
     /**
@@ -457,7 +528,6 @@ public class MovieDetailViewModel extends BaseObservable {
         review.setAuthor(cursor.getString(MovieReviewQuery.COL_AUTHOR));
         review.setContent(cursor.getString(MovieReviewQuery.COL_CONTENT));
         review.setSourceUri(Uri.parse(cursor.getString(MovieReviewQuery.COL_URL)));
-        Log.d(LOG_TAG, "new review:" + review); // TODO: Delete
         return review;
     }
 

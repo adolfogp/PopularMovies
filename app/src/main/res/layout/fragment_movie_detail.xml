@@ -93,6 +93,21 @@
                 android:text="@{viewModel.overview}"
                 tools:text="An apocalyptic story..."/>
 
+            <TextView
+                style="@style/MovieDetail.Trailers.Label"
+                android:text="@string/label_trailers"/>
+
+            <LinearLayout
+                style="@style/MovieDetail.Trailers.Container"
+                app:trailers="@{viewModel.trailers}" />
+
+            <TextView
+                style="@style/MovieDetail.Reviews.Label"
+                android:text="@string/label_reviews" />
+
+            <LinearLayout
+                style="@style/MovieDetail.Reviews.Container"
+                app:reviews="@{viewModel.reviews}" />
 
         </GridLayout>
     </ScrollView>

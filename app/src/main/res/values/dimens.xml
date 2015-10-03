@@ -15,4 +15,12 @@
     <dimen name="title">20sp</dimen>
     <dimen name="subhead">16sp</dimen>
     <dimen name="body">14sp</dimen>
+
+    <!-- Padding to use on the different sections of the movie details -->
+    <dimen name="review_label_top_padding">@dimen/activity_vertical_margin</dimen>
+    <dimen name="review_label_bottom_padding">8dp</dimen>
+
+    <!-- Sizes to use on movie review items -->
+    <dimen name="review_author_top_padding">8dp</dimen>
+    <dimen name="review_author_bottom_padding">4dp</dimen>
 </resources>

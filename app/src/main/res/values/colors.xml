@@ -18,6 +18,7 @@
 <resources>
     <item name="white" type="color">#ffffff</item>
     <item name="detail_label" type="color">#616161</item>
+    <item name="review_author" type="color">@color/detail_label</item>
     <item name="title_background" type="color">@color/popular_movies_green</item>
     <item name="popular_movies_green" type="color">#597725</item>
     <item name="popular_movies_dark_green" type="color">#2d3d13</item>
