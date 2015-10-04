@@ -544,7 +544,6 @@ public class MovieDetailViewModel extends BaseObservable {
         return review;
     }
 
-
     /**
      * Provides information about projection and column indices expected by
      * {@link MovieCollectionViewModel} when setting movie details from a

@@ -186,7 +186,7 @@ public class MovieCollectionFragment extends Fragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_fragment_movie_collection, menu);
-        MenuItem item = menu.findItem(R.id.spinner);
+        MenuItem item = menu.findItem(R.id.menu_item_sort_order);
         Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
         ArrayAdapter<LabeledItem<FetchMoviePageTaskFactory>> adapter =
                 new ArrayAdapter<>(getActivity()

@@ -9,6 +9,7 @@
     <string name="label_trailers">Trailers</string>
     <string name="label_reviews">Reviews</string>
     <string name="action_sort_order">Sort order</string>
+    <string name="action_share">Share</string>
     <string name="label_sort_order_popular">Most popular</string>
     <string name="label_sort_order_vote_average">Highest rated</string>
     <string name="content_description_backdrop_image">Backdrop image</string>

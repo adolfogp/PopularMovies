@@ -16,6 +16,8 @@
 
 package mx.com.adolfogarcia.popularmovies.view.fragment;
 
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -23,7 +25,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -33,6 +41,7 @@ import mx.com.adolfogarcia.popularmovies.PopularMoviesApplication;
 import mx.com.adolfogarcia.popularmovies.R;
 import mx.com.adolfogarcia.popularmovies.databinding.MovieDetailFragmentBinding;
 import mx.com.adolfogarcia.popularmovies.model.domain.Movie;
+import mx.com.adolfogarcia.popularmovies.model.domain.Trailer;
 import mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel;
 
 import static mx.com.adolfogarcia.popularmovies.data.MovieContract.CachedMovieEntry;
@@ -48,6 +57,16 @@ import static mx.com.adolfogarcia.popularmovies.model.view.MovieDetailViewModel.
  * @author Jesús Adolfo García Pasquel
  */
 public class MovieDetailFragment extends Fragment {
+
+    /**
+     * Identifies the messages written to the log by this class.
+     */
+    private static final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
+
+    /**
+     * The MIME type for plain text.
+     */
+    private static final String PLAIN_TEXT_MEDIA_TYPE = "text/plain";
 
     /**
      * Identifies the {@link Loader} that retrieves the movie details cached in
@@ -91,6 +110,11 @@ public class MovieDetailFragment extends Fragment {
     private MovieDetailFragmentBinding mBinding = null;
 
     /**
+     * Lets the user share the first movie trailer, if available.
+     */
+    private ShareActionProvider mShareActionProvider = null;
+
+    /**
      * Creates a new instance of {@link MovieDetailFragment} for the specified
      * movie. You must use this factory method to create new instances.
      *
@@ -108,10 +132,11 @@ public class MovieDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setHasOptionsMenu(true);
         if (getArguments() == null) {
             throw new IllegalStateException("No movie specified as Fragment argument.");
         }
-        restoreState(savedInstanceState);
+        this.restoreState(savedInstanceState);
     }
 
     /**
@@ -178,6 +203,39 @@ public class MovieDetailFragment extends Fragment {
         return mBinding.getRoot();
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_fragment_movie_detail, menu);
+        MenuItem item = menu.findItem(R.id.menu_item_share);
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+        mShareActionProvider.setShareIntent(getShareFirstTrailerIntent());
+    }
+
+    /**
+     * Returns an {@link Intent} that can be used to share the first movie
+     * trailer or {@code null} if there are no trailers (or there is no app on
+     * the device that may be used to share).
+     *
+     * @return an {@link Intent} that can be used to share the first movie
+     *     trailer or {@code null} if one is not available.
+     */
+    private Intent getShareFirstTrailerIntent() {
+        if (mViewModel == null || mViewModel.getTrailers().isEmpty()) {
+            return null;
+        }
+        Trailer firstTrailer = mViewModel.getTrailers().get(0);
+        Context context = getActivity();
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_TEXT, firstTrailer.getVideoUri().toString());
+        intent.setType(PLAIN_TEXT_MEDIA_TYPE);
+        if (intent.resolveActivity(context.getPackageManager()) == null) {
+            Log.w(LOG_TAG, "Unable to create share intent. No application available to share.");
+            intent = null;
+        }
+        return intent;
+    }
+
     /**
      * Handles the callbacks for the {@link Loader} that retrieves the movie's
      * details from the {@code ContentProvider}. When loading is finished,
@@ -229,6 +287,10 @@ public class MovieDetailFragment extends Fragment {
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
             mViewModel.setMovieTrailerData(data);
+            // Set the share intent, if the provider has already been loaded
+            if (mShareActionProvider != null) {
+                mShareActionProvider.setShareIntent(getShareFirstTrailerIntent());
+            }
         }
 
         @Override

@@ -16,12 +16,12 @@
   -->
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto"
-      xmlns:tools="http://schemas.android.com/tools"
-      tools:context=".MainActivity">
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
-        android:id="@+id/menu_item_sort_order"
-        app:actionViewClass="android.widget.Spinner"
+        android:id="@+id/menu_item_share"
+        android:title="@string/action_share"
         app:showAsAction="ifRoom"
-        android:title="@string/action_sort_order"/>
+        app:actionProviderClass="android.support.v7.widget.ShareActionProvider" />
+
 </menu>
