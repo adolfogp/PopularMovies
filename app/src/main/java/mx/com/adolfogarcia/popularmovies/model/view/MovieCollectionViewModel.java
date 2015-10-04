@@ -261,8 +261,12 @@ public class MovieCollectionViewModel implements AdapterView.OnItemClickListener
             Log.i(LOG_TAG, "No more movie pages to download.");
             return;
         }
-        mFetchMoviePageTask = getSelectedSortOrderTaskFactory().newFetchMovieTask();
-        mFetchMoviePageTask.execute(lastPageRetrieved + 1);
+        try {
+            mFetchMoviePageTask = getSelectedSortOrderTaskFactory().newFetchMovieTask();
+            mFetchMoviePageTask.execute(lastPageRetrieved + 1);
+        } catch (UnsupportedOperationException uoe) {
+            Log.i(LOG_TAG, "The selected sort order does not support downloading new movies.");
+        }
     }
 
     @Override

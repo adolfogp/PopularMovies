@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import mx.com.adolfogarcia.popularmovies.data.RestfulServiceConfiguration;
+import mx.com.adolfogarcia.popularmovies.net.FetchFavoriteMoviePageTaskFactory;
 import mx.com.adolfogarcia.popularmovies.net.FetchMoviePageTaskFactory;
 import mx.com.adolfogarcia.popularmovies.net.FetchPopularityMoviePageTaskFactory;
 import mx.com.adolfogarcia.popularmovies.net.FetchRatingMoviePageTaskFactory;
@@ -125,6 +126,8 @@ public class PopularMoviesApplicationModule {
                         , new FetchPopularityMoviePageTaskFactory(configuration, context))
                 , new LabeledItem(mApplication.getString(R.string.label_sort_order_vote_average)
                         , new FetchRatingMoviePageTaskFactory(configuration, context))
+                , new LabeledItem(mApplication.getString(R.string.label_sort_order_user_favorites)
+                        , new FetchFavoriteMoviePageTaskFactory())
         };
     }
 

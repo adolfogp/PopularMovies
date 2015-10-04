@@ -39,6 +39,8 @@ public interface FetchMoviePageTaskFactory {
      *     the number of the page of movies to download, and upon execution
      *     retrieves them and inserts them into
      *     {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
+     * @throws UnsupportedOperationException if the operation is not supported
+     *     by the implementation.
      */
     AsyncTask<Integer, ?, ?> newFetchMovieTask();
 
@@ -48,7 +50,7 @@ public interface FetchMoviePageTaskFactory {
      * {@link mx.com.adolfogarcia.popularmovies.data.MovieProvider}.
      *
      * @return the parameter used to specify the sort order to the RESTful API,
-     *     for example {@link TheMovieDbApi#SORT_BY_POPULARITY}.
+     *     for example {@link TheMovieDbApi#SORT_BY_POPULARITY}. May be {@code null}.
      * @see #getMovieProviderSortOrder()
      */
     String getRestApiSortOrder();

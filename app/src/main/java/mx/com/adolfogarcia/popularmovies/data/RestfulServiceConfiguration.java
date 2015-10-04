@@ -538,9 +538,13 @@ public class RestfulServiceConfiguration {
      *     constants: {@link TheMovieDbApi#SORT_BY_POPULARITY},
      *     {@link TheMovieDbApi#SORT_BY_USER_RATING}.
      * @return the number of the page last retrieved from the RESTful
-     * API for the specified sort order or zero if none have been retrieved.
+     *     API for the specified sort order or zero if none have been retrieved.
+     *     If the argument is {@code null} 0 is returned.
      */
     public int getLastMoviePageRetrieved(String apiSortOrder) {
+        if (apiSortOrder == null) {
+            return 0;
+        }
         SharedPreferences settings =
                 PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
         return settings.getInt(getPreferencesKeyForSortOrder(apiSortOrder), 0);
