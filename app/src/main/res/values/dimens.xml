@@ -31,6 +31,8 @@
     <dimen name="trailer_icon_height">24dp</dimen>
     <dimen name="share_icon_width">24dp</dimen>
     <dimen name="share_icon_height">24dp</dimen>
+    <dimen name="favorite_icon_width">24dp</dimen>
+    <dimen name="favorite_icon_height">24dp</dimen>
     <dimen name="trailer_name_left_padding">8dp</dimen>
     <dimen name="trailer_share_left_margin">@dimen/activity_horizontal_margin</dimen>
 </resources>
