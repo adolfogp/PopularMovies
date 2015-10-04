@@ -34,6 +34,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 
 import org.parceler.Parcels;
 
@@ -200,6 +201,9 @@ public class MovieDetailFragment extends Fragment {
             mViewModel = newViewModel();
         }
         mBinding.setViewModel(mViewModel);
+        // TODO: Bind onClick with Data Binding Library. At this moment, it breaks compilation
+        mBinding.checkboxFavorite.setOnClickListener(
+                (v) -> mViewModel.onClickFavorite((CheckBox) v));
         return mBinding.getRoot();
     }
 

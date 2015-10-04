@@ -87,6 +87,11 @@ public class Movie {
     private List<Review> mReviews;
 
     /**
+     * Indicates if the movie is one of the user's favorites.
+     */
+    private boolean userFavorite;
+
+    /**
      * Creates a new instance of {@link Movie} with the default values for
      * all its attributes.
      */
@@ -172,6 +177,14 @@ public class Movie {
 
     public void setReviews(List<Review> reviews) {
         mReviews = reviews;
+    }
+
+    public boolean isUserFavorite() {
+        return userFavorite;
+    }
+
+    public void setUserFavorite(boolean userFavorite) {
+        this.userFavorite = userFavorite;
     }
 
     @Override

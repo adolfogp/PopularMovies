@@ -57,9 +57,14 @@
 
                 <CheckBox
                     style="@style/MovieDetail.Title.Favorite"
+                    android:id="@+id/checkbox_favorite"
                     android:layout_width="@dimen/favorite_icon_width"
                     android:layout_height="@dimen/favorite_icon_height"
+                    android:checked="@{viewModel.favorite}"
                     android:button="@drawable/btn_star_selector" />
+                <!-- TODO: Remove id from CheckBox and use databinding for onClick.
+                           At the moment, adding the following line breaks compilation:
+                           android:onClick="@{viewModel.onClickFavorite}"  -->
 
             </GridLayout>
 

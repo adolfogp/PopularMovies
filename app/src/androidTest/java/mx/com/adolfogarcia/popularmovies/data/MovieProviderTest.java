@@ -554,9 +554,9 @@ public class MovieProviderTest extends AndroidTestCase {
      */
     public void testUpdate_movie() {
         ContentValues values = TestUtilities.createMadMaxMovieValues();
-        Uri locationUri = mContext.getContentResolver().insert(
+        Uri movieUri = mContext.getContentResolver().insert(
                 CachedMovieEntry.CONTENT_URI, values);
-        long rowId = ContentUris.parseId(locationUri);
+        long rowId = ContentUris.parseId(movieUri);
         Assert.assertTrue("Provider inserted the movie", rowId != -1);
 
         ContentValues updatedValues = new ContentValues(values);

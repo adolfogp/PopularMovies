@@ -16,6 +16,7 @@
 
 package mx.com.adolfogarcia.popularmovies.model.view;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.databinding.BaseObservable;
@@ -25,11 +26,14 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.squareup.picasso.Picasso;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.parceler.Parcel;
 
 import java.lang.ref.WeakReference;
@@ -195,6 +199,18 @@ public class MovieDetailViewModel extends BaseObservable {
         return mMovie != null
                 ? formatter.format(mMovie.getReleaseDate())
                 : null;
+    }
+
+    /**
+     * Returns {@code true} if  the movie is one of the user's favorites,
+     * {@code false} otherwise.
+     *
+     * @return {@code true} if  the movie is one of the user's favorites,
+     *     {@code false} otherwise.
+     */
+    @Bindable
+    public boolean isFavorite() {
+        return mMovie.isUserFavorite();
     }
 
     /**
@@ -427,6 +443,8 @@ public class MovieDetailViewModel extends BaseObservable {
         mMovie.setBackdropUri(Uri.parse(configuration.getBestFittingPosterUrl(
                 cursor.getString(MovieDetailQuery.COL_BACKDROP_PATH), backdropPixelWidth)));
         mMovie.setVoteAverage(cursor.getDouble(MovieDetailQuery.COL_VOTE_AVERAGE));
+        mMovie.setUserFavorite(BooleanUtils.toBoolean(
+                cursor.getInt(MovieDetailQuery.COL_USER_FAVORITE)));
 
         notifyPropertyChanged(BR._all);
     }
@@ -545,6 +563,35 @@ public class MovieDetailViewModel extends BaseObservable {
     }
 
     /**
+     * Sets or removes the movie from the user's favorites, depending on
+     * the value of {@link CheckBox#isChecked()}. This change is performed on
+     * the {@code ContentProvider}.
+     *
+     * @param checkBox the {@link CheckBox} that was clicked.
+     */
+    public void onClickFavorite(CheckBox checkBox) {
+        final boolean checked = checkBox.isChecked();
+        if (checked == mMovie.isUserFavorite()) {
+            Log.d(LOG_TAG, "Ignoring favorite change request. No change submitted.");
+            return;
+        }
+        Context context = checkBox.getContext();
+        ContentValues favoriteMovieValues = new ContentValues();
+        favoriteMovieValues.put(CachedMovieEntry.COLUMN_USER_FAVORITE
+                , BooleanUtils.toInteger(checked));
+        int count = context.getContentResolver().update(
+                CachedMovieEntry.CONTENT_URI
+                , favoriteMovieValues
+                , CachedMovieEntry._ID + "= ?"
+                , new String[]{Long.toString(mMovie.getId())});
+        if (count != 1) {
+            Log.e(LOG_TAG, "Expected 1 movie to change favorite status, but got " + count);
+        }
+        mMovie.setUserFavorite(checked);
+        notifyPropertyChanged(BR.favorite);
+    }
+
+    /**
      * Provides information about projection and column indices expected by
      * {@link MovieCollectionViewModel} when setting movie details from a
      * {@link Cursor}.
@@ -563,7 +610,8 @@ public class MovieDetailViewModel extends BaseObservable {
                 CachedMovieEntry.COLUMN_OVERVIEW,
                 CachedMovieEntry.COLUMN_POSTER_PATH,
                 CachedMovieEntry.COLUMN_BACKDROP_PATH,
-                CachedMovieEntry.COLUMN_VOTE_AVERAGE
+                CachedMovieEntry.COLUMN_VOTE_AVERAGE,
+                CachedMovieEntry.COLUMN_USER_FAVORITE
         };
 
         /**
@@ -612,6 +660,12 @@ public class MovieDetailViewModel extends BaseObservable {
          * {@link #PROJECTION}.
          */
         public static final int COL_VOTE_AVERAGE = 7;
+
+        /**
+         * Index of {@link CachedMovieEntry#COLUMN_VOTE_AVERAGE} in
+         * {@link #PROJECTION}.
+         */
+        public static final int COL_USER_FAVORITE = 8;
 
         /**
          * The class only provides constants and utility methods.
