@@ -12,7 +12,13 @@ https://svn.apache.org/repos/asf/hive/trunk/checkstyle/
 poster_placeholder.png is based on the CC-BY-SA licensed SVG image available at
 http://sv-ti.com/2013/10/16/creating-an-ajax-loader-in-svg/
 
-The icon and logo are based on the public domain file available at
+ic_youtube_play.png is based on the CC-BY 4.0 licensed SVG image youtube-play.svg
+available at https://materialdesignicons.com/
+
+ic_share_variant.png is based on the CC-BY 4.0 licensed SVG image share-variant.svg
+available at https://materialdesignicons.com/
+
+The application's icon and logo are based on the public domain file available at
 https://upload.wikimedia.org/wikipedia/commons/9/9b/Clapboard.svg
 Modifications were done with Gimp and Inkscape, using the shadows provided by
 Material Design Shadows for Inkscape, available at

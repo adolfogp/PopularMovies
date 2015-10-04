@@ -27,18 +27,32 @@
             type="MovieTrailerListItemViewModel"/>
     </data>
 
-    <LinearLayout style="@style/MovieDetail.Trailer.Item"
-                  android:orientation="vertical"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:onClick="@{viewModel.onClick}">
+    <GridLayout
+        style="@style/MovieDetail.Trailer.Item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="3">
 
-        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:tools="http://schemas.android.com/tools"
-                  style="@style/MovieReview.Author"
+        <ImageView style="@style/MovieDetail.Trailer.Icon"
+                   android:contentDescription="@string/content_description_play_icon"
+                   android:layout_width="@dimen/trailer_icon_width"
+                   android:layout_height="@dimen/trailer_icon_height"
+                   android:src="@drawable/ic_youtube_play"
+                   android:onClick="@{viewModel.onClick}"/>
+
+        <TextView style="@style/MovieDetail.Trailer.Name"
+                  android:layout_columnWeight="8"
                   android:text="@{viewModel.name}"
-                  tools:text="The next big action movie!" />
+                  android:onClick="@{viewModel.onClick}"
+                  tools:text="Theatrical trailer 1"/>
 
-    </LinearLayout>
+        <ImageView style="@style/MovieDetail.Trailer.Share"
+                   android:contentDescription="@string/content_description_play_icon"
+                   android:layout_width="@dimen/share_icon_width"
+                   android:layout_height="@dimen/share_icon_height"
+                   android:src="@drawable/ic_share_variant"
+                   android:onClick="@{viewModel.onShare}"/>
+
+    </GridLayout>
 
 </layout>

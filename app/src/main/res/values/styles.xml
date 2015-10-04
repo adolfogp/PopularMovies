@@ -134,15 +134,35 @@
     </style>
 
     <style name="MovieDetail.Trailer.Item" parent="AppTheme">
-        <item name="android:gravity">center_vertical</item>
         <item name="android:minHeight">?android:attr/listPreferredItemHeight</item>
     </style>
+
+    <style name="MovieDetail.Trailer.Icon" parent="AppTheme">
+        <item name="android:layout_gravity">fill|center</item>
+        <item name="android:gravity">center</item>
+        <item name="android:scaleType">center</item>
+    </style>
+
+    <style name="MovieDetail.Trailer.Share" parent="AppTheme">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_gravity">fill|center</item>
+        <item name="android:gravity">center</item>
+        <item name="android:scaleType">center</item>
+        <item name="android:layout_marginLeft">@dimen/trailer_share_left_margin</item>
+    </style>
+
+    <style name="MovieDetail.Trailer.Name" parent="AppTheme">
+        <item name="android:layout_gravity">fill|center</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingLeft">@dimen/trailer_name_left_padding</item>
+    </style>
+
 
     <style name="MovieDetail.Reviews.Label" parent="MovieDetail.Label">
         <item name="android:textSize">@dimen/subhead</item>
         <item name="android:layout_columnSpan">2</item>
         <item name="android:textColor">@color/detail_label</item>
-        <item name="android:paddingTop"> @dimen/review_label_top_padding</item>
+        <item name="android:paddingTop">@dimen/review_label_top_padding</item>
         <item name="android:paddingBottom">@dimen/review_label_bottom_padding</item>
         <item name="android:layout_marginRight"> @dimen/activity_horizontal_margin</item>
         <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>

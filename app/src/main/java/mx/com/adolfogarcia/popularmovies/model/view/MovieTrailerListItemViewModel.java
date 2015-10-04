@@ -34,6 +34,11 @@ import mx.com.adolfogarcia.popularmovies.model.domain.Trailer;
 public class MovieTrailerListItemViewModel {
 
     /**
+     * The MIME type for plain text.
+     */
+    private static final String PLAIN_TEXT_MEDIA_TYPE = "text/plain";
+
+    /**
      * Identifies the messages written to the log by this class.
      */
     private static final String LOG_TAG =
@@ -76,6 +81,25 @@ public class MovieTrailerListItemViewModel {
             context.startActivity(intent);
         } else {
             Log.w(LOG_TAG, "Unable to open trailer. No application on device can open it.");
+        }
+    }
+
+    /**
+     * Requests for the movie trailer to be shared. If no app on the device
+     * can share it, nothing is done.
+     *
+     * @param view the {@link View} that was clicked.
+     */
+    public void onShare(View view) {
+        Context context = view.getContext();
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_SEND);
+        intent.putExtra(Intent.EXTRA_TEXT, mTrailer.getVideoUri().toString());
+        intent.setType(PLAIN_TEXT_MEDIA_TYPE);
+        if (intent.resolveActivity(context.getPackageManager()) != null) {
+            context.startActivity(intent);
+        } else {
+            Log.w(LOG_TAG, "Unable to share trailer. No application on device can share it.");
         }
     }
 
