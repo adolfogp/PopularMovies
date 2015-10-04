@@ -201,7 +201,7 @@ public class MovieDetailFragment extends Fragment {
             mViewModel = newViewModel();
         }
         mBinding.setViewModel(mViewModel);
-        // TODO: Bind onClick with Data Binding Library. At this moment, it breaks compilation
+        // TODO: Bind onClick with Data Binding library. At this moment, it breaks compilation
         mBinding.checkboxFavorite.setOnClickListener(
                 (v) -> mViewModel.onClickFavorite((CheckBox) v));
         return mBinding.getRoot();
@@ -285,7 +285,7 @@ public class MovieDetailFragment extends Fragment {
                     , MovieTrailerQuery.PROJECTION
                     , null
                     , null
-                    , null); // TODO: Set order criteria
+                    , MovieTrailerQuery.SORT_ORDER);
         }
 
         @Override
@@ -318,7 +318,7 @@ public class MovieDetailFragment extends Fragment {
                     , MovieReviewQuery.PROJECTION
                     , null
                     , null
-                    , null); // TODO: Set order criteria
+                    , MovieReviewQuery.SORT_ORDER);
         }
 
         @Override

@@ -32,15 +32,11 @@
                   android:layout_height="wrap_content"
                   android:onClick="@{viewModel.onClick}">
 
-        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:tools="http://schemas.android.com/tools"
-                  style="@style/MovieReview.Author"
+        <TextView style="@style/MovieReview.Author"
                   android:text="@{viewModel.author}"
                   tools:text="SomeGuy" />
 
-        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:tools="http://schemas.android.com/tools"
-                  style="@style/MovieReview.Content"
+        <TextView style="@style/MovieReview.Content"
                   android:text="@{viewModel.content}"
                   tools:text="This is one of those movies you cannot miss!" />
 

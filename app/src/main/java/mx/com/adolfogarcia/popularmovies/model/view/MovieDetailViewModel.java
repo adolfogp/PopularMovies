@@ -26,7 +26,6 @@ import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -695,6 +694,13 @@ public class MovieDetailViewModel extends BaseObservable {
         };
 
         /**
+         * Sort order to be used in the query. Considers the local id of
+         * the videos, in ascending order.
+         */
+        public static final String SORT_ORDER =
+                CachedMovieVideoEntry.TABLE_NAME + "." + CachedMovieVideoEntry._ID + " ASC";
+
+        /**
          * Index of {@link CachedMovieVideoEntry#_ID} in {@link #PROJECTION}.
          */
         public static final int COL_ID = 0;
@@ -744,6 +750,13 @@ public class MovieDetailViewModel extends BaseObservable {
                 CachedMovieReviewEntry.COLUMN_CONTENT,
                 CachedMovieReviewEntry.COLUMN_URL
         };
+
+        /**
+         * Sort order to be used in the query. Considers the local id of
+         * the reviews, in ascending order.
+         */
+        public static final String SORT_ORDER =
+                CachedMovieReviewEntry.TABLE_NAME + "." + CachedMovieReviewEntry._ID + " ASC";
 
         /**
          * Index of {@link CachedMovieReviewEntry#_ID} in {@link #PROJECTION}.

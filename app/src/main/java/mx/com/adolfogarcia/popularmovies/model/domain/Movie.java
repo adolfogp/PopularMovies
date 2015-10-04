@@ -89,7 +89,7 @@ public class Movie {
     /**
      * Indicates if the movie is one of the user's favorites.
      */
-    private boolean userFavorite;
+    private boolean mUserFavorite;
 
     /**
      * Creates a new instance of {@link Movie} with the default values for
@@ -180,11 +180,11 @@ public class Movie {
     }
 
     public boolean isUserFavorite() {
-        return userFavorite;
+        return mUserFavorite;
     }
 
     public void setUserFavorite(boolean userFavorite) {
-        this.userFavorite = userFavorite;
+        this.mUserFavorite = userFavorite;
     }
 
     @Override
