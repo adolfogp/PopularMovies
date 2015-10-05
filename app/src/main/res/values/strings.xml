@@ -16,4 +16,5 @@
     <string name="content_description_backdrop_image">Backdrop image</string>
     <string name="content_description_poster_image">Poster image</string>
     <string name="content_description_play_icon">Play trailer icon</string>
+    <string name="content_description_share_icon">Share trailer icon</string>
 </resources>

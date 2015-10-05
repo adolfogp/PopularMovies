@@ -146,30 +146,33 @@
     </style>
 
     <style name="MovieDetail.Trailer.Item" parent="AppTheme">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">?android:attr/listPreferredItemHeight</item>
     </style>
 
     <style name="MovieDetail.Trailer.Icon" parent="AppTheme">
-        <item name="android:layout_gravity">fill|center</item>
-        <item name="android:gravity">center</item>
+        <item name="android:layout_width">@dimen/trailer_icon_width</item>
+        <item name="android:layout_height">@dimen/trailer_icon_height</item>
+        <item name="android:layout_centerInParent">true</item>
         <item name="android:scaleType">center</item>
-    </style>
-
-    <style name="MovieDetail.Trailer.Share" parent="AppTheme">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_gravity">fill|center</item>
-        <item name="android:gravity">center</item>
-        <item name="android:scaleType">center</item>
-        <item name="android:layout_marginLeft">@dimen/trailer_share_left_margin</item>
     </style>
 
     <style name="MovieDetail.Trailer.Name" parent="AppTheme">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_gravity">fill|center</item>
-        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:layout_marginLeft">@dimen/trailer_share_left_margin</item>
         <item name="android:paddingLeft">@dimen/trailer_name_left_padding</item>
     </style>
 
+    <style name="MovieDetail.Trailer.Share" parent="AppTheme">
+        <item name="android:layout_width">@dimen/share_icon_width</item>
+        <item name="android:layout_height">@dimen/share_icon_height</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:layout_marginLeft">@dimen/trailer_share_left_margin</item>
+        <item name="android:scaleType">center</item>
+    </style>
 
     <style name="MovieDetail.Reviews.Label" parent="MovieDetail.Label">
         <item name="android:textSize">@dimen/subhead</item>
