@@ -44,29 +44,30 @@
                 app:backdropUri="@{viewModel.backdropUri}"
                 tools:src="@drawable/backdrop_placeholder"/>
 
-            <GridLayout
+            <RelativeLayout
                 style="@style/MovieDetail.Title.Container"
-                android:layout_columnSpan="2"
-                android:columnCount="2">
+                android:layout_columnSpan="2">
 
                 <TextView
                     style="@style/MovieDetail.Title.Text"
                     android:text="@{viewModel.originalTitle}"
-                    android:layout_columnWeight="9"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerInParent="true"
+                    android:layout_toLeftOf="@+id/checkbox_favorite"
                     tools:text="Mad Max: Fury Road"/>
 
                 <CheckBox
                     style="@style/MovieDetail.Title.Favorite"
                     android:id="@+id/checkbox_favorite"
-                    android:layout_width="@dimen/favorite_icon_width"
-                    android:layout_height="@dimen/favorite_icon_height"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerInParent="true"
                     android:checked="@{viewModel.favorite}"
                     android:button="@drawable/btn_star_selector" />
                 <!-- TODO: Remove id from CheckBox and use databinding for onClick.
                            At the moment, adding the following line breaks compilation:
                            android:onClick="@{viewModel.onClickFavorite}"  -->
 
-            </GridLayout>
+            </RelativeLayout>
 
 
             <ImageView
