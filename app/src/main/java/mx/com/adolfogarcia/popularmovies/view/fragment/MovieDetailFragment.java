@@ -119,8 +119,8 @@ public class MovieDetailFragment extends Fragment {
      * Creates a new instance of {@link MovieDetailFragment} for the specified
      * movie. You must use this factory method to create new instances.
      *
-     * @param movie the for which the details will be displayed.
-     * @return A new instance of fragment MovieDetailFragment.
+     * @param movie the {@link Movie} for which the details will be displayed.
+     * @return A new instance of {@link MovieDetailFragment}.
      */
     public static MovieDetailFragment newInstance(Movie movie) {
         Bundle args = new Bundle();
